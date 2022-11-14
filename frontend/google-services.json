@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "267792515204",
+    "project_id": "basurahunt-f286d",
+    "storage_bucket": "basurahunt-f286d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267792515204:android:4ee829a614bec5c7b602d1",
+        "android_client_info": {
+          "package_name": "com.basurahunt"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "267792515204-g68kq44mbm5ncvn0bmvc9pafvhqmnfes.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVoQUX6sMvWbzNlQ65gOsPYPc37FEHCfM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "267792515204-g68kq44mbm5ncvn0bmvc9pafvhqmnfes.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

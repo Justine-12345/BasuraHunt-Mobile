@@ -1,0 +1,10 @@
+ - change date picker in register
+ - Starting loading page
+ - OTP
+ - Scroll Bar Terms & Conds.
+
+ PR = 
+ Login
+ OTP
+ Registration
+ Dump Crud

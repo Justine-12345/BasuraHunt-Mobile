@@ -1,0 +1,239 @@
+[
+    {
+        "_id": {
+            "$oid": "6326beff8b17899e85433be0"
+        },
+        "images": [
+            {
+                "public_id": "BasuraHunt/Dump/nnqhlhsacdjevw0cdom2",
+                "url": "https://images.pexels.com/photos/13803731/pexels-photo-13803731.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+                "_id": {
+                    "$oid": "6326beff8b17899e85433be1"
+                }
+            },
+            {
+                "public_id": "BasuraHunt/Dump/kokftgzinxx2w28afmrz",
+                "url": "https://images.pexels.com/photos/7005019/pexels-photo-7005019.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+                "_id": {
+                    "$oid": "6326beff8b17899e85433be2"
+                }
+            }
+        ],
+        "coordinates": {
+            "latitude": {
+                "$numberDouble": "14.4801"
+            },
+            "longtitude": {
+                "$numberDouble": "121.05824"
+            }
+        },
+        "complete_address": "Hzhzha",
+        "barangay": "Bagumbayan",
+        "district": {
+            "$numberInt": "1"
+        },
+        "landmark": "Hshjsjs",
+        "waste_type": [
+            {
+                "type": "Construction",
+                "_id": {
+                    "$oid": "6326beff8b17899e85433be3"
+                }
+            },
+            {
+                "type": "Household",
+                "_id": {
+                    "$oid": "6326beff8b17899e85433be4"
+                }
+            }
+        ],
+        "waste_desc": "",
+        "waste_size": "Trash Bin",
+        "accessible_by": "People Only",
+        "category_violation": "Littering, Illegal dumping, Illegal disposal of garbage",
+        "additional_description": "Jsjzjz",
+        "report_using": "Anonymous",
+        "user_id": {
+            "$oid": "6326b7268b17899e85430b03"
+        },
+        "status": "Cleaned",
+        "score": {
+            "$numberInt": "50"
+        },
+        "comments": [
+            {
+                "user": {
+                    "$oid": "6326b7268b17899e85430b03"
+                },
+                "author": "Anonymous",
+                "comment": "Gahaha ****",
+                "_id": {
+                    "$oid": "6326c0308b17899e854340e4"
+                },
+                "createdAt": "2022-09-18T06:52:32.792+00:00"
+            },
+            {
+                "user": {
+                    "$oid": "6326bbd48b17899e854319d3"
+                },
+                "author": "Anonymous",
+                "comment": "Testing",
+                "_id": {
+                    "$oid": "6326c0468b17899e85434239"
+                },
+                "createdAt": "2022-09-18T06:52:54.337+00:00"
+            },
+            {
+                "user": {
+                    "$oid": "6326be228b17899e85433437"
+                },
+                "author": "Sam Rudolph",
+                "comment": "HAHAHAHAHAHHA",
+                "_id": {
+                    "$oid": "6326c1468b17899e854349db"
+                },
+                "createdAt": "2022-09-18T06:57:10.925+00:00"
+            }
+        ],
+        "collectors": [],
+        "createdAt": "2022-09-18T06:47:27.946+00:00",
+        "__v": {
+            "$numberInt": "3"
+        },
+        "chat_id": {
+            "$oid": "6326bf008b17899e85433be9"
+        },
+        "date_cleaned": "2022-09-18T07:19:53.000+00:00"
+    },
+    {
+        "_id": {
+            "$oid": "632d528c54ef78d36f190a3c"
+        },
+        "images": [
+            {
+                "public_id": "BasuraHunt/Dump/nzbnbgowxfqfczgg9o6m",
+                "url": "https://images.pexels.com/photos/6692132/pexels-photo-6692132.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+                "_id": {
+                    "$oid": "6335a6e35c91c3619a1c531d"
+                }
+            }
+        ],
+        "coordinates": {
+            "latitude": {
+                "$numberDouble": "14.32957"
+            },
+            "longtitude": {
+                "$numberDouble": "121.08891"
+            }
+        },
+        "complete_address": "Bayabas st.",
+        "barangay": "Bagumbayan",
+        "district": {
+            "$numberInt": "1"
+        },
+        "landmark": "Beside mariel store",
+        "waste_type": [
+            {
+                "type": "Burned",
+                "_id": {
+                    "$oid": "6335a6e35c91c3619a1c5319"
+                }
+            },
+            {
+                "type": "Animal Corpse",
+                "_id": {
+                    "$oid": "6335a6e35c91c3619a1c531a"
+                }
+            },
+            {
+                "type": "Burned",
+                "_id": {
+                    "$oid": "6335a6e35c91c3619a1c531b"
+                }
+            },
+            {
+                "type": "Animal Corpse",
+                "_id": {
+                    "$oid": "6335a6e35c91c3619a1c531c"
+                }
+            }
+        ],
+        "waste_desc": "",
+        "waste_size": "Trash Bin",
+        "accessible_by": "People Only",
+        "category_violation": "Dirty frontage and immediate surroundings for establisments owners",
+        "additional_description": "Basta madumk",
+        "report_using": "Anonymous",
+        "user_id": {
+            "$oid": "632d507554ef78d36f190788"
+        },
+        "status": "newReport",
+        "score": {
+            "$numberInt": "0"
+        },
+        "comments": [],
+        "collectors": [],
+        "createdAt": "2022-09-23T06:30:36.351+00:00",
+        "__v": {
+            "$numberInt": "0"
+        },
+        "chat_id": {
+            "$oid": "632d528c54ef78d36f190a44"
+        }
+    },
+    {
+        "_id": {
+            "$oid": "634a10737d23ced2c1136560"
+        },
+        "images": [
+            {
+                "public_id": "BasuraHunt/Dump/ekvp54pfoqj5torsz4wa",
+                "url": "https://images.pexels.com/photos/6223226/pexels-photo-6223226.jpeg?auto=compress&cs=tinysrgb&w=600&lazy=load",
+                "_id": {
+                    "$oid": "634a10737d23ced2c1136561"
+                }
+            }
+        ],
+        "coordinates": {
+            "latitude": {
+                "$numberDouble": "14.509588548019508"
+            },
+            "longtitude": {
+                "$numberDouble": "121.03469430209421"
+            }
+        },
+        "complete_address": "Test loc.",
+        "barangay": "Bambang",
+        "district": {
+            "$numberInt": "1"
+        },
+        "landmark": "Test land.",
+        "waste_type": [
+            {
+                "type": "Paper",
+                "_id": {
+                    "$oid": "634a10737d23ced2c1136562"
+                }
+            }
+        ],
+        "waste_desc": "",
+        "additional_description": "Test details.",
+        "report_using": "Dens",
+        "user_id": {
+            "$oid": "632d507554ef78d36f190788"
+        },
+        "status": "newReport",
+        "score": {
+            "$numberInt": "0"
+        },
+        "comments": [],
+        "collectors": [],
+        "createdAt": "2022-10-15T01:44:19.751+00:00",
+        "__v": {
+            "$numberInt": "0"
+        },
+        "chat_id": {
+            "$oid": "634a10747d23ced2c1136567"
+        }
+    }
+]
