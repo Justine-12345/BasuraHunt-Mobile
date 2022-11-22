@@ -155,6 +155,48 @@ const RandomStyle = StyleSheet.create({
         color: "grey",
         width: width-140,
     },
+    lContainer4: {
+        minHeight: 100,
+        borderRadius: 10,
+        backgroundColor: "#1E5128",
+        marginVertical: 5,
+        position: "relative",
+        marginHorizontal: 10,
+        elevation: 3,
+    },
+    lContainer4Grey: {
+        minHeight: 100,
+        borderRadius: 10,
+        backgroundColor: "grey",
+        marginVertical: 5,
+        position: "relative",
+        marginHorizontal: 10,
+        elevation: 3,
+    },
+    lHeader: {
+        fontSize: 18,
+        fontWeight: "bold",
+        color: "white",
+        textAlign: "center"
+    },
+    lHeader1:{
+        fontSize: 12,
+        fontWeight: "bold",
+        color: "white",
+        opacity: .7,
+        textAlign: "center",
+    },
+    lItem:{
+        fontSize: 15,
+        color: "white",
+        textAlign: "center",
+        width: width/2.3
+    },
+    lItem2:{
+        fontSize: 15,
+        color: "white",
+        textAlign: "center"
+    },
     // search
     searchContainer:{
         height: 40
@@ -301,6 +343,15 @@ const RandomStyle = StyleSheet.create({
         right: 0,
         top: -5,
         backgroundColor: "limegreen",
+        color: "white",
+        padding: 5,
+        borderRadius: 5
+    },
+    vBadgeGrey: {
+        position: "absolute",
+        right: 0,
+        top: -5,
+        backgroundColor: "grey",
         color: "white",
         padding: 5,
         borderRadius: 5

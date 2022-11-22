@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, View, Image, StyleSheet, Dimensions, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
+import { Text, View, Image, Dimensions, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { HStack } from 'native-base';
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -8,8 +8,7 @@ import Toast from 'react-native-toast-message';
 import { login, clearErrors } from "../../Redux/Actions/userActions";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
-
-var { width } = Dimensions.get("window");
+import Styles from "../../stylesheets/styles";
 
 const Login = ({ navigation }) => {
     const dispatch = useDispatch()
@@ -82,28 +81,30 @@ const Login = ({ navigation }) => {
 
     return (
         <>
-            <View style={styles.container}>
+            <View style={Styles.container}>
                 <Image
 
                     source={require("../../assets/BasuraHunt-logo.png")}
                     // resizeMode="center"
-                    style={styles.logo}
+                    style={Styles.logo}
                 />
-                <Text style={styles.title}>BasuraHunt</Text>
+                <Text style={Styles.title}>BasuraHunt</Text>
             </View>
-            <Text style={[styles.text0, styles.text1]}>Login</Text>
+            <Text style={[Styles.text0, Styles.text1]}>Login</Text>
 
-            <TextInput editable={!authLoading} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={styles.textInput} />
-            <TextInput editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={true} style={styles.textInput} />
+            <TextInput editable={!authLoading} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
+            <TextInput editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={true} style={Styles.textInput} />
 
-            <Text style={styles.text0}>Forgot Password?</Text>
+            <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={Styles.touchable}>
+                <Text style={Styles.text0}>Forgot Password?</Text>
+            </TouchableOpacity>
 
             {authLoading ?
-                <View onPress={loginHandle} style={styles.loginBtn} activeOpacity={0.8}>
-                    <Text style={styles.login}><ActivityIndicator size="large" color="#00ff00" /></Text>
+                <View onPress={loginHandle} style={Styles.loginBtn} activeOpacity={0.8}>
+                    <Text style={Styles.login}><ActivityIndicator size="large" color="#00ff00" /></Text>
                 </View> :
-                <TouchableOpacity onPress={loginHandle} style={styles.loginBtn} activeOpacity={0.8}>
-                    <Text style={styles.login}>Login</Text>
+                <TouchableOpacity onPress={loginHandle} style={Styles.loginBtn} activeOpacity={0.8}>
+                    <Text style={Styles.login}>Login</Text>
                 </TouchableOpacity>
             }
 
@@ -111,58 +112,11 @@ const Login = ({ navigation }) => {
             <HStack style={{ alignSelf: "center" }}>
                 <Text>Don't have an account?</Text>
                 <TouchableOpacity>
-                    <Text onPress={() => navigation.navigate('Register')} style={[styles.text0, { marginStart: 5 }]}>Sign up</Text>
+                    <Text onPress={() => navigation.navigate('Register')} style={[Styles.text0, { marginStart: 5 }]}>Sign up</Text>
                 </TouchableOpacity>
             </HStack>
         </>
     )
 }
-
-const styles = StyleSheet.create({
-    container: {
-        backgroundColor: "#1E5128",
-        paddingVertical: 30,
-        marginBottom: 30
-    },
-    logo: {
-        height: width / 3,
-        width: width / 3,
-        alignSelf: "center",
-
-    },
-    title: {
-        color: "white",
-        fontWeight: "bold",
-        fontSize: 40,
-        alignSelf: "center"
-    },
-    text0: {
-        color: "#1E5128",
-        textAlign: "center"
-    },
-    text1: {
-        fontSize: 25,
-        fontWeight: "bold"
-    },
-    textInput: {
-        borderBottomWidth: 1,
-        borderBottomColor: "#1E5128",
-        fontSize: 20,
-        margin: 20
-    },
-    loginBtn: {
-        backgroundColor: "#1E5128",
-        width: 200,
-        padding: 5,
-        borderRadius: 10,
-        alignSelf: "center",
-        margin: 30,
-    },
-    login: {
-        color: "white",
-        textAlign: "center",
-        fontSize: 20
-    }
-})
 
 export default Login;

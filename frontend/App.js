@@ -15,6 +15,8 @@ import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import store from './Redux/Store';
 import registerNNPushToken from 'native-notify';
+import Verification from './screens/user/register/verification';
+import IntroLoading from './screens/extras/IntroLoading2';
 
 const Theme = {
   ...DefaultTheme,
@@ -35,6 +37,8 @@ export default function App() {
           {/* <RegisterNav /> */}
           {/* <Main/> */}
           {/* <AccessDenied/> */}
+          {/* <Verification/> */}
+          {/* <IntroLoading/> */}
           <Toast />
         </NativeBaseProvider>
       </NavigationContainer>
