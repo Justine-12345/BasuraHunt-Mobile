@@ -4,8 +4,11 @@ import Profile from "../screens/user/profile/profile";
 import Login from "../screens/user/login";
 import RegisterNav from "./registerNav";
 import Main from "./main";
-import OTP from "../screens/user/otp-temp";
+// import OTP from "../screens/user/otp-temp";
+import OTP from "../screens/user/otp";
 import IntroLoading from "../screens/extras/IntroLoading";
+import ForgotPassword from "../screens/user/forgot-password";
+import ResetPassword from "../screens/user/reset-password";
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -47,6 +50,22 @@ function MyStack() {
             <Stack.Screen
                 name="OTP"
                 component={OTP}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="ForgotPassword"
+                component={ForgotPassword}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="ResetPassword"
+                component={ResetPassword}
                 options={{
                     headerShown: false
                 }}

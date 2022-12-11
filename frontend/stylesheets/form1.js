@@ -14,6 +14,10 @@ const Form1 = StyleSheet.create({
         color: "#1E5128",
         fontSize: 20
     },
+    sub: {
+        fontStyle: "italic",
+        color: "grey"
+    },
     formContainer: {
         padding: 30,
     },
@@ -89,6 +93,9 @@ const Form1 = StyleSheet.create({
         color: "#1E5128",
         bottom: 0,
         alignSelf: "flex-end",
+    },
+    otpContainer: {
+        marginVertical: 30
     }
 
 

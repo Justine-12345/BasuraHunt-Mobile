@@ -77,8 +77,7 @@ const Verification = ({ navigation }) => {
 
     const source = {
         html: `
-        <div style={{fontSize:"12px", boxShadow:"0px 6px 6px 0px rgba(0,0,0,.2)", height:"300px", overflowY:"scroll", backgroundColor:"#f0f0f0", padding:"24px"}}>
-           <h3>Terms & Conditions</h3>
+        <div>
            <p><strong>TABLE OF CONTENTS</strong></p>
             <ol>
                 <li>
@@ -343,11 +342,17 @@ const Verification = ({ navigation }) => {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <VStack style={Form1.formContainer}>
-
-                <RenderHtml
-                    contentWidth={width}
-                    source={source}
-                />
+                <ScrollView stickyHeaderIndices={[0]} style={{height:height/2}} >
+                    <View style={{backgroundColor: "#f7faf7", paddingHorizontal: 10}}>
+                        <Text style={{ fontWeight: "bold", fontSize: 20 }}>TERMS AND CONDITIONS</Text>
+                    </View>
+                    <View style={{backgroundColor: "white", paddingHorizontal: 10}}>
+                        <RenderHtml
+                            contentWidth={width}
+                            source={source}
+                        />
+                    </View>
+                </ScrollView>
 
                 <Checkbox.Item
                     label="I have read and accept the terms and conditions."
