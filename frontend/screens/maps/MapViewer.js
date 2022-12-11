@@ -15,7 +15,7 @@ const MapViewer = ({ long, lati }) => {
 
     useFocusEffect(
         useCallback(() => {
-            console.log("map", long + " " + lati)
+            // console.log("map", long + " " + lati)
             setInitLat(lati)
             setInitLng(long)
             setLatMarker(lati)

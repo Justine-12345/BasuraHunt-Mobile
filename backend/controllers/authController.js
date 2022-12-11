@@ -294,7 +294,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler('Please enter email & password', 400))
     }
 
-	const user = await User.findOne({ email }).select('password otp_status role first_name last_name avatar')
+	const user = await User.findOne({ email }).select('password otp_status role first_name last_name avatar alias')
 
     if (!user) {
         return next(new ErrorHandler('Invalid Email or Password', 401));
@@ -707,7 +707,15 @@ exports.deleteUser = catchAsyncErrors(async(req, res, next) => {
 
 //******Reported Dumps By User******
 exports.reportedDumps = catchAsyncErrors(async(req, res, next) => {
-	const userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate('reported_dumps.dump')
+	const userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate({
+		path : 'reported_dumps',
+		populate : {
+		  path : 'dump',
+		  populate:{
+			path: 'chat_id'
+		  }
+		}
+	  })
 
 	if(!userDumpsFind){
 		return next(new ErrorHandler('User Dumps not found', 404));

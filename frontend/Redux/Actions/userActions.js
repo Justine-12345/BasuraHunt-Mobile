@@ -100,7 +100,6 @@ export const login = (email, password) => async (dispatch) => {
         })
 
     } catch (error) {
-        console.log(error)
         dispatch({
             type: LOGIN_FAIL,
             payload: error.response.data.message
@@ -383,15 +382,20 @@ export const reportedDumps = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-
+        
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
-                Authorization: `Bearer ${token}`
+                Authorization: `Bearer ${token}`,
             }
         }
+      
+        const { data } = await axios.get(`${baseURL}/me/reported-dumps`,config)
 
-        const { data } = await axios.get(`${baseURL}/me/reported-dumps`, config)
+        // axios.get(`${baseURL}/me/reported-dumps`, config)
+        //     .then(res => console.log(res))
+        //     .catch(err => console.log(err))
+
 
         dispatch({
             type: USER_DUMPS_SUCCESS,

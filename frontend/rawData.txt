@@ -3,8 +3,13 @@
  - OTP
  - Scroll Bar Terms & Conds.
 
- PR = 
+ PR = (Unused)
  Login
  OTP
  Registration
  Dump Crud
+
+ PR = (Unused)
+ Socket server deploy
+ migrate from heroku to netlify and render
+ comment in Dump

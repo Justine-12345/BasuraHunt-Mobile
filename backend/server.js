@@ -4,7 +4,7 @@ const cloudinary = require('cloudinary')
 const path = require('path')
 const dotenv = require('dotenv');
 const http = require("http");
-const { Server } = require("socket.io");
+// const { Server } = require("socket.io");
 dotenv.config({path:'./config/config.env'})
 
 // if (process.env.NODE_ENV !== 'PRODUCTION') 
@@ -31,13 +31,13 @@ const server = app.listen(process.env.PORT, ()=>{
 
 
 //FOR LOCAL******
-const serverForSocket = http.createServer(app);
-const io = new Server(serverForSocket, {
-  cors: {
-    origin: "http://127.0.0.1:3000",
-    methods: ["GET", "POST"],
-  },
-});
+// const serverForSocket = http.createServer(app);
+// const io = new Server(serverForSocket, {
+//   cors: {
+//     origin: "http://127.0.0.1:3000",
+//     methods: ["GET", "POST"],
+//   },
+// });
 
 //FOR DEPLOYMENT******
 // const io = new Server(server, {
@@ -49,32 +49,32 @@ const io = new Server(serverForSocket, {
 
 
 
-io.on("connection", (socket) => {
-  console.log(`User Connected: ${socket.id}`);
-  // socket.disconnect()
-  socket.on("join_room", (data) => {
-    socket.join(data);
-    console.log(`User with ID: ${socket.id} joined room: ${data}`);
-  });
+// io.on("connection", (socket) => {
+//   console.log(`User Connected: ${socket.id}`);
+//   // socket.disconnect()
+//   socket.on("join_room", (data) => {
+//     socket.join(data);
+//     console.log(`User with ID: ${socket.id} joined room: ${data}`);
+//   });
 
-  socket.on("send_message", (data) => {
-    console.log(data)
-    socket.to(data.room).emit("receive_message", data);
-  });
+//   socket.on("send_message", (data) => {
+//     console.log(data)
+//     socket.to(data.room).emit("receive_message", data);
+//   });
 
 
-  socket.on("disconnect", () => {
-    console.log("User Disconnected", socket.id);
-  });
-});
+//   socket.on("disconnect", () => {
+//     console.log("User Disconnected", socket.id);
+//   });
+// });
 
 
 
 
 //FOR LOCAL ******
-serverForSocket.listen(3001, () => {
-  console.log("SOCKET IS SERVER RUNNING");
-});
+// serverForSocket.listen(3001, () => {
+//   console.log("SOCKET IS SERVER RUNNING");
+// });
 
 
 

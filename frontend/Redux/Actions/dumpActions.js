@@ -335,17 +335,24 @@ export const rankings = (rankingData) => async (dispatch) => {
 // Add comment to dump
 export const addComment = (id, commentData) => async (dispatch) => {
     try {
-
         dispatch({ type: DUMP_COMMENT_REQUEST })
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
 
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
             }
         }
 
-        const { data } = await axios.put(`/api/v1/dump/comment/${id}`, commentData, config)
-
+        const { data } = await axios.put(`${baseURL}/dump/comment/${id}`, commentData, config)
+       
         dispatch({
             type: DUMP_COMMENT_SUCCESS,
             payload: data

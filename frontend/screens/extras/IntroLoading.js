@@ -5,6 +5,8 @@ import { getPushDataObject } from 'native-notify'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import Toast from 'react-native-toast-message';
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
+
+
 var { width } = Dimensions.get("window");
 
 
@@ -28,19 +30,27 @@ export default function IntroLoading({ navigation }) {
       // }
 
 
-
+      let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+      console.log(token)
+      
+      
 
       let userInfo = {
         user: {},
         isAuthenticated: ''
       }
-      AsyncStorage.multiGet(['user', 'isAuthenticated'], (err, stores) => {
+      AsyncStorage.multiGet(['user', 'isAuthenticated', 'jwt'], (err, stores) => {
         stores.map((result, i, store) => {
           let key = store[i][0];
           let val = store[i][1];
           userInfo[key] = val
         });
-
+        // console.log(userInfo);
         if (userInfo.isAuthenticated) {
           if (JSON.parse(userInfo.user).otp_status === "Verified") {
             navigation.dispatch(

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { HStack, Select, VStack } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -11,19 +11,40 @@ import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
 import { DELETE_DUMP_RESET } from "../../../Redux/Constants/dumpConstants";
 import Toast from 'react-native-toast-message';
+import { SOCKET_PORT } from "../../../Redux/Constants/socketConstants";
+import io from "socket.io-client"
+import { addComment } from "../../../Redux/Actions/dumpActions";
+import AsyncStorage from "@react-native-async-storage/async-storage"
+const socket = io.connect(SOCKET_PORT);
+const swearjarEng = require('swearjar-extended2');
+const swearjarFil = require('swearjar-extended2');
 const PublicReportsView = (props) => {
     const item = props.route.params.item
     const dispatch = useDispatch()
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
-    const [identity, setIdentity] = useState("");
+    const [author, setAuthor] = useState('Alias')
+    const [comment, setComment] = useState('')
+    const [allComments, setAllComments] = useState(item.comments)
     const [modalVisible, setModalVisible] = useState(false);
     const creationDate = new Date(item.createdAt).toLocaleDateString()
+    const [dump, setDump] = useState(item)
+    const [status, setStatus] = useState(item.status)
+    const [user, setUser] = useState()
 
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
-
+    const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
+	
     useFocusEffect(
         useCallback(() => {
+            socket.disconnect()
+
+            AsyncStorage.getItem("user")
+            .then((res) => {
+                setUser(JSON.parse(res))
+            })
+            .catch((error) => console.log(error))
+            
             if (isDeleted) {
                 Toast.show({
                     type: 'success',
@@ -42,37 +63,114 @@ const PublicReportsView = (props) => {
                 });
             }
 
-        }, [isDeleted, upDelError])
+            if (commentError) {
+                Toast.show({
+                    type: 'error',
+                    text1: commentError,
+                    text2: 'Comment: Something went wrong, please try again later'
+                });
+            }
+
+            socket.connect()
+            socket.emit("join_room", [dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
+
+           
+        }, [isDeleted, upDelError, commentError])
     )
 
-    let images = [];
+    useEffect(() => {
+        socket.on("receive_message", (data) => {
+            console.log("data",data)
+            if (data.type) {
+                if (data.type === "status") {
+                    setStatus(data.message)
+                }
+                if (data.type === "comment") {
+                    setAllComments((oldComment) => [...oldComment, data])
+                }
+                if (data.type === "admin-updated-dump") {
+                    setDump(data.dump)
+                }
+            }
+            else {
+                if (data.message) {
+                    setMessageList((list) => [...list, data])
+                }
+            }
 
-    item.images.forEach(img => {
-        images.push({ uri: img.url })
-    });
+        }
+        )
+
+    }, [socket])
+
+
+    let images = [];
 
     const showImages = (index) => {
         setOpenImages(true);
         setImgIndex(index);
     }
     let uniqueWt = []
+
+    const commentSubmit = () => {
+        // console.log(author, comment)
+        if (comment === "") {
+            Toast.show({
+                type: 'error',
+                text1: "Please enter your comment",
+                text2: 'Empty comment is invalid'
+            });
+        } else {
+            const formData = new FormData();
+            formData.append('author', author);
+            formData.append('comment', comment);
+            dispatch(addComment(dump._id, formData))
+            let authorForNotif
+
+            if (author === "Anonymous") {
+                authorForNotif = "Anonymous"
+            }
+            else if (author === "Real Name") {
+                authorForNotif = `${user.first_name} ${user.last_name}`
+            }
+            else if (author === "Alias") {
+                authorForNotif = `${user.alias}`
+            }
+
+            swearjarEng.setLang("en");
+			const cleanCommentEng = swearjarEng.censor(comment);
+			swearjarFil.setLang("ph");
+			const cleanCommentFil = swearjarEng.censor(cleanCommentEng);
+
+            const commentData = {
+				room: dump.chat_id.room,
+				author: authorForNotif,
+				comment: cleanCommentFil,
+				createdAt: new Date(Date.now()),
+				type: "comment"
+			}
+			socket.emit("send_message", commentData);
+            setAllComments((oldComment) => [...oldComment, commentData])
+            setComment('')
+           
+        }
+    }
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={RandomStyle.vContainer}>
                 <View style={RandomStyle.vHeader}>
-
-
-                    <Text style={RandomStyle.vText1}>Illegal Dump No. {item._id}</Text>
+                    <Text style={RandomStyle.vText1}>Illegal Dump No. {dump._id}</Text>
                     <HStack justifyContent={"space-between"}>
                         <VStack>
                             <HStack>
                                 <Text style={RandomStyle.vText2}>Status: </Text>
-                                <Text>{item.status === "newReport" ? "New Repert" : item.status}</Text>
+                                <Text>{status === "newReport" ? "New Report" : status}</Text>
                             </HStack>
-                            {item.date_cleaned != null ?
+                            {dump.date_cleaned != null ?
                                 <HStack>
                                     <Text style={RandomStyle.vText2}>Date Cleaned: </Text>
-                                    <Text>{new Date(item.date_cleaned).toLocaleDateString()}</Text>
+                                    <Text>{new Date(dump.date_cleaned).toLocaleDateString()}</Text>
                                 </HStack>
                                 : null
                             }
@@ -83,12 +181,12 @@ const PublicReportsView = (props) => {
                             <TouchableOpacity style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity>
-                            <TouchableOpacity
+                            {/* <TouchableOpacity
                                 onPress={() => {
                                     props.navigation.navigate("MyPublicReportsUpdate", { item: item })
                                 }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="content-save-edit" size={40} style={RandomStyle.vChat} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
 
                             <Modal
                                 animationType="slide"
@@ -144,26 +242,26 @@ const PublicReportsView = (props) => {
                             </Modal>
 
 
-                            <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                            {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="trash-can" size={40} style={RandomStyle.vChat} />
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </HStack>
                     </HStack>
                 </View>
-                <HStack>
+                <HStack style={{ flexWrap: 'wrap', alignItems: "flex-start" }}>
                     <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                    <Text>{item.complete_address}</Text>
+                    <Text>{dump.complete_address}</Text>
                 </HStack>
                 <HStack>
                     <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
-                    <Text>{item.landmark}</Text>
+                    <Text>{dump.landmark}</Text>
                 </HStack>
                 <View style={RandomStyle.vMapContainer}>
-                    <MapViewer long={item.coordinates.longtitude} lati={item.coordinates.latitude} />
+                    <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
 
                 </View>
                 <View style={RandomStyle.vImages}>
-                    {item.images.map((img, index) =>
+                    {dump.images.map((img, index) =>
                         <TouchableOpacity key={index} onPress={() => showImages(index)}>
                             <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
                         </TouchableOpacity>
@@ -178,7 +276,7 @@ const PublicReportsView = (props) => {
 
                 <Text style={RandomStyle.vText2}>Type of Waste</Text>
                 <View style={RandomStyle.vContainer2}>
-                    {item.waste_type.forEach(wt => {
+                    {dump.waste_type.forEach(wt => {
                         if (!uniqueWt.includes(wt.type)) {
                             uniqueWt.push(wt.type)
                         }
@@ -188,7 +286,7 @@ const PublicReportsView = (props) => {
                         <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
                     )}
                 </View>
-                {item.waste_size ?
+                {dump.waste_size ?
                     <>
                         <Text style={RandomStyle.vText2}>Size of Waste</Text>
                         <View style={RandomStyle.vContainer2}>
@@ -198,7 +296,7 @@ const PublicReportsView = (props) => {
                     :
                     ""}
 
-                {item.accessible_by ?
+                {dump.accessible_by ?
                     <>
                         <Text style={RandomStyle.vText2}>Accessible by</Text>
                         <View style={RandomStyle.vContainer2}>
@@ -210,44 +308,46 @@ const PublicReportsView = (props) => {
 
                 <Text style={RandomStyle.vText2}>Category of Violation</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{item.category_violation}</Text>
+                    <Text>{dump.category_violation}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Additional Details</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{item.additional_desciption}</Text>
+                    <Text>{dump.additional_desciption}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Reported by</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{item.report_using}</Text>
+                    <Text>{dump.report_using}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Comment Section</Text>
 
-                <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={identity} onValueChange={item => setIdentity(item)}>
+                <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={author} onValueChange={item => setAuthor(item)}>
                     <Select.Item label="Anonymous" value="Anonymous" />
                     <Select.Item label="Real Name" value="Real Name" />
-                    <Select.Item label="Alias/Username" value="Alias/Username" />
+                    <Select.Item label="Alias/Username" value="Alias" />
                 </Select>
                 <TextInput
                     placeholder="Type your comment here..."
                     style={RandomStyle.vMultiline}
                     multiline={true}
+                    value={comment}
                     numberOfLines={5}
+                    onChangeText={e => setComment(e)}
                 />
-                <BhButton right>
+                <BhButton right onPress={commentSubmit}>
                     <Text style={RandomStyle.vText4}>Post</Text>
                 </BhButton>
 
-                {item.comments.length > 0 ?
-                    item.comments.map((item) =>
-                        <View key={item._id.$oid} style={RandomStyle.vComment}>
+                {allComments.length > 0 ?
+                    allComments.map((item) =>
+                        <View key={Math.random()} style={RandomStyle.vComment}>
                             <Text style={RandomStyle.vText2}>{item.author}</Text>
                             <Text>{item.comment}</Text>
                             <Text style={RandomStyle.vCommentDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
                         </View>
-                    )
+                    ).reverse()
                     :
                     <Text>No comments yet.</Text>
                 }
