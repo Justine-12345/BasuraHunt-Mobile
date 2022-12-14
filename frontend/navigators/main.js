@@ -1,5 +1,5 @@
-import React from "react";
-import { View } from "react-native";
+import React, { useState } from "react";
+import { Keyboard, View } from "react-native";
 import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import HomeNav from "./homeNav";
@@ -7,8 +7,20 @@ import ScheduleNav from "./scheduleNav";
 import DonationsNav from "./donationsNav";
 import UserNav from "./userNav";
 import PublicReportsAdd from "../screens/home/reports/public-reports-add";
+
 const Tab = createBottomTabNavigator();
+
+
 const Main = () => {
+    const [keyboardShown, setKeyboardShown] = useState(false);
+
+    Keyboard.addListener("keyboardDidShow", ()=>{
+        setKeyboardShown(true);
+    })
+    Keyboard.addListener("keyboardDidHide", ()=>{
+        setKeyboardShown(false);
+    })
+    
     return (
         <Tab.Navigator
             screenOptions={{
@@ -20,7 +32,6 @@ const Main = () => {
                 },
                 tabBarActiveTintColor: "#f7faf7",
                 tabBarInactiveTintColor: "lightgrey",
-
             }}
         >
             <Tab.Screen
@@ -58,7 +69,7 @@ const Main = () => {
                             style={{ position: "absolute", bottom: 5, backgroundColor: "#1E6128", borderRadius: 100, padding: 5, elevation: 5 }}
                             name="target"
                             color={props.color}
-                            size={50}
+                            size={keyboardShown ? 25 : 50} 
                         />
                     }
                 }}

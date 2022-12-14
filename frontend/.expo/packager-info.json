@@ -1,9 +1,9 @@
 {
-  "expoServerPort": 19000,
-  "packagerPort": 19000,
-  "expoServerNgrokUrl": "https://65-4ff.anonymous.basurahunt.exp.direct",
-  "packagerNgrokUrl": "https://65-4ff.anonymous.basurahunt.exp.direct",
-  "ngrokPid": 3080,
+  "expoServerPort": null,
+  "packagerPort": null,
+  "expoServerNgrokUrl": null,
+  "packagerNgrokUrl": null,
+  "ngrokPid": null,
   "packagerPid": null,
   "webpackServerPort": null
 }

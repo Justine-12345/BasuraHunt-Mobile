@@ -235,7 +235,7 @@ const RandomStyle = StyleSheet.create({
         marginBottom: 10
     },
     vMapContainer: {
-        backgroundColor: "red",
+        backgroundColor: "lightgrey",
         width: "100%",
         height: width/1.5,
         marginVertical: 0,

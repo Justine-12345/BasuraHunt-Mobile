@@ -1,5 +1,5 @@
 import React from 'react';
-import { NativeBaseProvider } from 'native-base';
+import { Container, NativeBaseProvider } from 'native-base';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -17,7 +17,9 @@ import store from './Redux/Store';
 import registerNNPushToken from 'native-notify';
 import Verification from './screens/user/register/verification';
 // import IntroLoading from './screens/extras/IntroLoading2';
+import LoadingStart from './screens/extras/loadingPages/loading-start';
 import OTP from './screens/user/otp';
+import Chat from './screens/chat/chat';
 
 const Theme = {
   ...DefaultTheme,
@@ -36,11 +38,13 @@ export default function App() {
           <Header />
           {/* <AuthNav/> */}
           {/* <RegisterNav /> */}
-          {/* <Main/> */}
+          <Main/>
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
-          <OTP/>
+          {/* <OTP/> */}
+          {/* <Chat/> */}
+          {/* <LoadingStart/> */}
           <Toast />
         </NativeBaseProvider>
       </NavigationContainer>
