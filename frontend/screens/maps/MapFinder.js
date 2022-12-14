@@ -1,95 +1,115 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import MapView from 'react-native-maps';
+import MapView, { PROVIDER_GOOGLE } from 'react-native-maps';
 import { Marker } from 'react-native-svg';
 import { StyleSheet, Text, View, Dimensions, Image } from 'react-native';
 import * as Location from 'expo-location';
 import { SET_COORDINATE } from '../../Redux/Constants/mapConstants';
 import { useDispatch, useSelector } from 'react-redux';
+
 const MapFinder = () => {
 
-    (async () => {
-        if (Platform.OS !== "web") {
+    // (async () => {
+    //     if (Platform.OS !== "web") {
 
-            let { status } = await Location.requestForegroundPermissionsAsync();
-            if (status !== 'granted') {
-                alert('Permission to access location was denied');
-                return;
-            }
-        }
-        let location = await Location.getCurrentPositionAsync({});
-        setLatUser(location.coords.latitude)
-        setLngUser(location.coords.longitude)
-    })();
-    
+    //         let { status } = await Location.requestForegroundPermissionsAsync();
+    //         if (status !== 'granted') {
+    //             alert('Permission to access location was denied');
+    //         }
+    //     }
+    //     // let location = await Location.getCurrentPositionAsync({});
+    //     // setLatUser(location.coords.latitude)
+    //     // setLngUser(location.coords.longitude)
+    // })();
+
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
 
+    let lat = 0;
+    let lng = 0
+    
     useFocusEffect(
-        useCallback(()=>{
-            // console.log(mapLatitude)
-            if(mapLatitude===null){
+        useCallback(() => {
+            if (mapLatitude === null) {
                 setLatMarker(0)
                 setLngMarker(0)
             }
-        },[mapLatitude, mapLongtitude])
+            
+        }, [mapLatitude, mapLongtitude])
     )
-   
 
+    useEffect(()=>{
+        getUserLocation()
+    },[])
     const dispatch = useDispatch()
 
     const [latUser, setLatUser] = useState(0)
     const [lngUser, setLngUser] = useState(0)
 
+    const [latInit, setLatInit] = useState(0)
+    const [lngInit, setLngInit] = useState(0)
+
     const [latMarker, setLatMarker] = useState(0)
     const [lngMarker, setLngMarker] = useState(0)
-    let lat = 0
-    let lng = 0
-
     
+
+   
+
     const getUserLocation = async () => {
 
+        let { status } = await Location.requestForegroundPermissionsAsync();
+        if (status !== 'granted') {
+            alert('Permission to access location was denied');
+        }
+
+      
+
         let location = await Location.getCurrentPositionAsync({});
-        // console.log("i",location.coords.latitude);
-        // console.log(location.coords.longitude);
+        // // console.log("i",location.coords.latitude);
+        // // console.log(location.coords.longitude);
         setLatUser(location.coords.latitude)
         setLngUser(location.coords.longitude)
+        setLatInit(location.coords.latitude)
+        setLngInit(location.coords.longitude)
+     
 
-        const data = {latitude:location.coords.latitude, longitude:location.coords.longitude}
-            
+        const data = { latitude: location.coords.latitude, longitude: location.coords.longitude }
+        console.log("init",data);
         dispatch({
             type: SET_COORDINATE,
-            payload:data
+            payload: data
         })
     }
 
     const onRegionChange = (region) => {
-
+      
         lat = region.latitude
         lng = region.longitude
-        // console.log("lat", lat);
-        // console.log("lng", lng);
         setLatMarker(region.latitude)
         setLngMarker(region.longitude)
-
-        const data = {latitude:region.latitude, longitude:region.longitude}
-            
+        
+        const data = { latitude: region.latitude, longitude: region.longitude }
+        console.log("change",data);
         dispatch({
             type: SET_COORDINATE,
-            payload:data
+            payload: data
         })
     }
+
+
 
     return (
         <>
             <View style={styles.container}>
-                <MapView style={styles.map}
-                    region={{
-                        latitude: latMarker!==0?undefined:latUser,
-                        longitude: lngMarker!==0?undefined:lngUser,
+                {latInit !== 0 && lngInit !== 0? 
+                    <MapView style={styles.map}
+                    provider={PROVIDER_GOOGLE}
+                    initialRegion={{
+                        latitude: latInit,
+                        longitude: lngInit,
                         latitudeDelta: 0.00056,
                         longitudeDelta: 0.00011,
                     }}
-                    onMapLoaded={getUserLocation}
+                    onMapReady={getUserLocation}
                     onRegionChangeComplete={onRegionChange}
                 >
                     {/* <MapView.Marker
@@ -99,7 +119,9 @@ const MapFinder = () => {
                         }}
                     /> */}
                 </MapView>
-
+                :
+                    ""
+                }
             </View>
         </>
     );
@@ -111,13 +133,13 @@ const styles = StyleSheet.create({
         backgroundColor: '#fff',
         alignItems: 'center',
         justifyContent: 'center',
-        zIndex:1
+        zIndex: 1
     },
     map: {
         width: Dimensions.get('window').width / 1.05,
         height: Dimensions.get('window').width / 1.5,
         marginVertical: 5,
-        zIndex:1
+        zIndex: 1
     }
 });
 

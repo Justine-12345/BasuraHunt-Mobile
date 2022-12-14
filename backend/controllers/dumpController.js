@@ -818,7 +818,7 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 //****** Comment Dump Status******
 exports.addComment = catchAsyncErrors(async (req, res, next) => {
-
+	console.log(req.body)
 	// let images = []
 
 	//     if (typeof req.body.images === 'string') {

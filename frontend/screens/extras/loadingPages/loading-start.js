@@ -10,7 +10,6 @@ export default function LoadingStart() {
     <View style={styles.container}>
       <Image
         source={require("../../../assets/logo-green.png")}
-        // resizeMode="center"
         style={styles.logo}
       />
       <HStack>
@@ -24,7 +23,6 @@ export default function LoadingStart() {
 
 const styles = StyleSheet.create({
   container: {
-    // backgroundColor: "#1E5128",
     justifyContent: "center",
     alignItems: "center",
     flex: 1

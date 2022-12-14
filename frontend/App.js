@@ -38,13 +38,12 @@ export default function App() {
           <Header />
           {/* <AuthNav/> */}
           {/* <RegisterNav /> */}
-          <Main/>
+          {/* <Main/> */}
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
           {/* <OTP/> */}
-          {/* <Chat/> */}
-          {/* <LoadingStart/> */}
+          <Chat/>
           <Toast />
         </NativeBaseProvider>
       </NavigationContainer>
