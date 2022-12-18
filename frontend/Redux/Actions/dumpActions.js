@@ -87,18 +87,17 @@ export const newDump = (dumpData) => async (dispatch) => {
 }
 
 // Get Dumps for User
-export const getDumps = (keyword = '', currentPage = 1, district = '', barangay = '', waste_size = '', waste_type = '') => async (dispatch) => {
+export const getDumps = (keyword = '', currentPage = 1, district = '', barangay = '', waste_size = '', waste_type = '', ismobile = false) => async (dispatch) => {
     try {
 
         dispatch({ type: DUMPS_REQUEST })
-
 
 
         let districtQ = '';
         let barangayQ = '';
         let waste_sizeQ = '';
         let waste_typeQ = '';
-
+        let ismobileQ = '';
 
         if (district) {
             districtQ = `&district=${district}`
@@ -116,12 +115,29 @@ export const getDumps = (keyword = '', currentPage = 1, district = '', barangay 
             waste_typeQ = `&waste_type.type=${waste_type}`
         }
 
+        if (ismobile) {
+            ismobileQ = `&ismobile=${ismobile}`
+        }
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+                
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        let link = `${baseURL}/dumps?keyword=${keyword}&page=${currentPage}${waste_typeQ}${districtQ}${barangayQ}${waste_sizeQ}${ismobileQ}`
 
 
-        let link = `/api/v1/dumps?keyword=${keyword}&page=${currentPage}${waste_typeQ}${districtQ}${barangayQ}${waste_sizeQ}`
-
-
-        const { data } = await axios.get(link)
+        const { data } = await axios.get(link, config)
 
 
         dispatch({
@@ -142,7 +158,23 @@ export const getDumpList = () => async (dispatch) => {
 
         dispatch({ type: DUMP_LIST_REQUEST })
 
-        const { data } = await axios.get(`/api/v1/dump-list`)
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+                
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        const { data } = await axios.get(`${baseURL}/dump-list`, config)
+        
 
         dispatch({
             type: DUMP_LIST_SUCCESS,
@@ -150,7 +182,7 @@ export const getDumpList = () => async (dispatch) => {
         })
 
     } catch (error) {
-
+        console.log(error)
         dispatch({
             type: DUMP_LIST_FAIL,
             payload: error.response.data.message
