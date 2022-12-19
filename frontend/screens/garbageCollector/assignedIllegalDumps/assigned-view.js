@@ -14,11 +14,13 @@ import Toast from 'react-native-toast-message';
 import { SOCKET_PORT } from "../../../Redux/Constants/socketConstants";
 import io from "socket.io-client"
 import { addComment } from "../../../Redux/Actions/dumpActions";
-import AsyncStorage from "@react-native-async-storage/async-storage"
+import AsyncStorage from "@react-native-async-storage/async-storage";
+//import item from "../../../assets/sampleData/items";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
-const PublicReportsView = (props) => {
+
+const AssignedView = (props) => {
     const item = props.route.params.item
     const dispatch = useDispatch()
     const [openImages, setOpenImages] = useState(false);
@@ -177,12 +179,10 @@ const PublicReportsView = (props) => {
                             <Text>{creationDate}</Text>
                         </VStack>
                         <HStack>
-                            
-                            <TouchableOpacity onPress={()=>{props.navigation.navigate('PublicReportsChat', {chat:dump.chat_id})}} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+
+                            <TouchableOpacity style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity>
-
-
                             {/* <TouchableOpacity
                                 onPress={() => {
                                     props.navigation.navigate("MyPublicReportsUpdate", { item: item })
@@ -213,15 +213,15 @@ const PublicReportsView = (props) => {
                                 <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
 
                                     <View style={styles.modalView}>
-                                        <Text style={styles.modalText}>Are you sure, you want to delete this Dump?</Text>
-
+                                         {/*  <Text style={styles.modalText}>Are you sure, you want to delete this Dump?</Text>
+                                     
                                         {dumpLoading ?
                                             <ActivityIndicator size="small" color="#00ff00" />
                                             :
                                             <>
                                                 <Pressable
                                                     style={[styles.button, styles.buttonClose]}
-                                                    onPress={() => { dispatch(deleteDump(item._id)) }}
+                                                    onPress={() => { dispatch(deleteDump(item._id.$oid)) }}
                                                 >
                                                     <Text style={styles.textStyle}>Yes, Delete it!</Text>
                                                 </Pressable>
@@ -235,7 +235,7 @@ const PublicReportsView = (props) => {
                                             </>
                                         }
 
-
+*/}
 
 
                                     </View>
@@ -259,9 +259,8 @@ const PublicReportsView = (props) => {
                     <Text>{dump.landmark}</Text>
                 </HStack>
                 <View style={RandomStyle.vMapContainer}>
-                            {console.log(dump.coordinates.longtitude)}
                     <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
-                        
+
                 </View>
                 <View style={RandomStyle.vImages}>
                     {dump.images.map((img, index) =>
@@ -412,4 +411,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default PublicReportsView;
+export default AssignedView;

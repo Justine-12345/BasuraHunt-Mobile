@@ -1,0 +1,17 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\frontend",
+    "\\frontend\\assets",
+    "\\frontend\\assets\\sampleData",
+    "\\frontend\\screens",
+    "\\frontend\\screens\\garbageCollector",
+    "\\frontend\\screens\\garbageCollector\\assignedIllegalDumps",
+    "\\frontend\\screens\\home",
+    "\\frontend\\screens\\home\\reports",
+    "\\frontend\\screens\\user",
+    "\\frontend\\screens\\user\\profile"
+  ],
+  "SelectedNode": "\\frontend\\app.json",
+  "PreviewInSolutionExplorer": false
+}

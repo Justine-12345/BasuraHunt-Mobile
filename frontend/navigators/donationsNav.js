@@ -7,6 +7,8 @@ import PublicDonationsView from "../screens/donation/donations/public-donations-
 
 import PublicDonationsAdd from "../screens/donation/public-donations-add";
 
+import Chat from "../screens/chat/chat";
+
 const Tab = createMaterialTopTabNavigator();
 const Stack = createStackNavigator();
 
@@ -23,6 +25,13 @@ function MyStack(){
             <Stack.Screen
                 name="PublicDonationsView"
                 component={PublicDonationsView}
+                options={{
+                    headerShown:false
+                }}
+            />
+            <Stack.Screen
+                name="PublicDonationsChat"
+                component={Chat}
                 options={{
                     headerShown:false
                 }}

@@ -2,16 +2,15 @@ import React, { useState } from "react";
 import { Keyboard, View } from "react-native";
 import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import HomeNav from "./homeNav";
-import ScheduleNav from "./scheduleNav";
-import DonationsNav from "./donationsNav";
-import UserNav from "./userNav";
-import PublicReportsAdd from "../screens/home/reports/public-reports-add";
+import GarbageCollectorNav from "./garbageCollectorNav";
+//import ScheduleNav from "./scheduleNav";
+//import CollectorNav from "./collecorNav";
+
 
 const Tab = createBottomTabNavigator();
 
 
-const Main = () => {
+const HomeCollectorNav = () => {
     const [keyboardShown, setKeyboardShown] = useState(false);
 
     Keyboard.addListener("keyboardDidShow", ()=>{
@@ -34,22 +33,10 @@ const Main = () => {
                 tabBarInactiveTintColor: "lightgrey",
             }}
         >
-            <Tab.Screen
-                name="Home"
-                component={HomeNav}
-                options={{
-                    tabBarIcon: (props) => {
-                        return <FontAwesome
-                            name="home"
-                            color={props.color}
-                            size={25}
-                        />
-                    }
-                }}
-            />
+   {/*
             <Tab.Screen
                 name="Schedule"
-                component={ScheduleNav}
+              //  component={ScheduleNav}
                 options={{
                     tabBarIcon: (props) => {
                         return <FontAwesome
@@ -59,37 +46,25 @@ const Main = () => {
                         />
                     }
                 }}
-            />
+            />*/}
             <Tab.Screen
                 name="Report"
-                component={PublicReportsAdd}
+                component={GarbageCollectorNav}
                 options={{
                     tabBarIcon: (props) => {
-                        return <MaterialCommunityIcons
-                            style={{ position: "absolute", bottom: 5, backgroundColor: "#1E6128", borderRadius: 100, padding: 5, elevation: 5 }}
-                            name="target"
-                            color={props.color}
-                            size={keyboardShown ? 25 : 50} 
-                        />
-                    }
-                }}
-            />
-            <Tab.Screen
-                name="Donation"
-                component={DonationsNav}
-                options={{
-                    tabBarIcon: (props) => {
-                        return <FontAwesome5
-                            name="box"
+                      return <FontAwesome
+                            name="tasks"
                             color={props.color}
                             size={25}
+                            class ="fal fa"
                         />
                     }
                 }}
             />
+    {/*
             <Tab.Screen
-                name="User"
-                component={UserNav}
+                name="Collector"
+               // component={CollectorNav}
                 options={{
                     tabBarIcon: (props) => {
                         return <FontAwesome
@@ -99,10 +74,10 @@ const Main = () => {
                         />
                     }
                 }}
-            />
+            />*/}
         </Tab.Navigator>
     )
 }
 
 
-export default Main;
+export default HomeCollectorNav;

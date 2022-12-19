@@ -2,6 +2,9 @@
  - Starting loading page
  - OTP
  - Scroll Bar Terms & Conds.
+ --------------------------
+ - di na scroll ung chat sa bottom
+ - hanap ng package for cert
 
  PR = (Unused)
  Login
@@ -13,3 +16,6 @@
  Socket server deploy
  migrate from heroku to netlify and render
  comment in Dump
+
+ dump PublicReportsList with search and sort
+ --- cant chat if not their report
