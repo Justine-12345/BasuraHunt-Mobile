@@ -21,6 +21,9 @@ import LoadingStart from './screens/extras/loadingPages/loading-start';
 import OTP from './screens/user/otp';
 import Chat from './screens/chat/chat';
 
+import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
+
+import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
 const Theme = {
   ...DefaultTheme,
   colors: {
@@ -39,11 +42,12 @@ export default function App() {
           {/* <AuthNav/> */}
           {/* <RegisterNav /> */}
           {/* <Main/> */}
+          <HomeCollectorNav/> 
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
           {/* <OTP/> */}
-          <Chat/>
+          {/* <Chat/> */}
           <Toast />
         </NativeBaseProvider>
       </NavigationContainer>
