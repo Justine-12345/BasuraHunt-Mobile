@@ -177,10 +177,12 @@ const PublicReportsView = (props) => {
                             <Text>{creationDate}</Text>
                         </VStack>
                         <HStack>
-
-                            <TouchableOpacity style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                            
+                            <TouchableOpacity onPress={()=>{props.navigation.navigate('PublicReportsChat', {chat:dump.chat_id})}} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity>
+
+
                             {/* <TouchableOpacity
                                 onPress={() => {
                                     props.navigation.navigate("MyPublicReportsUpdate", { item: item })
@@ -257,8 +259,9 @@ const PublicReportsView = (props) => {
                     <Text>{dump.landmark}</Text>
                 </HStack>
                 <View style={RandomStyle.vMapContainer}>
+                            {console.log(dump.coordinates.longtitude)}
                     <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
-
+                        
                 </View>
                 <View style={RandomStyle.vImages}>
                     {dump.images.map((img, index) =>
