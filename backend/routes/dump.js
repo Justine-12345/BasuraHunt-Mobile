@@ -9,7 +9,7 @@ router.route('/dump/new').post(isAuthenticatedUser, authorizeRoles('administrato
 router.route('/dumps').get(isAuthenticatedUser, authorizeRoles('administrator', 'user', 'newUser'), getDumps);
 router.route('/dump/:id').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'garbageCollector', 'user', 'newUser'), getSingleDump);
 
-router.route('/dump-list').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'garbageCollector', 'user'), getDumpList);
+router.route('/dump-list').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'garbageCollector', 'user', 'newUser'), getDumpList);
 
 router.route('/public-dump').get(getDumpList);
 

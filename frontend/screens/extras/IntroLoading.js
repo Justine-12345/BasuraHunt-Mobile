@@ -50,7 +50,7 @@ export default function IntroLoading({ navigation }) {
           let val = store[i][1];
           userInfo[key] = val
         });
-        // console.log(userInfo);
+        
         if (userInfo.isAuthenticated) {
           if (JSON.parse(userInfo.user).otp_status === "Verified") {
             navigation.dispatch(

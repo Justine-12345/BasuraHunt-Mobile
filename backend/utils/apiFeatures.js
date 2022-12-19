@@ -54,7 +54,7 @@ class APIFeatures{
 
 	}
 
-
+	
 	pagination(resPerPage){
 		const currentPath = Number(this.queryStr.page) || 1;
 		const skip = resPerPage * (currentPath - 1)

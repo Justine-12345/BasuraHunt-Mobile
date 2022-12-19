@@ -177,10 +177,10 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 	const resPerPage = 5;
 	const dumpsCount = await Dump.countDocuments();
 	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }), req.query).search().filter();
-
-
-	apiFeatures.pagination(resPerPage);
-
+	console.log("ismobile",req.query.ismobile == true )
+	if (req.query.ismobile === undefined) {
+		apiFeatures.pagination(resPerPage);
+	}
 	const dumps = await apiFeatures.query;
 
 	let filteredDumpCount = dumps.length;
@@ -200,8 +200,7 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
 
-	const dumps = await Dump.find().populate("user_id").populate('chat_id').sort({ _id: -1 });
-
+	const dumps = await Dump.find().populate("user_id").populate("chat_id").sort({ _id: -1 });
 	res.status(200).json({
 		success: true,
 		dumps
@@ -247,7 +246,7 @@ exports.getSingleDump = catchAsyncErrors(async (req, res, next) => {
 //****** Update Dump******
 exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 
-	
+
 	let dump = await Dump.findById(req.params.id).populate('user_id');
 
 	if (!dump) {
