@@ -34,9 +34,9 @@ export default function App() {
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
           <Header />
-          <AuthNav/>
+          {/* <AuthNav/> */}
           {/* <RegisterNav /> */}
-          {/* <Main/> */}
+          <Main/>
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}

@@ -295,6 +295,12 @@ const RandomStyle = StyleSheet.create({
         color: "white",
         textAlign: "center"
     },
+    vText5: {
+        color: "green",
+        textAlign: "left",
+        fontSize: 20,
+        fontWeight: "bold"
+    },
     vMultiline: {
         backgroundColor: "white",
         borderColor: "lightgrey",
