@@ -41,7 +41,7 @@ export default function App() {
           <Header />
           <AuthNav/>
           {/* <RegisterNav /> */}
-          {/* <Main/> */}
+          <Main/>
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
