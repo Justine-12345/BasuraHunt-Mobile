@@ -15,6 +15,8 @@ import { SOCKET_PORT } from "../../../Redux/Constants/socketConstants";
 import io from "socket.io-client"
 import { addComment } from "../../../Redux/Actions/dumpActions";
 import AsyncStorage from "@react-native-async-storage/async-storage"
+import { APPEND_CHAT, GET_CHAT_RESET } from "../../../Redux/Constants/chatConstants";
+import Chat from "../../chat/chat";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
@@ -31,20 +33,19 @@ const PublicReportsView = (props) => {
     const [dump, setDump] = useState(item)
     const [status, setStatus] = useState(item.status)
     const [user, setUser] = useState()
-
+    const [messageList, setMessageList] = useState([])
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
     const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
-	
+
     useFocusEffect(
         useCallback(() => {
             socket.disconnect()
-
             AsyncStorage.getItem("user")
-            .then((res) => {
-                setUser(JSON.parse(res))
-            })
-            .catch((error) => console.log(error))
-            
+                .then((res) => {
+                    setUser(JSON.parse(res))
+                })
+            // .catch((error) => console.log(error))
+
             if (isDeleted) {
                 Toast.show({
                     type: 'success',
@@ -74,13 +75,15 @@ const PublicReportsView = (props) => {
             socket.connect()
             socket.emit("join_room", [dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
 
-           
+            // return ()=>{
+            //     socket.disconnect()
+            // }
         }, [isDeleted, upDelError, commentError])
     )
 
     useEffect(() => {
         socket.on("receive_message", (data) => {
-            console.log("data",data)
+            console.log("data", data)
             if (data.type) {
                 if (data.type === "status") {
                     setStatus(data.message)
@@ -94,14 +97,14 @@ const PublicReportsView = (props) => {
             }
             else {
                 if (data.message) {
-                    setMessageList((list) => [...list, data])
-                }
+					setMessageList((list) => [...list, data])
+				}
             }
 
         }
         )
 
-    }, [socket])
+    }, [])
 
 
     let images = [];
@@ -138,21 +141,21 @@ const PublicReportsView = (props) => {
             }
 
             swearjarEng.setLang("en");
-			const cleanCommentEng = swearjarEng.censor(comment);
-			swearjarFil.setLang("ph");
-			const cleanCommentFil = swearjarEng.censor(cleanCommentEng);
+            const cleanCommentEng = swearjarEng.censor(comment);
+            swearjarFil.setLang("ph");
+            const cleanCommentFil = swearjarEng.censor(cleanCommentEng);
 
             const commentData = {
-				room: dump.chat_id.room,
-				author: authorForNotif,
-				comment: cleanCommentFil,
-				createdAt: new Date(Date.now()),
-				type: "comment"
-			}
-			socket.emit("send_message", commentData);
+                room: dump.chat_id.room,
+                author: authorForNotif,
+                comment: cleanCommentFil,
+                createdAt: new Date(Date.now()),
+                type: "comment"
+            }
+            socket.emit("send_message", commentData);
             setAllComments((oldComment) => [...oldComment, commentData])
             setComment('')
-           
+
         }
     }
 
@@ -177,8 +180,7 @@ const PublicReportsView = (props) => {
                             <Text>{creationDate}</Text>
                         </VStack>
                         <HStack>
-                            
-                            <TouchableOpacity onPress={()=>{props.navigation.navigate('PublicReportsChat', {chat:dump.chat_id})}} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump.chat_id.chats, chatDetail: dump.chat_id, chatId: dump.chat_id._id }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity>
 
@@ -259,9 +261,9 @@ const PublicReportsView = (props) => {
                     <Text>{dump.landmark}</Text>
                 </HStack>
                 <View style={RandomStyle.vMapContainer}>
-                            {console.log(dump.coordinates.longtitude)}
+                    {console.log(dump.coordinates.longtitude)}
                     <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
-                        
+
                 </View>
                 <View style={RandomStyle.vImages}>
                     {dump.images.map((img, index) =>

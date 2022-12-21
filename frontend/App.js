@@ -39,7 +39,7 @@ export default function App() {
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
           <Header />
-          {/* <AuthNav/> */}
+          <AuthNav/>
           {/* <RegisterNav /> */}
           {/* <Main/> */}
           {/* <AccessDenied/> */}

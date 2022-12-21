@@ -57,7 +57,7 @@ const PublicReportsList = ({ navigation }) => {
             // }
 
 
-        }, [error, keyword, currentPage, district, barangay, size, type]
+        }, [dispatch, error, keyword, currentPage, district, barangay, size, type]
         ))
 
 

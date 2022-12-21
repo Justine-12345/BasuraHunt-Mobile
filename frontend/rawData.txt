@@ -18,4 +18,5 @@
  comment in Dump
 
  dump PublicReportsList with search and sort
+ chat
  --- cant chat if not their report

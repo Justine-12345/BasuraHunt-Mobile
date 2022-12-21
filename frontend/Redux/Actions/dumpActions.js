@@ -341,13 +341,19 @@ export const rankings = (rankingData) => async (dispatch) => {
 
         dispatch({ type: DUMP_RANKING_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                Authorization: `Bearer ${token}`
             }
         }
-
-        const { data } = await axios.post(`/api/v1/rankings/`, rankingData, config)
+        const { data } = await axios.post(`${baseURL}/rankings/`, rankingData, config)
 
         dispatch({
             type: DUMP_RANKING_SUCCESS,

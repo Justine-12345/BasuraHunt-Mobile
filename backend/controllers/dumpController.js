@@ -808,7 +808,8 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 		topBrgyUser,
 		topCityUser,
 		barangaysOrDistrictStatuses,
-		topUserForAdmin
+		topUserForAdmin,
+		userBarangay: user.barangay
 	})
 
 

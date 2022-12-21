@@ -16,7 +16,7 @@ const socket = io.connect(SOCKET_PORT);
 const Chat = (props) => {
     const dispatch = useDispatch();
 
-    const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
+    const { chat:chatCompleteDetail, loading: chatLoading, chats, chats2 } = useSelector(state => state.chatDetails)
 
     // const allChat = props.route.params.chat
     const chatDetail = props.route.params.chatDetail
@@ -28,14 +28,14 @@ const Chat = (props) => {
     const animatedImage = new Animated.Value(0);
     const [user, setUser] = useState("")
     const [chat, setChat] = useState([])
-    const [messageList, setMessageList] = useState([])
 
+  
     useFocusEffect(
         useCallback(() => {
             // console.log(chatDetail.room)
             socket.disconnect()
 
-            dispatch({ type: GET_CHAT_RESET })
+            dispatch({type:GET_CHAT_RESET})
 
             dispatch(getChat(chatId))
             AsyncStorage.getItem("user")
@@ -44,49 +44,43 @@ const Chat = (props) => {
                     setUser(JSON.parse(res)._id)
                 })
                 .catch((error) => console.log(error))
-
-
-            socket.connect()
-            socket.emit("join_room", [chatDetail.room])
-            return ()=>{
-                setMessageList([])
-            }
+            
+           
+                socket.connect()
+                socket.emit("join_room", [chatDetail.room])
         }, [])
     )
-    useEffect(() => {
-        socket.on("receive_message", (data) => {
-            if (data.type) {
-                if (data.type === "status") {
-                    setStatus(data.message)
-                }
-                if (data.type === "comment") {
-                    setAllComments((oldComment) => [...oldComment, data])
-                }
-                if (data.type === "admin-updated-dump") {
-                    setDump(data.dump)
-                }
-            }
-            else {
-                if (data.message) {
-                    if (data.message) {
-                        setMessageList((list) => [data, ...list])
-                    }
-                }
-            }
-
-        }
-        )
-    }, [socket])
-
-    useEffect(() => {
-        // if (messageList === undefined || messageList.length <= 0) {
-            setMessageList(chats && chats)
-        // }
-    }, [chats])
+        // useEffect(() => {
+        //     socket.on("receive_message", (data) => {
+        //         if (data.type) {
+        //             if (data.type === "status") {
+        //                 setStatus(data.message)
+        //             }
+        //             if (data.type === "comment") {
+        //                 setAllComments((oldComment) => [...oldComment, data])
+        //             }
+        //             if (data.type === "admin-updated-dump") {
+        //                 setDump(data.dump)
+        //             }
+        //         }
+        //         else {
+        //             if (data.message) {
+        //                 console.log("data", data)
+        //                 dispatch({
+        //                     type: APPEND_CHAT,
+        //                     payload:data
+        //                 })
+        //             }
+        //         }
+    
+        //     }
+        //     )
+        // },[socket])
+    
 
     const sendHandler = () => {
         // console.log("meron")
-        // console.log(data)
+         // console.log(data)
         if (message !== "") {
             const chatTime = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
             const messageData = {
@@ -97,18 +91,16 @@ const Chat = (props) => {
             }
 
             const formData = new FormData();
-            formData.append('message', message);
-            // formData.append('notifCode', notifCodeForChat);
-            // formData.append('link', linkForNotif)
-            formData.append('time', chatTime)
-            dispatch(updateChat(chatId, formData))
+			formData.append('message', message);
+			// formData.append('notifCode', notifCodeForChat);
+			// formData.append('link', linkForNotif)
+			formData.append('time', chatTime)
+			dispatch(updateChat(chatId, formData))
             // dispatch({
             //     type: APPEND_CHAT,
-            //     payload:[messageData,...chats]
+            //     payload:messageData
             // })
-
-            setMessageList((list) => [messageData, ...list])
-
+            
             setMessage("")
 
             socket.emit("send_message", messageData);
@@ -187,7 +179,6 @@ const Chat = (props) => {
         <>
             {/* {console.log("chatsLoading",chatLoading&&chatLoading)} */}
             {/* {  console.log("chats2",chats)} */}
-            {/* {console.log("messageList", messageList)} */}
             <Animated.View style={[styles.header,
             {
                 backgroundColor: animatedImage.interpolate({
@@ -267,7 +258,7 @@ const Chat = (props) => {
                     }]}>Chat with Admin</Animated.Text>
 
             </Animated.View>
-            {console.log("messageList", messageList === undefined || messageList.length <= 0)}
+            {console.log("chat_id",chatId)}
             <FlatList
                 ref={flatlist}
                 inverted={true}
@@ -275,7 +266,7 @@ const Chat = (props) => {
                 // onLayout={() => flatlist.current.scrollToEnd({ animated: "true" })}
                 // onScroll={(e) => scrollHandler(e)}
                 style={styles.chatContainer}
-                data={ messageList}
+                data={chats}
                 renderItem={chatBubbles}
                 keyExtractor={item => Math.random().toString(36)}
 

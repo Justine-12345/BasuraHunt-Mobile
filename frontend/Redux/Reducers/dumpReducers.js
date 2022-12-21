@@ -350,7 +350,8 @@ switch(action.type){
             topBrgyUser:action.payload.topBrgyUser,
             topCityUser:action.payload.topCityUser,
             barangaysOrDistrictStatuses: action.payload.barangaysOrDistrictStatuses,
-            topUserForAdmin: action.payload.topUserForAdmin
+            topUserForAdmin: action.payload.topUserForAdmin,
+            userBarangay: action.payload.userBarangay
         }
 
   case DUMP_RANKING_RESET:
