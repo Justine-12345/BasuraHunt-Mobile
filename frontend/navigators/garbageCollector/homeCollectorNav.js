@@ -64,7 +64,7 @@ const HomeCollectorNav = () => {
             />
 
             <Tab.Screen
-                name="Profile"
+                name="CollectorProfile"
                 component={Profile}
                 options={{
                     tabBarIcon: (props) => {

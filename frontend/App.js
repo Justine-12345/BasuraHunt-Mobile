@@ -23,7 +23,6 @@ import Chat from './screens/chat/chat';
 import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
 import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
 
-
 const Theme = {
   ...DefaultTheme,
   colors: {
@@ -41,7 +40,7 @@ export default function App() {
           <Header />
           <AuthNav/>
           {/* <RegisterNav /> */}
-          <Main/>
+          {/* <Main/> */}
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
