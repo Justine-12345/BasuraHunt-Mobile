@@ -9,6 +9,8 @@ import OTP from "../screens/user/otp";
 import IntroLoading from "../screens/extras/IntroLoading";
 import ForgotPassword from "../screens/user/forgot-password";
 import ResetPassword from "../screens/user/reset-password";
+import LoadingStart from "../screens/extras/loadingPages/loading-start";
+import HomeCollectorNav from "./garbageCollector/homeCollectorNav";
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -16,8 +18,8 @@ function MyStack() {
         <Stack.Navigator>
 
             <Stack.Screen
-                name="IntroLoading"
-                component={IntroLoading}
+                name="LoadingStart"
+                component={LoadingStart}
                 options={{
                     headerShown: false
                 }}
@@ -42,6 +44,14 @@ function MyStack() {
             <Stack.Screen
                 name="Main"
                 component={Main}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="HomeCollectorNav"
+                component={HomeCollectorNav}
                 options={{
                     headerShown: false
                 }}

@@ -1,25 +1,26 @@
 import React, { useState } from "react";
-import { Keyboard, View } from "react-native";
+import { Keyboard, View, Text } from "react-native";
 import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import GarbageCollectorNav from "./garbageCollectorNav";
 //import ScheduleNav from "./scheduleNav";
 //import CollectorNav from "./collecorNav";
-
-
+import GarbageCollectorSchedNav from "./garbageCollectorSchedNav";
+import Profile from "../../screens/garbageCollector/profile/profile";
+import Start from "../../screens/garbageCollector/schedule/start";
 const Tab = createBottomTabNavigator();
 
 
 const HomeCollectorNav = () => {
     const [keyboardShown, setKeyboardShown] = useState(false);
 
-    Keyboard.addListener("keyboardDidShow", ()=>{
+    Keyboard.addListener("keyboardDidShow", () => {
         setKeyboardShown(true);
     })
-    Keyboard.addListener("keyboardDidHide", ()=>{
+    Keyboard.addListener("keyboardDidHide", () => {
         setKeyboardShown(false);
     })
-    
+
     return (
         <Tab.Navigator
             screenOptions={{
@@ -33,10 +34,10 @@ const HomeCollectorNav = () => {
                 tabBarInactiveTintColor: "lightgrey",
             }}
         >
-   {/*
+
             <Tab.Screen
-                name="Schedule"
-              //  component={ScheduleNav}
+                name="GarbageCollectorSchedNav"
+                component={GarbageCollectorSchedNav}
                 options={{
                     tabBarIcon: (props) => {
                         return <FontAwesome
@@ -46,25 +47,25 @@ const HomeCollectorNav = () => {
                         />
                     }
                 }}
-            />*/}
+            />
             <Tab.Screen
-                name="Report"
+                name="GarbageCollectorNav"
                 component={GarbageCollectorNav}
                 options={{
                     tabBarIcon: (props) => {
-                      return <FontAwesome
+                        return <FontAwesome
                             name="tasks"
                             color={props.color}
                             size={25}
-                            class ="fal fa"
+                            class="fal fa"
                         />
                     }
                 }}
             />
-    {/*
+
             <Tab.Screen
-                name="Collector"
-               // component={CollectorNav}
+                name="Profile"
+                component={Profile}
                 options={{
                     tabBarIcon: (props) => {
                         return <FontAwesome
@@ -74,7 +75,16 @@ const HomeCollectorNav = () => {
                         />
                     }
                 }}
-            />*/}
+            />
+
+            <Tab.Screen
+                name="Start"
+                component={Start}
+                options={{
+                    tabBarButton: () => null,
+                    tabBarVisible: false,
+                }}
+            />
         </Tab.Navigator>
     )
 }

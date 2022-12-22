@@ -4,7 +4,7 @@ import { Button, HStack, VStack } from "native-base";
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import RandomStyle from "../../../stylesheets/randomStyle";
 
-const CScheduleToday = () => {
+const CScheduleToday = ({navigation}) => {
 
     const [schedules, setSchedules] = useState(["a","b","c","b","c","b","c","b","c","b","c","b","c"]);
     // const {navigate} = this.props.navigation;
@@ -34,7 +34,7 @@ const CScheduleToday = () => {
                                 <Text numberOfLines={1} style={RandomStyle.lItem2}>Pampanga Street, Ilocos Street...</Text>
                             </VStack>
                             <TouchableOpacity activeOpacity={0.8} style={{width: 250, alignSelf: "center"}} 
-                            // onPress={() => navigation.navigate("Start")}
+                            onPress={() => navigation.navigate("Start")}
                             >
                                 <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
                             </TouchableOpacity>

@@ -374,12 +374,20 @@ exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
 		return next(new ErrorHandler(`User does not found with id: ${req.params.id}`))
 	}
 
+	let token
+	if(req.headers.token){
+		token = req.headers.token
+	}else{
+		token = req.cookies.token
+	}
+
 	res.status(200).json({
 		success:true,
 		user,
 		userBrgyRank,
 		userCityRank,
-		otp_status:user.otp_status
+		otp_status:user.otp_status,
+		token
 	})
 
 })

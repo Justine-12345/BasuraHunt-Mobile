@@ -18,45 +18,72 @@ const Login = ({ navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
-        if (authError) {
-            Toast.show({
-                type: 'error',
-                text1: authError,
-                text2: 'Something went wrong, please try again later'
-            });
-            dispatch(clearErrors())
-        }
-        let userInfo = {
-            user: {},
-            isAuthenticated:''
-        }
-        AsyncStorage.multiGet(['user', 'isAuthenticated'], (err, stores) => {
-            stores.map((result, i, store) => {
-              let key = store[i][0];
-              let val = store[i][1];
-            userInfo[key] = val
-            });
-
-            if(userInfo.isAuthenticated){
-                if(JSON.parse(userInfo.user).otp_status === "Verified"){
-                    navigation.dispatch(
-                        CommonActions.reset({
-                          index: 1,
-                          routes: [
-                            { name: 'Main' }
-                          ],
-                        })
-                      );
-
-                    navigation.navigate('Main')
-                }else if(JSON.parse(userInfo.user).otp_status === "Fresh"){
-                    navigation.navigate('OTP')
-                }
+            if (authError) {
+                Toast.show({
+                    type: 'error',
+                    text1: authError,
+                    text2: 'Something went wrong, please try again later'
+                });
+                dispatch(clearErrors())
             }
+            let userInfo = {
+                user: {},
+                isAuthenticated: ''
+            }
+            AsyncStorage.multiGet(['user', 'isAuthenticated'], (err, stores) => {
+                stores.map((result, i, store) => {
+                    let key = store[i][0];
+                    let val = store[i][1];
+                    userInfo[key] = val
+                });
 
-          });
+                if (userInfo.isAuthenticated) {
+                    if (JSON.parse(userInfo.user).otp_status === "Verified") {
+                        if (JSON.parse(userInfo.user).role === "user") {
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'Main' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('Main')
+                        } else if (JSON.parse(userInfo.user).role === "garbageCollector") {
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'HomeCollectorNav' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('HomeCollectorNav')
+                        } else {
+                            AsyncStorage.clear()
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Denied',
+                                text2: 'Access has been denied to this account'
+                            });
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'Login' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('Login')
+                        }
+                    } else if (JSON.parse(userInfo.user).otp_status === "Fresh") {
+                        navigation.navigate('OTP')
+                    }
+                }
 
-    }, [authError, isAuthenticated]))
+            });
+
+        }, [authError, isAuthenticated]))
 
     const loginHandle = () => {
         if (!email || email === '') {

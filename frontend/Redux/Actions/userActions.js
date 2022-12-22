@@ -225,7 +225,22 @@ export const loadUser = () => async (dispatch) => {
 
         dispatch({ type: LOAD_USER_REQUEST })
 
-        const { data } = await axios.get('/api/v1/me')
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+      
+
+        const { data } = await axios.get(`${baseURL}/me`, config)
 
         dispatch({
             type: LOAD_USER_SUCCESS,
@@ -525,8 +540,21 @@ export const getUserDetails = (id) => async (dispatch) => {
 
         dispatch({ type: USER_DETAILS_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
 
-        const { data } = await axios.get(`/api/v1/admin/user/${id}`)
+        const { data } = await axios.get(`/api/v1/admin/user/${id}`,config)
 
         dispatch({
             type: USER_DETAILS_SUCCESS,

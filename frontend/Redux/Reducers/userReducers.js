@@ -97,7 +97,8 @@ export const authReducer = (state = { user: {} }, action) => {
         case LOGIN_SUCCESS:
         case REGISTER_USER_SUCCESS:
         case LOAD_USER_SUCCESS:
-        case CHECK_OTP_SUCCESS:
+        case CHECK_OTP_SUCCESS:  
+            
             AsyncStorage.setItem("isAuthenticated", "true");
             AsyncStorage.setItem("user", JSON.stringify(action.payload.user));
             AsyncStorage.setItem("jwt", action.payload.token);

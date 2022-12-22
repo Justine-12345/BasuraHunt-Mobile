@@ -17,13 +17,12 @@ import store from './Redux/Store';
 import registerNNPushToken from 'native-notify';
 import Verification from './screens/user/register/verification';
 // import IntroLoading from './screens/extras/IntroLoading2';
-import LoadingStart from './screens/extras/loadingPages/loading-start';
 import OTP from './screens/user/otp';
 import Chat from './screens/chat/chat';
-
 import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
-
 import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
+
+
 const Theme = {
   ...DefaultTheme,
   colors: {
@@ -39,14 +38,24 @@ export default function App() {
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
           <Header />
+
+        
+
+          {/* ======MAIN====== */}
           <AuthNav/>
+
+           {/* ======FOR GARBAGE COLLECTORS ACCOUNT====== */}
+           {/* <HomeCollectorNav/> */}
+
+          {/* ======FOR TESTINGS====== */}
           {/* <RegisterNav /> */}
-          <Main/>
+          {/* <Main/> */}
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
           {/* <OTP/> */}
           {/* <Chat/> */}
+
           <Toast />
         </NativeBaseProvider>
       </NavigationContainer>

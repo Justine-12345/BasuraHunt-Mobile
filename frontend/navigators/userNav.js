@@ -2,7 +2,7 @@ import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
 // import Profile from "../screens/user/profile/profile";
-import Profile from "../screens/garbageCollector/profile/profile"
+import Profile from "../screens/user/profile/profile";
 import UserReportsList from "../screens/user/profile/user-reports-list";
 import UserDonationsList from "../screens/user/profile/user-donations-list";
 import UserClaimedDonationsList from "../screens/user/profile/user-claimed-donations-list";

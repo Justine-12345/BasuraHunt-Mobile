@@ -10,14 +10,14 @@ const LoadingList = () => {
 
     return (
         <>
-            <View style={RandomStyle.lContainer3}>
+            {/* <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>  
                     <Text style={RandomStyle.searchInput}/>
                     <TouchableOpacity disabled style={RandomStyle.searchFilterContainer}>
                         <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128"/></Text>
                     </TouchableOpacity>
                 </HStack>
-            </View>
+            </View> */}
         <ScrollView> 
             <View style={RandomStyle.lContainer2}>
                 <HStack>

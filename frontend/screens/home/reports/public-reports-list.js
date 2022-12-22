@@ -10,6 +10,7 @@ import { getDumps } from "../../../Redux/Actions/dumpActions";
 import Toast from 'react-native-toast-message';
 import dist from "react-native-image-viewing";
 import Styles from "../../../stylesheets/styles";
+import LoadingList from "../../extras/loadingPages/loading-list";
 const PublicReportsList = ({ navigation }) => {
 
     const dispatch = useDispatch();
@@ -36,15 +37,15 @@ const PublicReportsList = ({ navigation }) => {
                     text2: 'Something went wrong, please try again later'
                 });
             }
-           
+
 
 
             // if (searching == true) {
-                // setReports(reports)
+            // setReports(reports)
             // }
 
             // if (searching == false) {
-                dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
+            dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
             // }
 
 
@@ -94,7 +95,7 @@ const PublicReportsList = ({ navigation }) => {
     ];
 
     const typeList = [
-        { value: "", label:"All" },
+        { value: "", label: "All" },
         { value: "Animal Corpse" },
         { value: "Automotive" },
         { value: "Construction" },
@@ -186,18 +187,18 @@ const PublicReportsList = ({ navigation }) => {
     const FilterOptions = () => {
         return (
             <>
-                
+
                 <Select marginTop={1} placeholder="Select District" selectedValue={district} onValueChange={dist => setDistrict(dist)}>
-                     <Select.Item label="All" value="" />
+                    <Select.Item label="All" value="" />
                     <Select.Item label="1" value="1" />
                     <Select.Item label="2" value="2" />
                 </Select>
-                
+
                 <Select marginTop={1} placeholder="Select Barangay" selectedValue={barangay} onValueChange={brgy => setBarangay(brgy)}>
                     {barangayList.length > 0 ?
                         barangayList.map(item => {
                             return (
-                                <Select.Item key={item} label={item.label?item.label:item.value} value={item.value} />
+                                <Select.Item key={item} label={item.label ? item.label : item.value} value={item.value} />
                             )
                         })
                         : null}
@@ -211,7 +212,7 @@ const PublicReportsList = ({ navigation }) => {
                     {typeList.length > 0 ?
                         typeList.map(item => {
                             return (
-                                <Select.Item key={item} label={item.label?item.label:item.value} value={item.value} />
+                                <Select.Item key={item} label={item.label ? item.label : item.value} value={item.value} />
                             )
                         })
                         : null}
@@ -226,7 +227,7 @@ const PublicReportsList = ({ navigation }) => {
         const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
-            {/* {console.log(item)} */}
+                {/* {console.log(item)} */}
                 <TouchableOpacity onPress={() => navigation.navigate("PublicReportsView", { item })} activeOpacity={.8}>
                     <View style={RandomStyle.lContainer2}>
                         <HStack>
@@ -247,33 +248,33 @@ const PublicReportsList = ({ navigation }) => {
     }
     return (
         <>
-        {/* <Text>{console.log(dumps&&dumps.length)}</Text> */}
+            {/* <Text>{console.log(dumps&&dumps.length)}</Text> */}
             <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>
-                    <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text) } />
-                
-                        <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
-                            <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
-                        </TouchableOpacity>
-                    
+                    <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
+
+                    <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
+                        <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
+                    </TouchableOpacity>
+
                 </HStack>
-                {filter == false? null : <FilterOptions />}
+                {filter == false ? null : <FilterOptions />}
             </View>
-            { dumps && dumps.length > 0 ?
+            {dumps && dumps.length > 0 ?
                 <FlatList
                     data={dumps}
                     renderItem={reportsItem}
                     keyExtractor={item => item._id}
                 />
-                :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                    {dumps&&dumps.length != undefined?
-                        "No reports yet!":
-                        <Text style={Styles.login}><ActivityIndicator size="large" color="#0F5733" /></Text>
-                    }  
-                    </Text>
-                </View> 
+                :dumps&& dumps.length != undefined ?
+                    <View style={Empty1.container}>
+                        <Text style={Empty1.text1}>
+                            "No reports yet!"
+                        </Text>
+                    </View>
+                    :
+                    <LoadingList />
+                    
             }
         </>
     )
