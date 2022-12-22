@@ -19,6 +19,7 @@ import Verification from './screens/user/register/verification';
 // import IntroLoading from './screens/extras/IntroLoading2';
 import OTP from './screens/user/otp';
 import Chat from './screens/chat/chat';
+
 import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
 import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
 
@@ -38,18 +39,9 @@ export default function App() {
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
           <Header />
-
-        
-
-          {/* ======MAIN====== */}
           <AuthNav/>
-
-           {/* ======FOR GARBAGE COLLECTORS ACCOUNT====== */}
-           {/* <HomeCollectorNav/> */}
-
-          {/* ======FOR TESTINGS====== */}
           {/* <RegisterNav /> */}
-          {/* <Main/> */}
+          <Main/>
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}

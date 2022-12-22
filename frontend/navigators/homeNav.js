@@ -5,7 +5,7 @@ import Newsfeed from "../screens/home/newsfeed/newsfeed";
 import NewsfeedNav from "./newsfeedNav";
 import RankingNav from "./rankingNav";
 import ReportsNav from "./reportsNav";
-
+import About from "../screens/home/extras/about";
 const Tab = createMaterialTopTabNavigator();
 
 function MyTabs() {
@@ -41,6 +41,13 @@ function MyTabs() {
                 component={ReportsNav}
                 options={{
                     title: "Illegal Dumps"
+                }}
+            />
+             <Tab.Screen
+                name="About"
+                component={About}
+                options={{
+                    title: "About"
                 }}
             />
         </Tab.Navigator>
