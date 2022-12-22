@@ -1,7 +1,8 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 
-import Profile from "../screens/user/profile/profile";
+// import Profile from "../screens/user/profile/profile";
+import Profile from "../screens/garbageCollector/profile/profile"
 import UserReportsList from "../screens/user/profile/user-reports-list";
 import UserDonationsList from "../screens/user/profile/user-donations-list";
 import UserClaimedDonationsList from "../screens/user/profile/user-claimed-donations-list";
@@ -30,6 +31,15 @@ function MyTabs() {
                     title: "Profile"
                 }}
             />
+
+                {/* <Tab.Screen
+                name="GProfile"
+                component={GProfile}
+                options={{
+                    title: "GProfile"
+                }}
+            /> */}
+
             <Tab.Screen
                 name="MyReports"
                 component={MyReports}
@@ -46,7 +56,7 @@ function MyTabs() {
             />
             <Tab.Screen
                 name="UserClaimedDonationsList"
-                component={UserClaimedDonationsList}
+                component={UserClaimedDonationsList}  
                 options={{
                     title: "Claimed Items"
                 }}

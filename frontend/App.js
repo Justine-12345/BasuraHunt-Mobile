@@ -38,6 +38,7 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
+
         <Header /> 
         <Slider/>
         
@@ -45,6 +46,7 @@ export default function App() {
           {/* <RegisterNav /> */}
           {/* <Main/> */}
           {/*<HomeCollectorNav/> */}
+
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}

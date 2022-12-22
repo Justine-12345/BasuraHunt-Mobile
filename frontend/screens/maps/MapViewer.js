@@ -1,9 +1,12 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
-import MapView from 'react-native-maps';
-import { Marker } from 'react-native-svg';
+import MapView , { Marker } from 'react-native-maps';
+// import { Marker } from 'react-native-maps';
 import { StyleSheet, Text, View, Dimensions, Image } from 'react-native';
-import * as Location from 'expo-location';
+// import * as Location from 'expo-location';
+
+
+
 const MapViewer = ({ long, lati }) => {
 
 
@@ -23,7 +26,7 @@ const MapViewer = ({ long, lati }) => {
         })
     )
 
-
+    
 
     return (
         <>
@@ -36,18 +39,20 @@ const MapViewer = ({ long, lati }) => {
                         longitudeDelta: 0.00011,
                     }}
                 >
-                    <MapView.Marker
+
+                  <Marker
                         coordinate={{
-                            latitude: latMarker,
-                            longitude: lngMarker,
+                            latitude: initLat,
+                        longitude: initLng,
                         }}
                     >
                         <Image
                             source={{ uri: "https://img.icons8.com/glyph-neue/100/26ff00/marker.png" }}
-                            style={{ width: 38, height: 40 }}
+                            style={{ width: 38, height: 40, zIndex:100 }}
                             resizeMode="stretch"
                         />
-                    </MapView.Marker>
+                    </Marker>
+                    
                 </MapView>
 
             </View>
@@ -68,7 +73,12 @@ const styles = StyleSheet.create({
         height: Dimensions.get('window').width / 1.5,
         marginVertical: 5,
         zIndex: 1
+    },
+    pin:{
+        zIndex: 100
     }
+
+
 });
 
 export default MapViewer

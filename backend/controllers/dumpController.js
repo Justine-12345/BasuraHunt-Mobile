@@ -176,11 +176,13 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 
 	const resPerPage = 5;
 	const dumpsCount = await Dump.countDocuments();
-	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }), req.query).search().filter();
+	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id'), req.query).search().filter();
 	console.log("ismobile",req.query.ismobile == true )
+
 	if (req.query.ismobile === undefined) {
 		apiFeatures.pagination(resPerPage);
 	}
+
 	const dumps = await apiFeatures.query;
 
 	let filteredDumpCount = dumps.length;
@@ -806,7 +808,8 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 		topBrgyUser,
 		topCityUser,
 		barangaysOrDistrictStatuses,
-		topUserForAdmin
+		topUserForAdmin,
+		userBarangay: user.barangay
 	})
 
 

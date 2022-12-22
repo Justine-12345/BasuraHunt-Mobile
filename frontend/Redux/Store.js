@@ -25,6 +25,11 @@ import {
     dumpCommentReducer
 } from './Reducers/dumpReducers'
 
+import {
+    newChatReducer,
+    chatDetailsReducer,
+    chatReducer
+} from './Reducers/chatReducers';
 
 import { coordinateReducer } from './Reducers/mapReducers';
 
@@ -47,7 +52,12 @@ const reducers = combineReducers({
     dumpDetails: dumpDetailsReducer,
     dump: dumpReducer,
     ranking: rankingReducer,
-    dumpComment:dumpCommentReducer,
+    dumpComment: dumpCommentReducer,
+
+
+    newChat: newChatReducer,
+    chatDetails: chatDetailsReducer,
+    chat: chatReducer,
 
     coordinate: coordinateReducer
 })

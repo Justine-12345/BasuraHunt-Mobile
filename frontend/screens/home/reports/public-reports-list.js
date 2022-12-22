@@ -57,7 +57,7 @@ const PublicReportsList = ({ navigation }) => {
             // }
 
 
-        }, [error, keyword, currentPage, district, barangay, size, type]
+        }, [dispatch, error, keyword, currentPage, district, barangay, size, type]
         ))
 
 
@@ -226,6 +226,7 @@ const PublicReportsList = ({ navigation }) => {
         const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
+            {/* {console.log(item)} */}
                 <TouchableOpacity onPress={() => navigation.navigate("PublicReportsView", { item })} activeOpacity={.8}>
                     <View style={RandomStyle.lContainer2}>
                         <HStack>
@@ -233,7 +234,7 @@ const PublicReportsList = ({ navigation }) => {
                             <VStack>
                                 <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
                                 {/* item.additional_desciption change to item.addition_description */}
-                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_description} {item.district} {item.barangay}</Text>
+                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_description}</Text>
                                 <View style={{ flex: 1, justifyContent: "flex-end", }}>
                                     <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
                                 </View>
@@ -246,7 +247,7 @@ const PublicReportsList = ({ navigation }) => {
     }
     return (
         <>
-        <Text>{console.log(dumps&&dumps.length)}</Text>
+        {/* <Text>{console.log(dumps&&dumps.length)}</Text> */}
             <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text) } />

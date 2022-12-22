@@ -33,7 +33,8 @@ const AssignedView = (props) => {
     const [dump, setDump] = useState(item)
     const [status, setStatus] = useState(item.status)
     const [user, setUser] = useState()
-
+    const [messageList, setMessageList] = useState([])
+    
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
     const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
 	
