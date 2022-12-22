@@ -20,7 +20,7 @@ import Verification from './screens/user/register/verification';
 import LoadingStart from './screens/extras/loadingPages/loading-start';
 import OTP from './screens/user/otp';
 import Chat from './screens/chat/chat';
-
+import Slider from './screens/home/extras/slider';
 import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
 
 import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
@@ -38,11 +38,13 @@ export default function App() {
     <Provider store={store}>
       <NavigationContainer theme={Theme}>
         <NativeBaseProvider>
-          <Header />
+        <Header /> 
+        <Slider/>
+        
           {/* <AuthNav/> */}
           {/* <RegisterNav /> */}
           {/* <Main/> */}
-          <HomeCollectorNav/> 
+          {/*<HomeCollectorNav/> */}
           {/* <AccessDenied/> */}
           {/* <Verification/> */}
           {/* <IntroLoading/> */}
