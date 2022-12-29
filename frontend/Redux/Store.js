@@ -31,6 +31,31 @@ import {
     chatReducer
 } from './Reducers/chatReducers';
 
+import {
+    collectionPointsReducer,
+    collectionPointsTodayReducer,
+    collectionPointsUpcomingReducer,
+    collectorsReducer,
+    collectionPointReducer,
+    collectionPointDetailsReducer,
+    newCollectionPointReducer,
+    liveNotificationReducer,
+} from './Reducers/collectionPointReducers';
+
+import {
+    itemsReducer,
+    itemReducer,
+    itemDetailsReducer,
+    newItemReducer,
+} from './Reducers/itemReducers';
+
+import {
+    newsfeedsReducer,
+    newsfeedReducer,
+    newsfeedDetailsReducer,
+    newNewsfeedReducer,
+} from './Reducers/newsfeedReducers';
+
 import { coordinateReducer } from './Reducers/mapReducers';
 
 const reducers = combineReducers({
@@ -54,10 +79,28 @@ const reducers = combineReducers({
     ranking: rankingReducer,
     dumpComment: dumpCommentReducer,
 
-
     newChat: newChatReducer,
     chatDetails: chatDetailsReducer,
     chat: chatReducer,
+
+    collectionPoints: collectionPointsReducer,
+    collectionPointsToday: collectionPointsTodayReducer,
+    collectionPointsUpcoming: collectionPointsUpcomingReducer,
+    collectors: collectorsReducer,
+    collectionPoint: collectionPointReducer,
+    collectionPointDetails: collectionPointDetailsReducer,
+    newCollectionPoint: newCollectionPointReducer,
+    liveNotification: liveNotificationReducer,
+
+    items: itemsReducer,
+    item: itemReducer,
+    itemDetails: itemDetailsReducer,
+    newItem: newItemReducer,
+
+    newsfeeds: newsfeedsReducer,
+    newsfeed: newsfeedReducer,
+    newsfeedDetails: newsfeedDetailsReducer,
+    newNewsfeed: newNewsfeedReducer,
 
     coordinate: coordinateReducer
 })
