@@ -14,6 +14,7 @@ const swearjarFil = require('swearjar-extended2');
 const cloudinary = require('cloudinary');
 const barangayStatuses = require('../utils/getBrgyStatuses')
 const districtStatuses = require('../utils/getDistrictStatuses')
+const expoSendNotification = require('../utils/expoSendNotification')
 //******Add New Dumps (Admin)****** 
 exports.newDump = catchAsyncErrors(async (req, res, next) => {
 	let images = []
@@ -177,7 +178,7 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 	const resPerPage = 5;
 	const dumpsCount = await Dump.countDocuments();
 	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id'), req.query).search().filter();
-	console.log("ismobile",req.query.ismobile == true )
+	console.log("ismobile", req.query.ismobile == true)
 
 	if (req.query.ismobile === undefined) {
 		apiFeatures.pagination(resPerPage);
@@ -438,6 +439,8 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
+	const userForPushNotification = await User.find({ _id: dump.user_id._id })
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id)
 
 
 	if (typeof req.body.collectors == "string") {
@@ -590,6 +593,8 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
+		const userForPushNotification = await User.find({ _id: updatedDump.user_id._id });
+		expoSendNotification(userForPushNotification, notifTitle1, 'MyPublicReportsView', updatedDump._id)
 
 	}
 
@@ -620,6 +625,9 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
+
+	const userForPushNotification = await User.find({ _id: updatedDump.user_id._id })
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', updatedDump._id)
 
 	res.status(200).json({
 		success: true,
@@ -820,30 +828,6 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 //****** Comment Dump Status******
 exports.addComment = catchAsyncErrors(async (req, res, next) => {
-	console.log(req.body)
-	// let images = []
-
-	//     if (typeof req.body.images === 'string') {
-	//         images.push(req.body.images)
-	//     } else {
-	//         images = req.body.images
-	//     }
-
-	//    let imagesLinks = [];
-
-	//    if(req.body.images){
-	//     for (let i = 0; i < images.length; i++) {
-	//         const result = await cloudinary.v2.uploader.upload(images[i], {
-	//             folder: 'animals'
-	//         });
-
-	//         imagesLinks.push({
-	//             public_id: result.public_id,
-	//             url: result.secure_url
-	//         })
-	//     }
-	// }
-
 
 	let findDump = await Dump.findById(req.params.id);
 
@@ -866,7 +850,7 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 
 	await findDump.save();
 
-	let dump = await Dump.findById(req.params.id);
+	let dump = await Dump.findById(req.params.id)
 
 	let authorForNotif
 
@@ -900,6 +884,8 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 			}
 		});
 	}
+	const userForPushNotification = await User.find({ _id: dump.user_id })
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id)
 
 	let dumpComments = dump.comments
 

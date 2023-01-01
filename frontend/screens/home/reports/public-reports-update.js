@@ -194,7 +194,7 @@ const PublicReportsUpdate = (props) => {
             quality: 0.1
         });
 
-        if (!result.cancelled) {
+        if (!result.canceled) {
             let imageUri = result ? `data:image/jpg;base64,${result.base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
             setImagesPreview(items => [...items, { uri: result.uri, base64: imageUri }])
@@ -212,7 +212,7 @@ const PublicReportsUpdate = (props) => {
             quality: 0.1
         });
 
-        if (!result.cancelled) {
+        if (!result.canceled) {
             let imageUri = result ? `data:image/jpg;base64,${result.base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
             setImagesPreview(items => [...items, { uri: result.uri, base64: imageUri }])

@@ -9,12 +9,53 @@ import { login, clearErrors } from "../../Redux/Actions/userActions";
 import { useSelector, useDispatch } from "react-redux";
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import Styles from "../../stylesheets/styles";
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
+
 
 const Login = ({ navigation }) => {
     const dispatch = useDispatch()
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
+    const [expoPushToken, setExpoPushToken] = useState('');
     const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
+
+
+    async function registerForPushNotificationsAsync() {
+        let token;
+        if (Device.isDevice) {
+          const { status: existingStatus } = await Notifications.getPermissionsAsync();
+          let finalStatus = existingStatus;
+          if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+          }
+          if (finalStatus !== 'granted') {
+            alert('Failed to get push token for push notification!');
+            return;
+          }
+          token = (await Notifications.getExpoPushTokenAsync()).data;
+          console.log("Token", token);
+        } else {
+          alert('Must use physical device for Push Notifications');
+        }
+      
+        if (Platform.OS === 'android') {
+          Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+          });
+        }
+      
+        return token;
+      }
+      
+      useEffect(()=>{
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+      },[])
 
     useFocusEffect(
         useCallback(() => {
@@ -100,7 +141,7 @@ const Login = ({ navigation }) => {
             });
         } else {
             // console.log(email, password)
-            dispatch(login(email, password))
+            dispatch(login(email, password, expoPushToken))
         }
     }
 
@@ -127,7 +168,7 @@ const Login = ({ navigation }) => {
             </TouchableOpacity>
 
             {authLoading ?
-                <View onPress={loginHandle} style={Styles.loginBtn} activeOpacity={0.8}>
+                <View style={Styles.loginBtn} activeOpacity={0.8}>
                     <Text style={Styles.login}><ActivityIndicator size="large" color="#00ff00" /></Text>
                 </View> :
                 <TouchableOpacity onPress={loginHandle} style={Styles.loginBtn} activeOpacity={0.8}>

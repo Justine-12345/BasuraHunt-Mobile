@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-var {width, height} = Dimensions.get("window");
+var { width, height } = Dimensions.get("window");
 
 const Form1 = StyleSheet.create({
     headerContainer: {
@@ -25,7 +25,7 @@ const Form1 = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "#1E5128",
         fontSize: 20,
-        marginBottom: 20 
+        marginBottom: 20
     },
     textInput2: {
         borderWidth: 1,
@@ -35,7 +35,7 @@ const Form1 = StyleSheet.create({
         padding: 5,
         width: "100%"
     },
-    birthdate:{
+    birthdate: {
         fontSize: 20,
         textAlign: "center"
     },
@@ -43,13 +43,13 @@ const Form1 = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: "#1E5128",
         width: "100%",
-        marginBottom: 20, 
+        marginBottom: 20,
     },
     btnLabel: {
         fontSize: 20,
         color: "white",
         textAlign: "center",
-    },    
+    },
     formBtn: {
         backgroundColor: "#1E5128",
         width: 200,
@@ -78,13 +78,17 @@ const Form1 = StyleSheet.create({
         flex: 1,
         justifyContent: "flex-end",
     },
+    bottom1: {
+        flex: 1,
+        alignSelf: "flex-end"
+    },
     picContainer: {
         alignSelf: "center",
         position: "relative"
     },
     profilePic: {
-        width: width/2,
-        height: width/2,
+        width: width / 2,
+        height: width / 2,
         borderRadius: 100,
     },
     pencil: {

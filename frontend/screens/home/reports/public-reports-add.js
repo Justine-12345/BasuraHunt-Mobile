@@ -14,6 +14,9 @@ import { newDump, clearErrors } from "../../../Redux/Actions/dumpActions";
 import Toast from 'react-native-toast-message';
 import { RESET_COORDINATE } from "../../../Redux/Constants/mapConstants";
 import { NEW_DUMP_RESET } from "../../../Redux/Constants/dumpConstants";
+import RandomStringGenerator from "../../extras/randomStringGenerator";
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import NotificationSender from "../../extras/notificationSender";
 const PublicReportsAdd = ({ navigation }) => {
     const dispatch = useDispatch()
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
@@ -54,7 +57,7 @@ const PublicReportsAdd = ({ navigation }) => {
     const [mapHeight, setMapHeight] = useState(0);
     const [mapWidth, setMapWidth] = useState(0);
     const [btnAdd, setBtnAdd] = useState(false);
-
+    const [user, setUser] = useState();
     // const setLongitude = (longitudeValue) =>{
     //     longitude =
     // }
@@ -104,7 +107,20 @@ const PublicReportsAdd = ({ navigation }) => {
     ]
 
     useEffect(() => {
+
+        AsyncStorage.getItem("user")
+            .then((res) => {
+                setUser(JSON.parse(res))
+            })
+            .catch((error) => console.log(error))
+
+
         if (success) {
+           
+            const notifCode = RandomStringGenerator(40)
+            console.log("notifCode",notifCode)
+            NotificationSender(`New illegal dump report in ${dump && dump.complete_address} Brgy.${dump && dump.barangay}`, user._id, null, barangay, 'illegalDump-new', notifCode, dump && dump)
+
             Toast.show({
                 type: 'success',
                 text1: 'Submitted Successfully',
@@ -151,10 +167,12 @@ const PublicReportsAdd = ({ navigation }) => {
             quality: 0.1
         });
 
-        if (!result.cancelled) {
-            let imageUri = result ? `data:image/jpg;base64,${result.base64}` : null;
+        if (!result.canceled) {
+            console.log("base64", result.assets[0].base64)
+            console.log("uri", result.assets[0].uri)
+            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
-            setImagesPreview(items => [...items, { uri: result.uri, base64: imageUri }])
+            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
         }
     }
 
@@ -169,10 +187,10 @@ const PublicReportsAdd = ({ navigation }) => {
             quality: 0.1
         });
 
-        if (!result.cancelled) {
-            let imageUri = result ? `data:image/jpg;base64,${result.base64}` : null;
+        if (!result.canceled) {
+            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
-            setImagesPreview(items => [...items, { uri: result.uri, base64: imageUri }])
+            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
         }
     }
 
@@ -188,10 +206,10 @@ const PublicReportsAdd = ({ navigation }) => {
         setMapHeight(height)
         setMapWidth(width)
     }
-  
+
     const submitHandle = () => {
 
-        
+
         // **** ___Add Filters here
         // console.log(imagesPreview.length)
         // console.log(images.length) 
@@ -410,16 +428,16 @@ const PublicReportsAdd = ({ navigation }) => {
                         </VStack> : null
                     }
                 </View>
-                {loading?
+                {loading ?
                     <BhButton center medium disabled>
-                    <ActivityIndicator size="small" color="#00ff00" />
-                </BhButton>:
-                <BhButton center medium onPress={submitHandle}>
-                    <Text style={{ color: "white" }}>Submit</Text>
-                </BhButton>
+                        <ActivityIndicator size="small" color="#00ff00" />
+                    </BhButton> :
+                    <BhButton center medium onPress={submitHandle}>
+                        <Text style={{ color: "white" }}>Submit</Text>
+                    </BhButton>
                 }
-                
-               
+
+
             </View>
         </ScrollView>
     )

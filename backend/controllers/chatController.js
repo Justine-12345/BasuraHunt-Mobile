@@ -2,7 +2,7 @@ const Chat = require('../models/chat');
 const Dump = require('../models/dump');
 const User = require('../models/user');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
-
+const expoSendNotification = require('../utils/expoSendNotification')
 
 
 exports.getChat = catchAsyncErrors(async(req,res,next) => {
@@ -43,7 +43,14 @@ exports.newChat = catchAsyncErrors(async(req,res,next) => {
 
 exports.updateChat = catchAsyncErrors(async(req,res,next) => {
 	
+	const dump = await Dump.find({chat_id:req.params.id}).populate('chat_id');
 	const chat = await Chat.findById(req.params.id);
+
+	const chatDetail = {_id:dump[0].chat_id._id, room:dump[0].chat_id.room}
+	const chatId = {_id:dump[0].chat_id._id}
+	const chatLength = {length:dump[0].chat_id.chats.length}
+	const dumpId = {_id:dump[0]._id}
+	const dumpLocation = {location:dump[0].complete_address}
 
 
 	let current_chats = [...chat.chats, {
@@ -103,6 +110,17 @@ exports.updateChat = catchAsyncErrors(async(req,res,next) => {
 				notifCode:req.body.notifCode, 
 				status:'unread',
 				category:'illegalDump-new-message'} } }  );
+
+				const obj = {
+					chatDetail,
+					chatId,
+					chatLength,
+					dumpId,
+					dumpLocation,
+				}
+				const userForPushNotification = await User.find( { _id: req.body.receiver } )
+				expoSendNotification(userForPushNotification, NotifTitle, 'PublicReportsChat', obj)
+
 		}
 	}
 

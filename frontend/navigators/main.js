@@ -7,20 +7,21 @@ import ScheduleNav from "./scheduleNav";
 import DonationsNav from "./donationsNav";
 import UserNav from "./userNav";
 import PublicReportsAdd from "../screens/home/reports/public-reports-add";
-
+import Chat from "../screens/chat/chat";
+import ScheduleView from "../screens/schedule/schedule-view";
 const Tab = createBottomTabNavigator();
 
 
 const Main = () => {
     const [keyboardShown, setKeyboardShown] = useState(false);
 
-    Keyboard.addListener("keyboardDidShow", ()=>{
+    Keyboard.addListener("keyboardDidShow", () => {
         setKeyboardShown(true);
     })
-    Keyboard.addListener("keyboardDidHide", ()=>{
+    Keyboard.addListener("keyboardDidHide", () => {
         setKeyboardShown(false);
     })
-    
+
     return (
         <Tab.Navigator
             screenOptions={{
@@ -60,6 +61,14 @@ const Main = () => {
                     }
                 }}
             />
+             <Tab.Screen
+                name="ScheduleView"
+                component={ScheduleView}
+                options={{
+                    tabBarButton: () => null,
+                    tabBarVisible: false,
+                }}
+            />
             <Tab.Screen
                 name="Report"
                 component={PublicReportsAdd}
@@ -69,7 +78,7 @@ const Main = () => {
                             style={{ position: "absolute", bottom: 5, backgroundColor: "#1E6128", borderRadius: 100, padding: 5, elevation: 5 }}
                             name="target"
                             color={props.color}
-                            size={keyboardShown ? 25 : 50} 
+                            size={keyboardShown ? 25 : 50}
                         />
                     }
                 }}
@@ -98,6 +107,15 @@ const Main = () => {
                             size={25}
                         />
                     }
+                }}
+            />
+
+            <Tab.Screen
+                name="PublicReportsChat"
+                component={Chat}
+                options={{
+                    tabBarButton: () => null,
+                    tabBarVisible: false,
                 }}
             />
         </Tab.Navigator>

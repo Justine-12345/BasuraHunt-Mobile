@@ -42,7 +42,7 @@ const PublicReportsAdd = () => {
             allowsEditing: true,
         });
 
-        if (!result.cancelled){
+        if (!result.canceled){
             setImages(items=>[...items, {uri: result.uri}])
         }
     }
@@ -53,7 +53,7 @@ const PublicReportsAdd = () => {
             allowsEditing: true
         });
 
-        if(!result.cancelled){
+        if(!result.canceled){
             setImages(items=>[...items, {uri: result.uri}])
         }
     }

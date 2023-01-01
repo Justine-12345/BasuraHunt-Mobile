@@ -14,7 +14,7 @@ const OTP = ({ navigation }) => {
     const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
     const [user, setUser] = useState()
     const [otp, setOtp] = useState('')
-
+    
     useFocusEffect(
         useCallback(() => {
 

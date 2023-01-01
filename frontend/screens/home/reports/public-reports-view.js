@@ -22,20 +22,24 @@ const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
 const PublicReportsView = (props) => {
     const item = props.route.params.item
+    const item_id = props.route.params.item_id
     const dispatch = useDispatch()
+
+    const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
+    const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
+    const { dump: dumpDetail } = useSelector(state => state.dumpDetails)
+
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
     const [author, setAuthor] = useState('Alias')
     const [comment, setComment] = useState('')
-    const [allComments, setAllComments] = useState(item.comments)
+    const [allComments, setAllComments] = useState(item ? item.comments : [])
     const [modalVisible, setModalVisible] = useState(false);
-    const creationDate = new Date(item.createdAt).toLocaleDateString()
+    // const creationDate = new Date(item.createdAt).toLocaleDateString()
     const [dump, setDump] = useState(item)
-    const [status, setStatus] = useState(item.status)
+    const [status, setStatus] = useState(item ? item.status : "")
     const [user, setUser] = useState()
     const [messageList, setMessageList] = useState([])
-    const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
-    const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
 
     useFocusEffect(
         useCallback(() => {
@@ -73,13 +77,26 @@ const PublicReportsView = (props) => {
             }
 
             socket.connect()
-            socket.emit("join_room", [dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
+            socket.emit("join_room", [dump && dump.chat_id && dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
 
             // return ()=>{
             //     socket.disconnect()
             // }
-        }, [isDeleted, upDelError, commentError])
+        }, [isDeleted, upDelError, commentError, dump, item])
     )
+
+    useEffect(() => {
+        // console.log("item_id", item_id)
+        if (item_id) {
+            setDump(dumpDetail)
+            setAllComments(dumpDetail.comments)
+            setStatus(dumpDetail.status)
+        } else {
+            setDump(item)
+            setAllComments(item.comments)
+            setStatus(item.status)
+        }
+    }, [dumpDetail])
 
     useEffect(() => {
         socket.on("receive_message", (data) => {
@@ -97,14 +114,14 @@ const PublicReportsView = (props) => {
             }
             else {
                 if (data.message) {
-					setMessageList((list) => [...list, data])
-				}
+                    setMessageList((list) => [...list, data])
+                }
             }
 
         }
         )
 
-    }, [])
+    }, [socket])
 
 
     let images = [];
@@ -127,7 +144,7 @@ const PublicReportsView = (props) => {
             const formData = new FormData();
             formData.append('author', author);
             formData.append('comment', comment);
-            dispatch(addComment(dump._id, formData))
+            dispatch(addComment(dump && dump._id, formData))
             let authorForNotif
 
             if (author === "Anonymous") {
@@ -146,7 +163,7 @@ const PublicReportsView = (props) => {
             const cleanCommentFil = swearjarEng.censor(cleanCommentEng);
 
             const commentData = {
-                room: dump.chat_id.room,
+                room: dump && dump.chat_id && dump.chat_id.room,
                 author: authorForNotif,
                 comment: cleanCommentFil,
                 createdAt: new Date(Date.now()),
@@ -161,26 +178,27 @@ const PublicReportsView = (props) => {
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+            {/* {console.log("dump", dump)} */}
             <View style={RandomStyle.vContainer}>
                 <View style={RandomStyle.vHeader}>
-                    <Text style={RandomStyle.vText1}>Illegal Dump No. {dump._id}</Text>
+                    <Text style={RandomStyle.vText1}>Illegal Dump No. {dump && dump._id}</Text>
                     <HStack justifyContent={"space-between"}>
                         <VStack>
                             <HStack>
                                 <Text style={RandomStyle.vText2}>Status: </Text>
                                 <Text>{status === "newReport" ? "New Report" : status}</Text>
                             </HStack>
-                            {dump.date_cleaned != null ?
+                            {dump && dump.date_cleaned != null ?
                                 <HStack>
                                     <Text style={RandomStyle.vText2}>Date Cleaned: </Text>
                                     <Text>{new Date(dump.date_cleaned).toLocaleDateString()}</Text>
                                 </HStack>
                                 : null
                             }
-                            <Text>{creationDate}</Text>
+                            <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
                         </VStack>
                         <HStack>
-                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump.chat_id.chats, chatDetail: dump.chat_id, chatId: dump.chat_id._id }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity>
 
@@ -254,19 +272,19 @@ const PublicReportsView = (props) => {
                 </View>
                 <HStack style={{ flexWrap: 'wrap', alignItems: "flex-start" }}>
                     <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                    <Text>{dump.complete_address}</Text>
+                    <Text>{dump && dump.complete_address}</Text>
                 </HStack>
                 <HStack>
                     <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
-                    <Text>{dump.landmark}</Text>
+                    <Text>{dump && dump.landmark}</Text>
                 </HStack>
-                <View style={RandomStyle.vMapContainer}>
-                    {console.log(dump.coordinates.longtitude)}
-                    <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
-
-                </View>
+                {dump && dump.coordinates && dump.coordinates.longtitude ?
+                    <View style={RandomStyle.vMapContainer}>
+                        <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
+                    </View> : null
+                }
                 <View style={RandomStyle.vImages}>
-                    {dump.images.map((img, index) =>
+                    {dump && dump.images && dump.images.map((img, index) =>
                         <TouchableOpacity key={index} onPress={() => showImages(index)}>
                             <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
                         </TouchableOpacity>
@@ -281,7 +299,7 @@ const PublicReportsView = (props) => {
 
                 <Text style={RandomStyle.vText2}>Type of Waste</Text>
                 <View style={RandomStyle.vContainer2}>
-                    {dump.waste_type.forEach(wt => {
+                    {dump && dump.waste_type && dump.waste_type.forEach(wt => {
                         if (!uniqueWt.includes(wt.type)) {
                             uniqueWt.push(wt.type)
                         }
@@ -291,21 +309,21 @@ const PublicReportsView = (props) => {
                         <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
                     )}
                 </View>
-                {dump.waste_size ?
+                {dump && dump.waste_size ?
                     <>
                         <Text style={RandomStyle.vText2}>Size of Waste</Text>
                         <View style={RandomStyle.vContainer2}>
-                            <Text style={RandomStyle.vOption}>{item.waste_size}</Text>
+                            <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
                         </View>
                     </>
                     :
                     ""}
 
-                {dump.accessible_by ?
+                {dump && dump.accessible_by ?
                     <>
                         <Text style={RandomStyle.vText2}>Accessible by</Text>
                         <View style={RandomStyle.vContainer2}>
-                            <Text style={RandomStyle.vOption}>{item.accessible_by}</Text>
+                            <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
                         </View>
                     </>
                     : ""
@@ -313,17 +331,17 @@ const PublicReportsView = (props) => {
 
                 <Text style={RandomStyle.vText2}>Category of Violation</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{dump.category_violation}</Text>
+                    <Text>{dump && dump.category_violation}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Additional Details</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{dump.additional_desciption}</Text>
+                    <Text>{dump && dump.additional_desciption}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Reported by</Text>
                 <View style={RandomStyle.vContainer2}>
-                    <Text>{dump.report_using}</Text>
+                    <Text>{dump && dump.report_using}</Text>
                 </View>
 
                 <Text style={RandomStyle.vText2}>Comment Section</Text>
@@ -345,7 +363,7 @@ const PublicReportsView = (props) => {
                     <Text style={RandomStyle.vText4}>Post</Text>
                 </BhButton>
 
-                {allComments.length > 0 ?
+                {allComments && allComments.length > 0 ?
                     allComments.map((item) =>
                         <View key={Math.random()} style={RandomStyle.vComment}>
                             <Text style={RandomStyle.vText2}>{item.author}</Text>

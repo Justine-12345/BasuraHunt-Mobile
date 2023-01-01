@@ -3,7 +3,7 @@ import { FlatList, Text, View, TouchableOpacity } from "react-native";
 import { HStack, VStack } from "native-base";
 import RandomStyle from "../../stylesheets/randomStyle";
 
-const ScheduleToday = () => {
+const ScheduleToday = ({navigation}) => {
 
     const [schedules, setSchedules] = useState(["a","b","c","b","c","b","c","b","c","b","c","b","c"]);
 
@@ -31,7 +31,7 @@ const ScheduleToday = () => {
                                 <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
                                 <Text numberOfLines={1} style={RandomStyle.lItem2}>asdasdfsdsd as, asdasd, asdasdasd, asdasdasd, asdasdasd, asdasdasdasda</Text>
                             </VStack>
-                            <TouchableOpacity activeOpacity={0.8} style={{width: 250, alignSelf: "center"}}>
+                            <TouchableOpacity onPress={() => navigation.navigate("ScheduleView")} activeOpacity={0.8} style={{width: 250, alignSelf: "center"}}>
                                 <Text style={RandomStyle.pButton2}>Watch Now</Text>
                             </TouchableOpacity>
                         </VStack>

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment } from "react";
-import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing } from "react-native";
+import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions } from "react-native";
 import { HStack } from "native-base";
 import ReversedFlatList from 'react-native-reversed-flat-list';
 import ChatBubble from "../../stylesheets/chatBubble";
@@ -12,16 +12,18 @@ import { APPEND_CHAT, GET_CHAT_RESET } from "../../Redux/Constants/chatConstants
 import { SOCKET_PORT } from "../../Redux/Constants/socketConstants";
 import * as io from 'socket.io-client';
 const socket = io.connect(SOCKET_PORT);
-
+let deviceWidth = Dimensions.get('window').width
 const Chat = (props) => {
     const dispatch = useDispatch();
 
     const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
 
-    // const allChat = props.route.params.chat
-    const chatDetail = props.route.params.chatDetail
+
+    const chatDetail = props.route.params.chatDetail 
     const chatId = props.route.params.chatId
-    const chatLength = props.route.params.chat.length
+    const chatLength = props.route.params.chatLength
+    const dumpId = props.route.params.dumpId
+    const dumpLocation = props.route.params.dumpLocation
     const sampleData = require("../../assets/sampleData/chat.json");
     const [message, setMessage] = useState("");
     const flatlist = useRef();
@@ -51,7 +53,7 @@ const Chat = (props) => {
             return ()=>{
                 setMessageList([])
             }
-        }, [])
+        }, [chatId])
     )
     useEffect(() => {
         socket.on("receive_message", (data) => {
@@ -228,6 +230,7 @@ const Chat = (props) => {
                     source={{ uri: "https://res.cloudinary.com/basurahunt/image/upload/v1658224082/BasuraHunt/Static/BasuraHunt_-_logo_v2aymh.png" }}
                 // resizeMode="cover"
                 />
+                
                 <Animated.Text numberOfLines={1}
                     style={[styles.headerText, {
                         transform: [
@@ -264,10 +267,19 @@ const Chat = (props) => {
                             inputRange: [0, 1],
                             outputRange: [0, 1]
                         })
-                    }]}>Chat with Admin</Animated.Text>
+                    }]}>
+                    Chat with Admin 
+                    </Animated.Text>
+                   
 
             </Animated.View>
-            {console.log("messageList", messageList === undefined || messageList.length <= 0)}
+            <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12}}>
+                <Text style={{fontSize:10, width:deviceWidth, color:"white"}}>Report ID: {dumpId}</Text>
+            </View>
+            <View style={{ backgroundColor: "#1E5128",  paddingHorizontal: 12}}>
+                <Text style={{fontSize:10, width:deviceWidth,  color:"white"}}>Location: {dumpLocation}</Text>
+            </View>
+            {/* {console.log("messageList", messageList === undefined || messageList.length <= 0)} */}
             <FlatList
                 ref={flatlist}
                 inverted={true}

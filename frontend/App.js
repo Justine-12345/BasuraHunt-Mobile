@@ -1,5 +1,5 @@
-import React from 'react';
-import { Container, NativeBaseProvider } from 'native-base';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import { Container, NativeBaseProvider, Text } from 'native-base';
 import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -14,7 +14,6 @@ import AuthNav from './navigators/authNav';
 import Toast from 'react-native-toast-message';
 import { Provider } from 'react-redux';
 import store from './Redux/Store';
-import registerNNPushToken from 'native-notify';
 import Verification from './screens/user/register/verification';
 // import IntroLoading from './screens/extras/IntroLoading2';
 import OTP from './screens/user/otp';
@@ -22,7 +21,16 @@ import Chat from './screens/chat/chat';
 
 import GarbageCollectorNav from './navigators/garbageCollector/garbageCollectorNav';
 import HomeCollectorNav from './navigators/garbageCollector/homeCollectorNav';
+import ForgotPassword from './screens/user/forgot-password';
+import ResetPassword from './screens/user/reset-password';
+import SchedNotifView from './screens/schedule/schedule-notification-view';
+import * as Notifications from 'expo-notifications';
+import { navigationRef } from './navigators/RootNavigation';
+import * as RootNavigation from './navigators/RootNavigation';
+import { SET_PUSH_NOTIFICATION } from './Redux/Constants/pushNotificationConstants';
 
+
+import { useDispatch } from 'react-redux';
 const Theme = {
   ...DefaultTheme,
   colors: {
@@ -31,14 +39,48 @@ const Theme = {
   }
 }
 
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: true,
+    shouldSetBadge: true,
+  }),
+});
+
 export default function App() {
-  registerNNPushToken(4801, 'OugbPUmRAVMDRi9zFZP5Au');
+  const [notification, setNotification] = useState(false);
+  const [txt, setTxt] = useState("false");
+  const [not, setNot] = useState()
+  const notificationListener = useRef();
+  const responseListener = useRef();
+  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+
+  useEffect(() => {
+    console.log("lastNotificationResponse",lastNotificationResponse&&lastNotificationResponse.notification.request.content.data.screen)
+    if (lastNotificationResponse) {
+      store.dispatch({
+        type: SET_PUSH_NOTIFICATION,
+        payload: lastNotificationResponse && lastNotificationResponse.notification.request.content.data
+      })
+    }
+  }, [lastNotificationResponse]);
+
+
+
+
   return (
     <Provider store={store}>
-      <NavigationContainer theme={Theme}>
+      <NavigationContainer ref={navigationRef} theme={Theme}>
         <NativeBaseProvider>
+
           <Header />
-          <AuthNav/>
+          <AuthNav />
+
+          {/* <SchedNotifView/> */}
+
+
+          {/* <ResetPassword/> */}
+          {/* <ForgotPassword/> */}
           {/* <RegisterNav /> */}
           {/* <Main/> */}
           {/* <AccessDenied/> */}

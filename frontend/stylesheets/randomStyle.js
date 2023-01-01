@@ -1,6 +1,6 @@
 import { StyleSheet, Dimensions } from "react-native";
 
-var {width, height} = Dimensions.get("window");
+var { width, height } = Dimensions.get("window");
 
 const RandomStyle = StyleSheet.create({
     // ranking
@@ -29,7 +29,7 @@ const RandomStyle = StyleSheet.create({
         borderBottomWidth: 2,
         borderBottomColor: "white"
     },
-    rItems:{
+    rItems: {
         backgroundColor: "#1E5128",
         // justifyContent: "space-between",
         marginVertical: 5,
@@ -111,19 +111,19 @@ const RandomStyle = StyleSheet.create({
     lContainer3: {
         padding: 10
     },
-    lLatestTitle:{
+    lLatestTitle: {
         color: "#f7faf7",
         fontSize: 25,
         fontWeight: "bold",
         margin: 10,
         width: "90%"
     },
-    lTitle:{
+    lTitle: {
         color: "#1E5128",
         fontSize: 15,
         fontWeight: "bold",
         margin: 5,
-        width: width-150
+        width: width - 150
     },
     lLatestImg: {
         width: "100%",
@@ -146,14 +146,14 @@ const RandomStyle = StyleSheet.create({
     },
     lContent: {
         color: "black",
-        width: width-140,
+        width: width - 140,
         margin: 5,
         fontSize: 15
     },
     lType: {
         marginHorizontal: 5,
         color: "grey",
-        width: width-140,
+        width: width - 140,
     },
     lContainer4: {
         minHeight: 100,
@@ -179,26 +179,26 @@ const RandomStyle = StyleSheet.create({
         color: "white",
         textAlign: "center"
     },
-    lHeader1:{
+    lHeader1: {
         fontSize: 12,
         fontWeight: "bold",
         color: "white",
         opacity: .7,
         textAlign: "center",
     },
-    lItem:{
+    lItem: {
         fontSize: 15,
         color: "white",
         textAlign: "center",
-        width: width/2.3
+        width: width / 2.3
     },
-    lItem2:{
+    lItem2: {
         fontSize: 15,
         color: "white",
         textAlign: "center"
     },
     // search
-    searchContainer:{
+    searchContainer: {
         height: 40
     },
     searchInput: {
@@ -237,7 +237,7 @@ const RandomStyle = StyleSheet.create({
     vMapContainer: {
         backgroundColor: "lightgrey",
         width: "100%",
-        height: width/1.5,
+        height: width / 1.5,
         marginVertical: 0,
     },
     vImages: {
@@ -277,11 +277,11 @@ const RandomStyle = StyleSheet.create({
         margin: 2.5,
         padding: 5,
         borderRadius: 5,
-        minWidth: width/2.5,
+        minWidth: width / 2.5,
         textAlign: "center",
         color: "white"
     },
-    vText1:{
+    vText1: {
         fontWeight: "bold",
         fontSize: 20
     },
@@ -299,7 +299,12 @@ const RandomStyle = StyleSheet.create({
         color: "green",
         textAlign: "left",
         fontSize: 20,
-        fontWeight: "bold"
+        fontWeight: "bold",
+    },
+    vText6: {
+        color: "white", textAlign: "center",
+        backgroundColor: "#4F7942", marginBottom: 20, marginTop: 10,
+        fontSize: 20
     },
     vMultiline: {
         backgroundColor: "white",

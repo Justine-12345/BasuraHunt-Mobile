@@ -82,7 +82,7 @@ import baseURL from '../../assets/commons/baseURL'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
 // Login
-export const login = (email, password) => async (dispatch) => {
+export const login = (email, password, pushToken = '') => async (dispatch) => {
     try {
 
         dispatch({ type: LOGIN_REQUEST })
@@ -93,7 +93,7 @@ export const login = (email, password) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.post(`${baseURL}/login`, { email, password }, config)
+        const { data } = await axios.post(`${baseURL}/login`, { email, password, pushToken}, config)
         dispatch({
             type: LOGIN_SUCCESS,
             payload: data
@@ -248,8 +248,6 @@ export const loadUser = () => async (dispatch) => {
         })
 
     } catch (error) {
-        localStorage.clear()
-
         dispatch({
             type: LOAD_USER_FAIL,
             payload: error.response.data.message
@@ -263,13 +261,21 @@ export const updateProfile = (userData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_PROFILE_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
         const config = {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             }
         }
 
-        const { data } = await axios.put('/api/v1/me/update', userData, config)
+        const { data } = await axios.put(`${baseURL}/me/update`, userData, config)
 
         dispatch({
             type: UPDATE_PROFILE_SUCCESS,
@@ -291,13 +297,21 @@ export const updatePassword = (passwords) => async (dispatch) => {
 
         dispatch({ type: UPDATE_PASSWORD_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             }
         }
 
-        const { data } = await axios.put('/api/v1/password/update', passwords, config)
+        const { data } = await axios.put(`${baseURL}/password/update`, passwords, config)
 
         dispatch({
             type: UPDATE_PASSWORD_SUCCESS,
@@ -319,13 +333,21 @@ export const forgotPassword = (email) => async (dispatch) => {
 
         dispatch({ type: FORGOT_PASSWORD_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             }
         }
 
-        const { data } = await axios.post('/api/v1/password/forgot', email, config)
+        const { data } = await axios.post(`${baseURL}/password/forgot`, email, config)
 
         dispatch({
             type: FORGOT_PASSWORD_SUCCESS,
@@ -342,18 +364,26 @@ export const forgotPassword = (email) => async (dispatch) => {
 
 
 // Reset password
-export const resetPassword = (token, passwords) => async (dispatch) => {
+export const resetPassword = (code, passwords) => async (dispatch) => {
     try {
 
         dispatch({ type: NEW_PASSWORD_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             }
         }
 
-        const { data } = await axios.put(`/api/v1/password/reset/${token}`, passwords, config)
+        const { data } = await axios.put(`${baseURL}/password/reset/${code}`, passwords, config)
 
         dispatch({
             type: NEW_PASSWORD_SUCCESS,
@@ -369,10 +399,25 @@ export const resetPassword = (token, passwords) => async (dispatch) => {
 }
 
 // Logout user
-export const logout = () => async (dispatch) => {
+export const logout = (user_id = '', pushToken = '', ismobile = '') => async (dispatch) => {
     try {
 
-        await axios.get(`${baseURL}/logout`)
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+
+
+        await axios.post(`${baseURL}/logout`,{user_id, pushToken, ismobile},config)
 
         dispatch({
             type: LOGOUT_SUCCESS,
@@ -628,8 +673,22 @@ export const getLevelExp = () => async (dispatch) => {
 
         dispatch({ type: GET_LEVEL_EXP_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+      
 
-        const { data } = await axios.get(`/api/v1/me/level-exp`)
+        const { data } = await axios.get(`${baseURL}/me/level-exp`, config)
 
         dispatch({
             type: GET_LEVEL_EXP_SUCCESS,

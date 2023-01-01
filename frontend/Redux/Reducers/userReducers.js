@@ -276,8 +276,9 @@ export const forgotPasswordReducer = (state = {}, action) => {
             }
 
         case NEW_PASSWORD_SUCCESS:
-            localStorage.setItem("isAuthenticated", true);
-            localStorage.setItem("user", JSON.stringify(action.payload.user));
+            AsyncStorage.setItem("isAuthenticated", "true");
+            AsyncStorage.setItem("user", JSON.stringify(action.payload.user));
+            AsyncStorage.setItem("jwt", action.payload.token);
             return {
                 ...state,
                 success: action.payload.success,

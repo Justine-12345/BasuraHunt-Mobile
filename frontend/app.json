@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
+    "scheme": "com.basurahunt",
     "userInterfaceStyle": "light",
     "splash": {
       "image": "./assets/splash.png",
@@ -25,6 +26,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#f7faf7"
       },
+      "useNextNotificationsApi": true,
       "permissions":[
         "ACCESS_COARSE_LOCATION",
         "ACCESS_FINE_LOCATION",

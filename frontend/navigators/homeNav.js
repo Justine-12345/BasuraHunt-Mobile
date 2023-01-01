@@ -43,13 +43,13 @@ function MyTabs() {
                     title: "Illegal Dumps"
                 }}
             />
-             <Tab.Screen
+             {/* <Tab.Screen
                 name="About"
                 component={About}
                 options={{
                     title: "About"
                 }}
-            />
+            /> */}
         </Tab.Navigator>
     )
 }

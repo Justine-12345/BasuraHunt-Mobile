@@ -1,33 +1,77 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import { Text, View, Image, StyleSheet, Dimensions, ActivityIndicator } from "react-native";
 import { HStack } from "native-base";
 import { Skeleton } from "@rneui/themed";
 import { LinearGradient } from "expo-linear-gradient";
-import { getPushDataObject } from 'native-notify'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import Toast from 'react-native-toast-message';
+import { useNotifications } from "../../../hooks/useNotifications";
+import * as Notifications from 'expo-notifications';
+// import * as Device from 'expo-device';
+// import { Platform } from 'react-native';
+
 
 var { width } = Dimensions.get("window");
 
+// Notifications.setNotificationHandler({
+//   handleNotification: async () => ({
+//     shouldShowAlert: true,
+//     shouldPlaySound: true,
+//     shouldSetBadge: true,
+//   }),
+// });
+
+
 export default function LoadingStart({ navigation }) {
 
-  let pushDataObject = getPushDataObject();
-  let i = 1
+
+//   const [notification, setNotification] = useState(false);
+//   const [not, setNot] = useState()
+//   const notificationListener = useRef();
+//   const responseListener = useRef();
+//  const lastNotificationResponse = Notifications.useLastNotificationResponse();
+
+
+  // useEffect(() => {
+   
+  //   // navigation.navigate("Main",{screen:"Schedule"})
+    
+  // }, [lastNotificationResponse]);
+
+
+
+  // useEffect(() => {
+
+  //   // This listener is fired whenever a notification is received while the app is foregrounded
+  //   notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+  //     console.log("notification", notification);
+  //   });
+
+  //   // This listener is fired whenever a user taps on or interacts with a notification (works when app is foregrounded, backgrounded, or killed)
+  //   responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+  //     console.log("response",response);
+  //     // navigation.navigate(`${response.notification.request.content.data}`)
+
+  //     // const screen = response.notification.request.content.data.screen
+  //     // let message
+  //     // if (response.notification.request.content.data.message) {
+  //     //   message = response.notification.request.content.data.message
+  //     // }
+  //     // if (screen === 'SchedNotifView') {
+  //     //   navigation.navigate('Schedule', { screen: 'TodaySchedNav', params: { screen: 'SchedNotifView', params: { title:message } } })
+  //     // }
+  //   });
+
+  //   // return () => {
+  //   //   Notifications.removeNotificationSubscription(notificationListener.current);
+  //   //   Notifications.removeNotificationSubscription(responseListener.current);
+  //   // };
+  // });
+
+
   useFocusEffect(
     useCallback(() => {
-
-      // if(pushDataObject.screenName){
-
-      //   Toast.show({
-      //     type: 'success',
-      //     text1: pushDataObject.screenName,
-      //     text2: 'Welcome To BasuraHunt, You can Log in Now'
-      // });
-
-      //  navigation.navigate(`${pushDataObject.screenName}`)
-
-      // }
 
 
       let token
@@ -36,7 +80,7 @@ export default function LoadingStart({ navigation }) {
           token = res
         })
         .catch((error) => console.log(error))
-      console.log(token)
+  
 
 
 
@@ -52,9 +96,15 @@ export default function LoadingStart({ navigation }) {
         });
 
         if (userInfo.isAuthenticated) {
+
+
           if (JSON.parse(userInfo.user).otp_status === "Verified") {
 
             if (JSON.parse(userInfo.user).role === "user") {
+
+
+
+
               navigation.dispatch(
                 CommonActions.reset({
                   index: 1,
@@ -64,6 +114,9 @@ export default function LoadingStart({ navigation }) {
                 })
               );
               navigation.navigate('Main')
+
+
+
             } else if (JSON.parse(userInfo.user).role === "garbageCollector") {
               navigation.dispatch(
                 CommonActions.reset({
@@ -104,30 +157,21 @@ export default function LoadingStart({ navigation }) {
             );
             navigation.navigate('OTP')
           }
+
+
+
         } else {
 
-          // For Notification
-          if (i === 0) {
+          navigation.dispatch(
+            CommonActions.reset({
+              index: 1,
+              routes: [
+                { name: 'Login' }
+              ],
+            })
+          );
+          navigation.navigate('Login')
 
-            Toast.show({
-              type: 'success',
-              text1: 'Register',
-              text2: 'Welcome To BasuraHunt, You can Log in Now'
-            });
-
-            navigation.navigate('Register')
-          } else {
-
-            navigation.dispatch(
-              CommonActions.reset({
-                index: 1,
-                routes: [
-                  { name: 'Login' }
-                ],
-              })
-            );
-            navigation.navigate('Login')
-          }
         }
 
       });
@@ -170,3 +214,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#1E5128"
   }
 })
+
+
+
+

@@ -4,7 +4,6 @@ import { createStackNavigator } from "@react-navigation/stack";
 import PublicReportsList from "../screens/home/reports/public-reports-list";
 import PublicReportsView from "../screens/home/reports/public-reports-view";
 import PublicReportsUpdate from "../screens/home/reports/public-reports-update";
-import Chat from "../screens/chat/chat";
 
 const Stack = createStackNavigator();
 
@@ -27,13 +26,13 @@ function MyStack() {
                     headerShown:false
                 }}
             />
-             <Stack.Screen
+             {/* <Stack.Screen
                 name="PublicReportsChat"
                 component={Chat}
                 options={{
                     headerShown:false
                 }}
-            />
+            /> */}
             <Stack.Screen
                 name="PublicReportsUpdate"
                 component={PublicReportsUpdate}

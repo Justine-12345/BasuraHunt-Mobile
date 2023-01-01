@@ -162,6 +162,19 @@ const userSchema = new mongoose.Schema({
 		type:String,
 	},
 
+	push_tokens: [
+        {
+            push_token: {
+                type:String,
+            }
+
+        }
+    ],
+
+	allows_notification:{
+		type:String,
+	},
+
 	otp_status:{
 		type:String,
 		 enum: {
@@ -258,6 +271,17 @@ userSchema.methods.getResetPasswordToken = function (){
 	this.resetPasswordExpire = Date.now() + 30 * 60 * 1000
 
 	return resetToken
+}
+
+
+userSchema.methods.getResetPasswordTokenMobile = function (code){
+
+	this.resetPasswordToken = code
+
+	//Set token expire time
+	this.resetPasswordExpire = Date.now() + 30 * 60 * 1000
+
+	return code
 }
 
 

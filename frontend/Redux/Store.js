@@ -31,6 +31,8 @@ import {
     chatReducer
 } from './Reducers/chatReducers';
 
+import { pushNotificationReducer } from './Reducers/pushNotificationReducer';
+
 import { coordinateReducer } from './Reducers/mapReducers';
 
 const reducers = combineReducers({
@@ -59,7 +61,9 @@ const reducers = combineReducers({
     chatDetails: chatDetailsReducer,
     chat: chatReducer,
 
-    coordinate: coordinateReducer
+    coordinate: coordinateReducer,
+    
+    pushNotification:pushNotificationReducer
 })
 
 const store = createStore(

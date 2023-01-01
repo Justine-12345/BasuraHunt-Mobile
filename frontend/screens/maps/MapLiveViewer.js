@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import MapView, { PROVIDER_GOOGLE, Marker } from 'react-native-maps';
 
-import { StyleSheet, Text, View, Dimensions, Image, TouchableOpacity, ActivityIndicator } from 'react-native';
+import { StyleSheet, Text, View, Dimensions, Image, TouchableOpacity,ActivityIndicator } from 'react-native';
 import * as Location from 'expo-location';
 import { SET_COORDINATE } from '../../Redux/Constants/mapConstants';
 import { useDispatch, useSelector } from 'react-redux';
@@ -11,7 +11,7 @@ import * as io from 'socket.io-client';
 import AsyncStorage from '@react-native-async-storage/async-storage'
 const socket = io.connect(SOCKET_PORT);
 
-const MapLive = ({ room }) => {
+const MapLiveViewer = ({ room }) => {
 
     let lat = 0;
     let lng = 0
@@ -25,72 +25,65 @@ const MapLive = ({ room }) => {
 
     const [latMarker, setLatMarker] = useState(0)
     const [lngMarker, setLngMarker] = useState(0)
+    const [isOnline, setIsOnline] = useState(false)
 
 
-    let subscription
-    const getUserLocation = async () => {
 
-        let { status } = await Location.requestForegroundPermissionsAsync();
-        if (status !== 'granted') {
-            alert('Permission to access location was denied');
-        }
+    // let subscription
+    // const getUserLocation = async () => {
 
-        subscription = await Location.watchPositionAsync({ accuracy: Location.Accuracy.Highest, timeInterval: 300, distanceInterval: 0 }, loc => {
-            setLatUser(loc.coords.latitude)
-            setLngUser(loc.coords.longitude)
-            setLatInit(loc.coords.latitude)
-            setLngInit(loc.coords.longitude)
+    //     let { status } = await Location.requestForegroundPermissionsAsync();
+    //     if (status !== 'granted') {
+    //         alert('Permission to access location was denied');
+    //     }
 
-            const coordsData = {
-                room: room && room,
-                author: user && user.first_name,
-                message: [loc.coords.longitude, loc.coords.latitude],
-                time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
-                online: true
+    //     subscription = await Location.watchPositionAsync({ accuracy: Location.Accuracy.Highest, timeInterval: 300, distanceInterval: 0 }, loc => {
+    //         setLatUser(loc.coords.latitude)
+    //         setLngUser(loc.coords.longitude)
+    //         setLatInit(loc.coords.latitude)
+    //         setLngInit(loc.coords.longitude)
+
+    //         const coordsData = {
+    //             room: room && room,
+    //             author: user && user.first_name,
+    //             message: [loc.coords.longitude, loc.coords.latitude],
+    //             time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
+    //             online: true
+    //         }
+
+    //         socket.emit("send_message", coordsData);
+
+    //     });
+
+
+
+    // }
+
+    useEffect(() => {
+        socket.on("receive_message", (data) => {
+            if (data) {
+                setIsOnline(data.online)
+                setLatInit(data.message&&data.message[1])
+                setLngInit(data.message&&data.message[0])
             }
-
-            socket.emit("send_message", coordsData);
-
-        });
-
-
-
-    }
+        })
+        return () => {
+            socket.disconnect()
+        }
+    }, [socket])
 
     useFocusEffect(
         useCallback(() => {
             socket.disconnect()
-
-            AsyncStorage.getItem("user")
-                .then((res) => {
-                    setUser(JSON.parse(res))
-                })
-                .catch((error) => console.log(error))
-
             socket.connect()
             socket.emit("join_room", [room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
             return async () => {
-                const coordsData = {
-                    room: room && room,
-                    author: user && user.first_name,
-                    message: [lngInit, latInit],
-                    time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
-                    online: false
-                }
-                socket.emit("send_message", coordsData);
                 socket.disconnect()
                 setLatInit(0)
                 setLngInit(0)
-                await subscription.remove()
             }
         }, [])
     )
-
-    useEffect(() => {
-        getUserLocation()
-    }, [])
-
-
 
 
 
@@ -98,7 +91,7 @@ const MapLive = ({ room }) => {
     return (
         <>
             <View style={styles.container}>
-                {latInit !== 0 && lngInit !== 0 ?
+                {latInit !== 0 && lngInit !== 0 && isOnline ?
                     <MapView style={styles.map}
                         provider={PROVIDER_GOOGLE}
                         region={{
@@ -108,10 +101,6 @@ const MapLive = ({ room }) => {
                             longitudeDelta: 0.00011,
                         }}
 
-
-
-                        onMapReady={getUserLocation}
-                    // onRegionChangeComplete={onRegionChange}
                     >
                         <Marker
                             coordinate={{
@@ -144,4 +133,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default MapLive
+export default MapLiveViewer

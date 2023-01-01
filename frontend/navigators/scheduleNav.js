@@ -6,6 +6,8 @@ import CScheduleToday from "../screens/garbageCollector/schedule/schedule-today"
 import GScheduleUpcoming from "../screens/garbageCollector/schedule/schedule-upcoming";
 // import ScheduleUpcoming from "../screens/schedule/schedule-upcoming";
 import Start from "../screens/garbageCollector/schedule/start";
+import TodaySchedNav from "./todaySchedNav";
+import ScheduleUpcoming from "../screens/schedule/schedule-upcoming";
 const Tab = createMaterialTopTabNavigator();
 
 function MyTabs() {
@@ -23,10 +25,10 @@ function MyTabs() {
             }}
         >
             <Tab.Screen
-                name="CScheduleToday"
-                component={CScheduleToday}
+                name="TodaySchedNav"
+                component={TodaySchedNav}
                 options={{
-                    title: "My Collection Today"
+                    title: "Collection Today"
                 }}
             />
 
@@ -53,8 +55,8 @@ function MyTabs() {
                 }}
             /> */}
               <Tab.Screen
-                name="GScheduleUpcoming"
-                component={GScheduleUpcoming}
+                name="ScheduleUpcoming"
+                component={ScheduleUpcoming}
                 options={{
                     title: "Upcoming"
                 }}

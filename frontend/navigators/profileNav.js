@@ -1,41 +1,41 @@
 import React from "react";
 import { createStackNavigator } from "@react-navigation/stack";
 
-import UserReportsList from "../screens/user/profile/user-reports-list";
-import PublicReportsView from "../screens/home/reports/public-reports-view";
-import PublicReportsUpdate from "../screens/home/reports/public-reports-update";
-
+import Profile from "../screens/user/profile/profile";
+import ProfileUpdate from "../screens/user/profile/profile-update";
+import ProfileUpdatePassword from "../screens/user/profile/profile-update-password";
 const Stack = createStackNavigator();
 
 function MyStack() {
+
+    
     return (
         <Stack.Navigator>
             <Stack.Screen
-                name="UserReportsList"
-                component={UserReportsList}
+                name="Profile"
+                component={Profile}
                 options={{
                     headerShown:false
                 }}
             />
             <Stack.Screen
-                name="MyPublicReportsView"
-                component={PublicReportsView}
+                name="ProfileUpdate"
+                component={ProfileUpdate}
                 options={{
                     headerShown:false
                 }}
             />
             <Stack.Screen
-                name="MyPublicReportsUpdate"
-                component={PublicReportsUpdate}
+                name="ProfileUpdatePassword"
+                component={ProfileUpdatePassword}
                 options={{
                     headerShown:false
                 }}
             />
-           
         </Stack.Navigator>
     )
 }
 
-export default function MyReports() {
+export default function ProfileNav() {
     return <MyStack/>;
 }

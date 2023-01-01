@@ -219,9 +219,23 @@ export const getSingleDump = (id) => async (dispatch) => {
 
         dispatch({ type: DUMP_DETAILS_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+                
+            })
+            .catch((error) => console.log(error))
 
-        const { data } = await axios.get(`/api/v1/dump/${id}`)
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
 
+        const { data } = await axios.get(`${baseURL}/dump/${id}`,config)
+        console.log("data",data)
         dispatch({
             type: DUMP_DETAILS_SUCCESS,
             payload: data
