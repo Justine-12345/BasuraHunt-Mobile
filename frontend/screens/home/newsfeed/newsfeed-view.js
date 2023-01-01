@@ -26,6 +26,36 @@ const NewsfeedView = (props) => {
         setImgIndex(index);
     }
 
+    const formatDate = (newsfeedDate) => {
+		let dateCreated = new Date(newsfeedDate);
+
+		const months = ["January", "February", "March", "April", "May", "June",
+			"July", "August", "September", "October", "November", "December"];
+		
+		const month = months[dateCreated.getMonth()];
+		const year = dateCreated.getFullYear();
+
+		const formattedDate = month + " " + dateCreated.getDate() + ", " + year;
+
+		return formattedDate;
+	}
+
+    const getTags = (tags) => {
+		let tagLists = "";
+
+		for (let i = 0; i < tags.length ; i++) {
+	    	
+			if(i !== tags.length - 1) {
+				tagLists = tagLists + tags[i].tag + ", "
+			}
+			else {
+				tagLists = tagLists + tags[i].tag
+			}
+	    }
+		
+		return tagLists;
+	}
+
     const date = new Date(item.createdAt).toLocaleDateString()
 
     const settings = {
@@ -72,17 +102,17 @@ const NewsfeedView = (props) => {
                     <HStack>
                         {/* tags */}
                         <Text style={RandomStyle.vText2}>Tags: </Text>
-                        <Text>*tags tags tags*</Text>
+                        <Text>{getTags(item.tags)}</Text>
                     </HStack>
                     <HStack>
                         {/* date published */}
                         <Text style={RandomStyle.vText2}>Date Published: </Text>
-                        <Text>{date}</Text>
+                        <Text>{formatDate(item.createdAt)}</Text>
                     </HStack>
                     <HStack>
                         {/* author */}
                         <Text style={RandomStyle.vText2}>Author: </Text>
-                        <Text>*author here*</Text>
+                        <Text>{item.user_id.first_name + " " + item.user_id.last_name}</Text>
                     </HStack>
                 </View>
 

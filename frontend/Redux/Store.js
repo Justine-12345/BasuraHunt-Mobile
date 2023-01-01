@@ -56,7 +56,6 @@ const reducers = combineReducers({
     ranking: rankingReducer,
     dumpComment: dumpCommentReducer,
 
-
     newChat: newChatReducer,
     chatDetails: chatDetailsReducer,
     chat: chatReducer,

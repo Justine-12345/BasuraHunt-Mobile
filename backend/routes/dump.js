@@ -6,7 +6,7 @@ const { getDumpList, newDump, getDumps, getSingleDump, updateDump, deleteDump, u
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
 router.route('/dump/new').post(isAuthenticatedUser, authorizeRoles('administrator', 'user', 'newUser'), newDump);
-router.route('/dumps').get(isAuthenticatedUser, authorizeRoles('administrator', 'user', 'newUser'), getDumps);
+router.route('/dumps').get(isAuthenticatedUser, authorizeRoles('administrator', 'garbageCollector', 'user', 'newUser'), getDumps);
 router.route('/dump/:id').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'garbageCollector', 'user', 'newUser'), getSingleDump);
 
 router.route('/dump-list').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'garbageCollector', 'user', 'newUser'), getDumpList);
