@@ -476,8 +476,21 @@ export const receiveItems = () => async (dispatch) => {
     try {
         dispatch({ type: USER_RECEIVE_REQUEST })
 
-        const { data } = await axios.get('/api/v1/me/receive-items')
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
 
+        const { data } = await axios.get(`${baseURL}/me/receive-items`, config)
         dispatch({
             type: USER_RECEIVE_SUCCESS,
             payload: data
@@ -495,7 +508,22 @@ export const donatedItems = () => async (dispatch) => {
     try {
         dispatch({ type: USER_DONATED_REQUEST })
 
-        const { data } = await axios.get('/api/v1/me/donated-items')
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+      
+
+        const { data } = await axios.get(`${baseURL}/me/donated-items`, config)
 
         dispatch({
             type: USER_DONATED_SUCCESS,
@@ -514,7 +542,21 @@ export const claimedItems = () => async (dispatch) => {
     try {
         dispatch({ type: USER_CLAIMED_REQUEST })
 
-        const { data } = await axios.get('/api/v1/me/claimed-items')
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+        
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+
+        const { data } = await axios.get(`${baseURL}/me/claimed-items`,config)
 
         dispatch({
             type: USER_CLAIMED_SUCCESS,

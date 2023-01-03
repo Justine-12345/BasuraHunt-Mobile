@@ -9,12 +9,15 @@ import UserDonationsList from "../screens/user/profile/user-donations-list";
 import UserClaimedDonationsList from "../screens/user/profile/user-claimed-donations-list";
 import PublicReportsView from "../screens/home/reports/public-reports-view";
 import MyReports from "./myreports";
+import MyDonations from "./myDonations";
+import MyClaimed from "./myClaimed";
+import MyReceived from "./myReceived";
 const Tab = createMaterialTopTabNavigator();
 
 function MyTabs() {
     return (
         <Tab.Navigator
-            backBehavior="history"
+            backBehavior="firstRoute"
             screenOptions={{
                 tabBarActiveTintColor: "black",
                 tabBarLabelStyle: {
@@ -55,23 +58,65 @@ function MyTabs() {
 
                         // Do something with the `navigation` object
                         navigation.navigate('UserReportsList');
-                        
+
                     },
                 })}
             />
             <Tab.Screen
-                name="UserDonationsList"
-                component={UserDonationsList}
+                name="MyDonations"
+                component={MyDonations}
                 options={{
                     title: "Donated Items"
                 }}
+
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('UserDonationsList');
+
+                    },
+                })}
+
             />
             <Tab.Screen
-                name="UserClaimedDonationsList"
-                component={UserClaimedDonationsList}
+                name="MyClaimed"
+                component={MyClaimed}
                 options={{
                     title: "Claimed Items"
                 }}
+
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('UserClaimedDonations');
+
+                    },
+                })}
+            />
+
+            <Tab.Screen
+                name="MyReceived"
+                component={MyReceived}
+                options={{
+                    title: "Received Items"
+                }}
+
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('UserReceivedDonations');
+
+                    },
+                })}
             />
 
         </Tab.Navigator>

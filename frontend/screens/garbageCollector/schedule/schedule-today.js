@@ -8,7 +8,9 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTodayCollectionPointList } from "../../../Redux/Actions/collectionPointActions"
 import Empty1 from "../../../stylesheets/empty1";
 import { TODAY_COLLECTION_POINT_LIST_RESET } from "../../../Redux/Constants/collectionPointConstants";
-
+import { liveMapNotification } from "../../../Redux/Actions/collectionPointActions";
+import RandomStringGenerator from "../../extras/randomStringGenerator";
+import NotificationSender from "../../extras/notificationSender";
 const CScheduleToday = ({ navigation }) => {
     const [userID, setUserID] = useState("");
     const { isRefreshed, collectionPointsToday } = useSelector(state => state.collectionPointsToday);
@@ -79,6 +81,18 @@ const CScheduleToday = ({ navigation }) => {
         }
     }
 
+    const sendNotificationStart = (collpoint)=> {
+        const notifCode = RandomStringGenerator(40)
+
+		const formData = new FormData();
+        	formData.append('liveStatus', 'start');
+        	formData.append('notifCode', notifCode);	
+            dispatch(liveMapNotification(collpoint._id,formData))
+
+	 	    NotificationSender(`Garbage Collector ${userID && userID.first_name} started a live map`,userID && userID._id, null,userID && userID.barangay, 'live', notifCode, collpoint)
+
+
+	}
 
     const getWatchBtn = (collectionPoint) => {
         const today = new Date();
@@ -102,7 +116,12 @@ const CScheduleToday = ({ navigation }) => {
         console.log(checkTime)
 
         if (checkTime) {
-            return <Link type="button" to={`/schedule/view/${collectionPoint._id}/${collectionPoint.roomCode}`} class="btn btn-success" style={{ width: "80%", margin: "auto", marginTop: "24px", marginBottom: "24px" }}><b>Watch Now</b></Link>;
+            return (
+            <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
+                onPress={() => navigation.navigate("Start", { collectionPoint: collectionPoint, collectionPoint_roomCode: collectionPoint.roomCode }, sendNotificationStart(collectionPoint))}
+            >
+                <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
+            </TouchableOpacity>);
         }
         else if (timeNow <= startTimeArray[0] + "" + startTimeArray[1]) {
             return "";
@@ -134,36 +153,35 @@ const CScheduleToday = ({ navigation }) => {
                     item.collectors.map((cp) => {
                         if (String(cp && cp.collector && cp.collector._id) === String(userID && userID._id)) {
                             return (
-                                <>
-                                    <View style={RandomStyle.lContainer4}>
-                                        <HStack>
-                                            {/* <Text style={RandomStyle.vBadgeGrey}>FINISHED</Text> */}
-                                            {/* <Text style={RandomStyle.vBadge}>ONGOING</Text> */}
-                                            <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
-                                                <Text style={RandomStyle.lHeader}>{dateNow()}</Text>
-                                                <HStack paddingY={2} justifyContent={"space-evenly"}>
-                                                    <VStack>
-                                                        <Text style={RandomStyle.lHeader1}>Type:</Text>
-                                                        <Text numberOfLines={1} style={RandomStyle.lItem}>{item.type}</Text>
-                                                    </VStack>
-                                                    <VStack>
-                                                        <Text style={RandomStyle.lHeader1}>Time:</Text>
-                                                        <Text numberOfLines={1} style={RandomStyle.lItem}>{collectionPointTime(item)}</Text>
-                                                    </VStack>
-                                                </HStack>
+                                <View key={item._id} style={RandomStyle.lContainer4}>
+                                    <HStack>
+                                        {/* <Text style={RandomStyle.vBadgeGrey}>FINISHED</Text> */}
+                                        {/* <Text style={RandomStyle.vBadge}>ONGOING</Text> */}
+                                        <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
+                                            <Text style={RandomStyle.lHeader}>{dateNow()}</Text>
+                                            <HStack paddingY={2} justifyContent={"space-evenly"}>
                                                 <VStack>
-                                                    <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
-                                                    <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
+                                                    <Text style={RandomStyle.lHeader1}>Type:</Text>
+                                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{item.type}</Text>
                                                 </VStack>
-                                                <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
-                                                    onPress={() => navigation.navigate("Start")}
-                                                >
-                                                    <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
-                                                </TouchableOpacity>
+                                                <VStack>
+                                                    <Text style={RandomStyle.lHeader1}>Time:</Text>
+                                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{collectionPointTime(item)}</Text>
+                                                </VStack>
+                                            </HStack>
+                                            <VStack>
+                                                <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
+                                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
                                             </VStack>
-                                        </HStack>
-                                    </View>
-                                </>
+                                            {getWatchBtn(item)}
+                                            {/* <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
+                                                onPress={() => navigation.navigate("Start", { collectionPoint: item })}
+                                            >
+                                                <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
+                                            </TouchableOpacity> */}
+                                        </VStack>
+                                    </HStack>
+                                </View>
                             )
                         }
                     })

@@ -64,7 +64,9 @@ const PublicReportsAdd = ({ navigation }) => {
         });
 
         if (!result.canceled){
-            setImages(items=>[...items, {uri: result.assets[0].uri}])
+            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
+            setImages(oldArray => [...oldArray, imageUri])
+            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
         }
     }
 
@@ -80,7 +82,9 @@ const PublicReportsAdd = ({ navigation }) => {
         });
 
         if(!result.canceled){
-            setImages(items=>[...items, {uri: result.assets[0].uri}])
+            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
+            setImages(oldArray => [...oldArray, imageUri])
+            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
         }
     }
 
@@ -145,7 +149,8 @@ const PublicReportsAdd = ({ navigation }) => {
             setDonateUsing('')
             dispatch({ type: ADD_ITEM_RESET })
             console.log("success")
-            navigation.navigate('User', { screen: 'UserDonationsList' });
+            navigation.navigate("User", {screen:'MyDonations', params:{screen:'UserDonationsList'}} )
+        
         }
 
         if (error) {
@@ -184,8 +189,8 @@ const PublicReportsAdd = ({ navigation }) => {
             formData.append("item_desc", "");
         }
 
-        images.forEach(images => {
-            formData.append('images', images)
+        images.forEach(image => {
+            formData.append('images', image)
         })
 
         itemTypes.forEach(it => {

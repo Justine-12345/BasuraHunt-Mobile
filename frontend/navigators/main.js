@@ -8,6 +8,7 @@ import DonationsNav from "./donationsNav";
 import UserNav from "./userNav";
 import PublicReportsAdd from "../screens/home/reports/public-reports-add";
 import Chat from "../screens/chat/chat";
+import ChatDonation from "../screens/chat/chat-donation";
 import ScheduleView from "../screens/schedule/schedule-view";
 const Tab = createBottomTabNavigator();
 
@@ -61,7 +62,7 @@ const Main = () => {
                     }
                 }}
             />
-             <Tab.Screen
+            <Tab.Screen
                 name="ScheduleView"
                 component={ScheduleView}
                 options={{
@@ -108,11 +109,31 @@ const Main = () => {
                         />
                     }
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('User',{screen:'ProfileNav'});
+                     
+
+                    },
+                })}
             />
 
             <Tab.Screen
                 name="PublicReportsChat"
                 component={Chat}
+                options={{
+                    tabBarButton: () => null,
+                    tabBarVisible: false,
+                }}
+            />
+
+            <Tab.Screen
+                name="PublicDonationsChat"
+                component={ChatDonation}
                 options={{
                     tabBarButton: () => null,
                     tabBarVisible: false,

@@ -5,11 +5,11 @@ import { HStack, VStack } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
 import { useDispatch, useSelector } from "react-redux";
-import { donatedItems } from "../../../Redux/Actions/userActions";
-const UserDonationsList = ({ navigation }) => {
+import { receiveItems } from "../../../Redux/Actions/userActions";
+const UserReceivedDonations = ({ navigation }) => {
     const dispatch = useDispatch()
     const sampleDonations = require("../../../assets/sampleData/items.json");
-    const { loading, error, userDonatedItems } = useSelector(state => state.userReportsAndItems)
+    const { loading, error, userReceiveItems } = useSelector(state => state.userReportsAndItems)
 
     const [items, setItems] = useState();
     const [searching, setSearching] = useState(false);
@@ -20,17 +20,18 @@ const UserDonationsList = ({ navigation }) => {
 
 
             if (searching === false || searching === undefined || !items) {
-                dispatch(donatedItems())
-                setItems(userDonatedItems)
+                dispatch(receiveItems())
+                setItems(userReceiveItems)
             }
             // setDumpCount(reports && reports.length)
             return () => {
-                donatedItems();
+                receiveItems();
                 setSearching();
             }
-        }, [userDonatedItems])
+        }, [userReceiveItems])
 
     )
+
 
 
     const search = (text) => {
@@ -44,29 +45,26 @@ const UserDonationsList = ({ navigation }) => {
         // console.log(text.length >= 1)
 
         if (text == "") {
-            setItems(userDonatedItems)
+            setItems(userReceiveItems)
         }
         setItems(
-            userDonatedItems.filter((item) =>
+            userReceiveItems.filter((item) =>
                 item.item && item.item.name.toLowerCase().includes(text.toLowerCase())
-
             )
         )
     }
-
     const donationsItem = ({ item, index }) => {
         if (item.item !== null) {
-            let img = item.item.images[0].url
+            let img =  item.item.images?item.item.images[0].url : "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png"
             const date = new Date(item.item.createdAt).toLocaleDateString()
             let itemForProps = item.item
             itemForProps.user_id = { _id: item.item.user_id }
-            // console.log("itemForProps",itemForProps)
             return (
                 <>
                     {/* {console.log("item", item.ite)} */}
                     <TouchableOpacity
                         onPress={() =>
-                            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item: itemForProps } } })
+                            navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item: itemForProps } } })
                         }
                         activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
@@ -96,8 +94,10 @@ const UserDonationsList = ({ navigation }) => {
             )
         }
     }
+
     return (
         <>
+    
             <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
@@ -114,7 +114,7 @@ const UserDonationsList = ({ navigation }) => {
                 :
                 <View style={Empty1.container}>
                     <Text style={Empty1.text1}>
-                        No donations yet!
+                        No received donations yet!
                     </Text>
                 </View>
             }
@@ -122,4 +122,4 @@ const UserDonationsList = ({ navigation }) => {
     )
 }
 
-export default UserDonationsList;
+export default UserReceivedDonations;

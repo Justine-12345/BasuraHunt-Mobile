@@ -89,6 +89,10 @@ const itemSchema = new mongoose.Schema({
         type: Date,
     },
 
+    date_claimed: {
+        type: Date,
+    },
+
     code : {
         type: String
     },

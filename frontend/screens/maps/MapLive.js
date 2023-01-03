@@ -16,6 +16,7 @@ const MapLive = ({ room }) => {
     let lat = 0;
     let lng = 0
     const [user, setUser] = useState()
+    const [liveRoom, setLiveRoom] = useState()
 
     const [latUser, setLatUser] = useState(0)
     const [lngUser, setLngUser] = useState(0)
@@ -40,9 +41,9 @@ const MapLive = ({ room }) => {
             setLngUser(loc.coords.longitude)
             setLatInit(loc.coords.latitude)
             setLngInit(loc.coords.longitude)
-
+            setLiveRoom(room)
             const coordsData = {
-                room: room && room,
+                room: room&&room,
                 author: user && user.first_name,
                 message: [loc.coords.longitude, loc.coords.latitude],
                 time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
@@ -66,12 +67,11 @@ const MapLive = ({ room }) => {
                     setUser(JSON.parse(res))
                 })
                 .catch((error) => console.log(error))
-
             socket.connect()
             socket.emit("join_room", [room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
             return async () => {
                 const coordsData = {
-                    room: room && room,
+                    room: room&&room,
                     author: user && user.first_name,
                     message: [lngInit, latInit],
                     time: new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes(),
@@ -90,6 +90,7 @@ const MapLive = ({ room }) => {
         getUserLocation()
     }, [])
 
+    
 
 
 

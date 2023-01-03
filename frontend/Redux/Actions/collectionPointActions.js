@@ -13,6 +13,11 @@ import {
     COLLECTION_POINT_LIST_SUCCESS,
     COLLECTION_POINT_LIST_FAIL,
 
+    ADD_COLLECTION_NUMBER_OF_TRUCK_REQUEST,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_SUCCESS,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_RESET,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_FAIL,
+
     ALL_COLLECTORS_REQUEST,
     ALL_COLLECTORS_SUCCESS,
     ALL_COLLECTORS_FAIL,
@@ -54,7 +59,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 export const getTodayCollectionPointList = () => async (dispatch) => {
     try {
         dispatch({ type: TODAY_COLLECTION_POINT_LIST_REQUEST })
-        
+
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -112,7 +117,7 @@ export const getUpcomingCollectionPointList = () => async (dispatch) => {
         })
 
     } catch (error) {
-        
+
         dispatch({
             type: UPCOMING_COLLECTION_POINT_LIST_FAIL,
             payload: error.response.data.message
@@ -145,7 +150,21 @@ export const getCollectionPointList = (currentPage = 1) => async (dispatch) => {
 export const getCollectionPointDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: COLLECTION_POINT_DETAILS_REQUEST })
-        const { data } = await axios.get(`/api/v1/collectionPoint/${id}`)
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        const { data } = await axios.get(`${baseURL}/collectionPoint/${id}`, config)
         dispatch({
             type: COLLECTION_POINT_DETAILS_SUCCESS,
             payload: data.collectionPoint
@@ -304,13 +323,21 @@ export const liveMapNotification = (id, liveData) => async (dispatch) => {
     try {
         dispatch({ type: LIVE_NOTIFICATION_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
         const config = {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
             }
         }
 
-        const { data } = await axios.put(`/api/v1/collectionPoint/live-notification/${id}`, liveData, config)
+        const { data } = await axios.put(`${baseURL}/collectionPoint/live-notification/${id}`, liveData, config)
         dispatch({
             type: LIVE_NOTIFICATION_SUCCESS,
             payload: data
@@ -323,6 +350,39 @@ export const liveMapNotification = (id, liveData) => async (dispatch) => {
     }
 }
 
+export const addCollectionnumOfTruck = (id, collectionPointData) => async (dispatch) => {
+    try {
+
+        dispatch({ type: ADD_COLLECTION_NUMBER_OF_TRUCK_REQUEST })
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        const { data } = await axios.put(`${baseURL}/collectionPoint/num-of-truck/${id}`, collectionPointData, config)
+
+        dispatch({
+            type: ADD_COLLECTION_NUMBER_OF_TRUCK_SUCCESS,
+            payload: data.success
+        })
+
+    } catch (error) {
+        dispatch({
+            type: ADD_COLLECTION_NUMBER_OF_TRUCK_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
 
 
 

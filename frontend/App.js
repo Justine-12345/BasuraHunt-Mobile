@@ -28,9 +28,8 @@ import * as Notifications from 'expo-notifications';
 import { navigationRef } from './navigators/RootNavigation';
 import * as RootNavigation from './navigators/RootNavigation';
 import { SET_PUSH_NOTIFICATION } from './Redux/Constants/pushNotificationConstants';
+import { getTodayCollectionPointList } from './Redux/Actions/collectionPointActions';
 
-
-import { useDispatch } from 'react-redux';
 const Theme = {
   ...DefaultTheme,
   colors: {
@@ -56,13 +55,21 @@ export default function App() {
   const lastNotificationResponse = Notifications.useLastNotificationResponse();
 
   useEffect(() => {
-    console.log("lastNotificationResponse",lastNotificationResponse&&lastNotificationResponse.notification.request.content.data.screen)
+    // console.log("lastNotificationResponse",lastNotificationResponse&&lastNotificationResponse.notification.request.content.data.screen)
     if (lastNotificationResponse) {
       store.dispatch({
         type: SET_PUSH_NOTIFICATION,
         payload: lastNotificationResponse && lastNotificationResponse.notification.request.content.data
       })
     }
+
+  Notifications.addNotificationReceivedListener(notification => {
+      const screen = notification.request.content.data.screen;
+      if(screen === 'SchedNotifView'){
+        store.dispatch(getTodayCollectionPointList())
+      }
+    });
+
   }, [lastNotificationResponse]);
 
 
@@ -89,7 +96,7 @@ export default function App() {
           {/* <OTP/> */}
           {/* <Chat/> */}
 
-          <Toast />
+          <Toast/>
         </NativeBaseProvider>
       </NavigationContainer>
     </Provider>

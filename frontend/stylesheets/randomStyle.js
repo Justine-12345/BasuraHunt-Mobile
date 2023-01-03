@@ -89,6 +89,16 @@ const RandomStyle = StyleSheet.create({
         justifyContent: "flex-end",
         margin: 10
     },
+    lContainerForTruckHistory: {
+        // width: "100%",
+        height: 145,
+        borderRadius: 10,
+        backgroundColor: "white",
+        marginBottom: 10,
+        position: "relative",
+        marginHorizontal: 10,
+        elevation: 4
+    },
     lContainer: {
         // width: "100%",
         height: 100,

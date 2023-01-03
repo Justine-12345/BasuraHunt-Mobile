@@ -118,13 +118,13 @@ const ScheduleUpcoming = () => {
         return repeatCheck;
     }
 
-    const schedulesList = ({ item }) => {
+    const schedulesList = ({ index, item }) => {
         // const date = new Date(item.createdAt).toLocaleDateString()
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday"];
         let dateToday = new Date(Date.now());
         const day = days[dateToday.getDay()];
-
+   
         return (
             <>
 
@@ -132,8 +132,7 @@ const ScheduleUpcoming = () => {
                     item.repeats.map((repeat) => {
                         if (repeat.repeat !== "Once" && filterRepeat(repeat.repeat) !== day && repeatCheck(repeat)) {
                             return (
-                                <>
-                                    <View style={RandomStyle.lContainer4Grey}>
+                                    <View key={repeat.repeat+item._id} style={RandomStyle.lContainer4Grey}>
                                         <HStack>
                                             <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
                                                 <Text style={RandomStyle.lItem2}>{filterRepeat(repeat.repeat)}</Text>
@@ -155,7 +154,6 @@ const ScheduleUpcoming = () => {
                                             </VStack>
                                         </HStack>
                                     </View>
-                                </>
                             )
                         }
                     })
@@ -166,7 +164,7 @@ const ScheduleUpcoming = () => {
 
     return (
         <>
-            {/* {console.log(collectionPoints && collectionPoints)} */}
+            {/* {console.log(collectionPointsUpcoming && collectionPointsUpcoming.length)} */}
             <View style={RandomStyle.lContainer3}>
                 <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text>
             </View>
@@ -174,7 +172,7 @@ const ScheduleUpcoming = () => {
                 <FlatList
                     data={collectionPointsUpcoming}
                     renderItem={schedulesList}
-                    keyExtractor={item => item._id}
+                    // keyExtractor={item => {console.log(item)}}
                 />
                 :
                 <View style={Empty1.container}>

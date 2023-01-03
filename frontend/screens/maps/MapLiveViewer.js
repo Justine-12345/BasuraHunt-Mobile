@@ -82,7 +82,7 @@ const MapLiveViewer = ({ room }) => {
                 setLatInit(0)
                 setLngInit(0)
             }
-        }, [])
+        }, [room])
     )
 
 

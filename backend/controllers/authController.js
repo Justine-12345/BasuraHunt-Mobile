@@ -862,7 +862,18 @@ exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 
 //******Receive Items By User******
 exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
-	const userReceiveItems = await User.findById(req.user.id).populate('received_items.item').select('received_items');
+	// const userReceiveItems = await User.findById(req.user.id).populate('received_items.item').select('received_items');
+
+	const userReceiveItems = await User.findById(req.user.id).populate({
+		path: 'received_items',
+		populate: {
+			path: 'item',
+			populate: {
+				path: 'chat_id'
+			}
+		}
+	}).select('received_items');
+
 
 	if (!userReceiveItems) {
 		return next(new ErrorHandler('User Receive Items not found', 404));
@@ -876,11 +887,26 @@ exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 
 //******Donated Items By User******
 exports.donatedItems = catchAsyncErrors(async (req, res, next) => {
-	const userDonatedItems = await User.findById(req.user.id).populate('donated_items.item').select('donated_items');
+	// const userDonatedItems = await User.findById(req.user.id).populate('donated_items.item').select('donated_items');
+
+	
+
+	const userDonatedItems = await User.findById(req.user.id).populate({
+		path: 'donated_items',
+		populate: {
+			path: 'item',
+			populate: {
+				path: 'chat_id'
+			}
+		}
+	}).select('donated_items');
+
 
 	if (!userDonatedItems) {
 		return next(new ErrorHandler('User Donated Items not found', 404));
 	}
+
+
 
 	res.status(200).json({
 		success: true,
@@ -892,7 +918,8 @@ exports.donatedItems = catchAsyncErrors(async (req, res, next) => {
 //******Claimed Items By User******
 exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
 	'Confirmed'
-	const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] });
+	const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).populate('chat_id').sort( { "date_claimed": -1 } )
+	;
 
 	console.log(req.user.id)
 
@@ -900,6 +927,15 @@ exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
 		return next(new ErrorHandler('User Donated Items not found', 404));
 	}
 
+	// let userClaimedItems = []
+
+	// userDumpsFind.reported_dumps.reverse().forEach(dump => {
+	// 	if (dump.dump !== null) {
+	// 		userDumps.push(dump)
+	// 	}
+	// })
+
+	console.log("userClaimedItems",userClaimedItems)
 	res.status(200).json({
 		success: true,
 		userClaimedItems

@@ -473,7 +473,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 	const userForPushNotification = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } })
-	
+	// console.log("userForPushNotification",userForPushNotification)
 	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView')
 
 
@@ -607,7 +607,7 @@ exports.liveMapNotification = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 	const userForPushNotification = await User.find({ barangay: req.user.barangay, _id: { $ne: req.user.id } })
-	expoSendNotification(userForPushNotification, NotifTitle, 'ScheduleView')
+	expoSendNotification(userForPushNotification, NotifTitle, 'ScheduleView', collectionPoints._id)
 
 	res.status(200).json({
 		success: true,

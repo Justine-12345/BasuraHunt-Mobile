@@ -73,7 +73,7 @@ const PublicDonationsList = ({ navigation }) => {
                 });
             }
 
-            dispatch(getItemList(keyword, currentPage, district, barangay, type));
+            dispatch(getItemList(keyword, currentPage, district, barangay, type, true));
 
             return () => {
 
@@ -169,7 +169,7 @@ const PublicDonationsList = ({ navigation }) => {
                 <FlatList
                     data={items}
                     renderItem={donationsItem}
-                    keyExtractor={item => item._id.$oid}
+                    keyExtractor={item => item._id}
                 />
                 :
                 <View style={Empty1.container}>

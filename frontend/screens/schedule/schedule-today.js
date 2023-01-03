@@ -9,7 +9,7 @@ import { getTodayCollectionPointList } from "../../Redux/Actions/collectionPoint
 import Empty1 from "../../stylesheets/empty1";
 import { TODAY_COLLECTION_POINT_LIST_RESET } from "../../Redux/Constants/collectionPointConstants";
 
-const ScheduleToday = ({navigation}) => {
+const ScheduleToday = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
     const { isRefreshed, collectionPointsToday } = useSelector(state => state.collectionPointsToday);
@@ -80,6 +80,7 @@ const ScheduleToday = ({navigation}) => {
         }
     }
 
+    
 
     const getWatchBtn = (collectionPoint) => {
         const today = new Date();
@@ -103,7 +104,9 @@ const ScheduleToday = ({navigation}) => {
         console.log(checkTime)
 
         if (checkTime) {
-            return <Link type="button" to={`/schedule/view/${collectionPoint._id}/${collectionPoint.roomCode}`} class="btn btn-success" style={{ width: "80%", margin: "auto", marginTop: "24px", marginBottom: "24px" }}><b>Watch Now</b></Link>;
+            return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", {collectionPoint:collectionPoint})} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
+                <Text style={RandomStyle.pButton2}>Watch Now</Text>
+            </TouchableOpacity>;
         }
         else if (timeNow <= startTimeArray[0] + "" + startTimeArray[1]) {
             return "";
@@ -152,9 +155,10 @@ const ScheduleToday = ({navigation}) => {
                                 <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
                                 <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
                             </VStack>
-                            <TouchableOpacity onPress={() => navigation.navigate("ScheduleView")} activeOpacity={0.8} style={{width: 250, alignSelf: "center"}}>
+                            {getWatchBtn(item)}
+                            {/* <TouchableOpacity onPress={() => navigation.navigate("ScheduleView")} activeOpacity={0.8} style={{width: 250, alignSelf: "center"}}>
                                 <Text style={RandomStyle.pButton2}>Watch Now</Text>
-                            </TouchableOpacity>
+                            </TouchableOpacity> */}
                         </VStack>
                     </HStack>
                 </View>

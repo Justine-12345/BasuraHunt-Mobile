@@ -142,8 +142,7 @@ const GScheduleUpcoming = () => {
                     item.repeats.map((repeat) => {
                         if (repeat.repeat !== "Once" && filterRepeat(repeat.repeat) !== day && repeatCheck(repeat) && collectorCheck(item.collectors)) {
                             return (
-                                <>
-                                    <View style={RandomStyle.lContainer4Grey}>
+                                    <View key={repeat.repeat+item._id} style={RandomStyle.lContainer4Grey}>
                                         <HStack>
                                             <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
                                                 <Text style={RandomStyle.lItem2}>{filterRepeat(repeat.repeat)}</Text>
@@ -165,7 +164,6 @@ const GScheduleUpcoming = () => {
                                             </VStack>
                                         </HStack>
                                     </View>
-                                </>
                             )
                         }
                     })
@@ -183,7 +181,7 @@ const GScheduleUpcoming = () => {
                 <FlatList
                     data={collectionPointsUpcoming}
                     renderItem={schedulesList}
-                    keyExtractor={item => item._id}
+                    // keyExtractor={item => item._id}
                 />
                 :
                 <View style={Empty1.container}>

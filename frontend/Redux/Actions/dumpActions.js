@@ -56,7 +56,6 @@ export const newDump = (dumpData) => async (dispatch) => {
     try {
 
         dispatch({ type: NEW_DUMP_REQUEST })
-
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {

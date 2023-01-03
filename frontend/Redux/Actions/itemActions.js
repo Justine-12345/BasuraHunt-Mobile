@@ -50,7 +50,7 @@ import {
 import baseURL from '../../assets/commons/baseURL'
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-export const getItemList = (keyword='', currentPage=1, district='', barangay='', item_type='') => async (dispatch) => {
+export const getItemList = (keyword='', currentPage=1, district='', barangay='', item_type='',  ismobile = false) => async (dispatch) => {
     try {
         let token
         AsyncStorage.getItem("jwt")
@@ -66,6 +66,7 @@ export const getItemList = (keyword='', currentPage=1, district='', barangay='',
         let districtQ = '';
         let barangayQ = '';
         let item_typeQ = '';
+        let ismobileQ = '';
 
         if (district){
             districtQ = `&district=${district}`
@@ -79,7 +80,11 @@ export const getItemList = (keyword='', currentPage=1, district='', barangay='',
            item_typeQ = `&item_type.type=${item_type}`
         }
 
-        let link = `${baseURL}/items?keyword=${keyword}&page=${currentPage}${item_typeQ}${districtQ}${barangayQ}`
+        if (ismobile) {
+            ismobileQ = `&ismobile=${ismobile}`
+        }
+
+        let link = `${baseURL}/items?keyword=${keyword}&page=${currentPage}${item_typeQ}${districtQ}${barangayQ}${ismobileQ}`
 
         const {data} = await axios.get(link);
         console.log(data)
@@ -98,7 +103,20 @@ export const getItemList = (keyword='', currentPage=1, district='', barangay='',
 export const getItemDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: ITEM_DETAILS_REQUEST })
-        const { data } = await axios.get(`/api/v1/item/${id}`)
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+        const { data } = await axios.get(`${baseURL}/item/${id}`,config)
         dispatch({
             type: ITEM_DETAILS_SUCCESS,
             payload: data
@@ -115,7 +133,7 @@ export const addItem = (itemData) => async (dispatch) => {
     try {
 
         dispatch({ type: ADD_ITEM_REQUEST })
-
+       
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -140,7 +158,7 @@ export const addItem = (itemData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: ADD_ITEM_FAIL,
-            payload: error.response.data.message
+            payload:  error.response.data.message
         })
     }
 }
@@ -248,7 +266,7 @@ export const receiveItem = (id) => async (dispatch) => {
     try {
 
         dispatch({ type: RECEIVE_ITEM_REQUEST })
-
+        console.log("id",id)
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -270,9 +288,10 @@ export const receiveItem = (id) => async (dispatch) => {
         })
 
     } catch (error) {
+        console.log(error)
         dispatch({
             type: RECEIVE_ITEM_FAIL,
-            payload: error.response.data.message
+            payload: error
         })
     }
 }

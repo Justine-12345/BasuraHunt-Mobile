@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment } from "react";
-import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions, ActivityIndicator } from "react-native";
+import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions,ActivityIndicator } from "react-native";
 import { HStack } from "native-base";
 import ReversedFlatList from 'react-native-reversed-flat-list';
 import ChatBubble from "../../stylesheets/chatBubble";
@@ -13,7 +13,7 @@ import { SOCKET_PORT } from "../../Redux/Constants/socketConstants";
 import * as io from 'socket.io-client';
 const socket = io.connect(SOCKET_PORT);
 let deviceWidth = Dimensions.get('window').width
-const Chat = (props) => {
+const ChatDonation = (props) => {
     const dispatch = useDispatch();
 
     const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
@@ -22,8 +22,8 @@ const Chat = (props) => {
     const chatDetail = props.route.params.chatDetail
     const chatId = props.route.params.chatId
     const chatLength = props.route.params.chatLength
-    const dumpId = props.route.params.dumpId
-    const dumpLocation = props.route.params.dumpLocation
+    const itemName = props.route.params.itemName
+    const itemId = props.route.params.itemId
     const sampleData = require("../../assets/sampleData/chat.json");
     const [message, setMessage] = useState("");
     const flatlist = useRef();
@@ -56,29 +56,15 @@ const Chat = (props) => {
         }, [chatId])
     )
     useEffect(() => {
-        socket.on("receive_message", (data) => {
-            if (data.type) {
-                if (data.type === "status") {
-                    setStatus(data.message)
-                }
-                if (data.type === "comment") {
-                    setAllComments((oldComment) => [...oldComment, data])
-                }
-                if (data.type === "admin-updated-dump") {
-                    setDump(data.dump)
-                }
-            }
-            else {
-                if (data.message) {
-                    if (data.message) {
-                        setMessageList((list) => [data, ...list])
-                    }
-                }
-            }
 
-        }
-        )
+        socket.on("receive_message", (data) => {
+            if (data.message) {
+                setMessageList((list) => [data,...list]);
+            }
+        })
+
     }, [socket])
+
 
     useEffect(() => {
         // if (messageList === undefined || messageList.length <= 0) {
@@ -102,6 +88,7 @@ const Chat = (props) => {
             formData.append('message', message);
             // formData.append('notifCode', notifCodeForChat);
             // formData.append('link', linkForNotif)
+            formData.append('chatCategory', "donation")
             formData.append('time', chatTime)
             dispatch(updateChat(chatId, formData))
             // dispatch({
@@ -114,8 +101,6 @@ const Chat = (props) => {
             } else {
                 setMessageList((list) => [messageData, ...list])
             }
-            // setMessageList((list) => [messageData, ...list])
-
             setMessage("")
 
             socket.emit("send_message", messageData);
@@ -126,6 +111,7 @@ const Chat = (props) => {
     const chatBubbles = ({ item, index }) => {
         return (
             <View style={{ flex: 1 }}>
+            {console.log("chatLength",chatLength)}
                 {index == chatLength - 1 ?
                     <>
                         {<View>
@@ -156,9 +142,11 @@ const Chat = (props) => {
             <View style={{ transform: [{ scaleY: -1 }] }}>
                 {!item ?
                     <View>
-                        {chatLoading ? <ActivityIndicator size="large" color="#00ff00" /> :
-                            <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}>*** No chat yet ***</Text>
+                        {/* <ChatBubble admin style={styles.chatBubbles}> */}
+                        {chatLoading?  <ActivityIndicator size="large" color="#00ff00" />:
+                            <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical:24, fontStyle:"italic" }]}>*** No chat yet ***</Text>
                         }
+                        {/* </ChatBubble> */}
                     </View> :
                     null}
             </View>
@@ -279,10 +267,10 @@ const Chat = (props) => {
 
             </Animated.View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
-                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Report ID: {dumpId}</Text>
+                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Report ID: {itemId}</Text>
             </View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
-                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Location: {dumpLocation}</Text>
+                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Name: {itemName}</Text>
             </View>
             {/* {console.log("messageList", messageList === undefined || messageList.length <= 0)} */}
             <FlatList
@@ -297,13 +285,13 @@ const Chat = (props) => {
                 keyExtractor={item => Math.random().toString(36)}
 
             />
-            {chatLoading ?
-                <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}> Retrieving chats </Text>
-                :
-                <View style={styles.chatInputContainer}>
-                    <TextInput cursorColor={"grey"} value={message} onChangeText={(text) => setMessage(text)} style={styles.chatInput} multiline={true} placeholder="Type your message here..." />
-                    <TouchableOpacity onPress={sendHandler} style={styles.sendBtn}><MaterialCommunityIcons name="send" style={styles.sendBtn2} /></TouchableOpacity>
-                </View>
+            {chatLoading?
+                <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical:24, fontStyle:"italic" }]}> Retrieving chats </Text>
+            :
+            <View style={styles.chatInputContainer}>
+                <TextInput cursorColor={"grey"} value={message} onChangeText={(text) => setMessage(text)} style={styles.chatInput} multiline={true} placeholder="Type your message here..." />
+                <TouchableOpacity onPress={sendHandler} style={styles.sendBtn}><MaterialCommunityIcons name="send" style={styles.sendBtn2} /></TouchableOpacity>
+            </View>
             }
         </>
     )
@@ -368,4 +356,4 @@ const styles = StyleSheet.create({
     }
 })
 
-export default Chat;
+export default ChatDonation;

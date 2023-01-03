@@ -31,6 +31,11 @@ import {
     NEW_COLLECTION_POINT_RESET,
     NEW_COLLECTION_POINT_FAIL,
 
+    ADD_COLLECTION_NUMBER_OF_TRUCK_REQUEST,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_SUCCESS,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_RESET,
+    ADD_COLLECTION_NUMBER_OF_TRUCK_FAIL,
+
     UPDATE_COLLECTION_POINT_REQUEST,
     UPDATE_COLLECTION_POINT_SUCCESS,
     UPDATE_COLLECTION_POINT_RESET,
@@ -192,7 +197,7 @@ export const collectorsReducer = (state = { collectors: [] }, action) => {
 export const collectionPointReducer = (state = {}, action) => {
     switch (action.type) {
 
-        case ADD_COLLECTION_MASSES_REQUEST:
+        case ADD_COLLECTION_NUMBER_OF_TRUCK_REQUEST:
         case DELETE_COLLECTION_POINT_REQUEST:
         case UPDATE_COLLECTION_POINT_REQUEST:
             return {
@@ -200,7 +205,7 @@ export const collectionPointReducer = (state = {}, action) => {
                 loading: true
             }
 
-        case ADD_COLLECTION_MASSES_SUCCESS:
+        case ADD_COLLECTION_NUMBER_OF_TRUCK_SUCCESS:
             return {
                 ...state,
                 loading: false,
@@ -221,7 +226,7 @@ export const collectionPointReducer = (state = {}, action) => {
                 isUpdated: action.payload
             }
 
-        case ADD_COLLECTION_MASSES_FAIL:
+        case ADD_COLLECTION_NUMBER_OF_TRUCK_FAIL:
         case DELETE_COLLECTION_POINT_FAIL:
         case UPDATE_COLLECTION_POINT_FAIL:
             return {
@@ -229,7 +234,7 @@ export const collectionPointReducer = (state = {}, action) => {
                 error: action.payload
             }
 
-        case ADD_COLLECTION_MASSES_RESET:
+        case ADD_COLLECTION_NUMBER_OF_TRUCK_RESET:
             return {
                 ...state,
                 isAdded: false

@@ -29,19 +29,27 @@
  
 
 schedule
----live 
+live 
 illegalDump-new 
 illegalDump-update  
 illegalDump-update-status 
 illegalDump-new-message
 illegalDump-new-comment
 ---donation-new
----donation-update-claim
----donation-update-cancel
----donation-update-confirm
----donation-update-receive
+donation-update-claim
+donation-update-cancel
+donation-update-confirm
+---donation-update-receive (Rate)
 ---donation-new-message
 ---collection-mass-add
 ---newsfeeds-add
----feedback-new
----user-verified
+
+user-verified (try nalang)
+
+---user donated
+---user claimed
+---cant donated new user
+---update dumps status for collector
+addrecieve item tab in profile
+
+---feedback-new (pagawan ng desing feedback)
