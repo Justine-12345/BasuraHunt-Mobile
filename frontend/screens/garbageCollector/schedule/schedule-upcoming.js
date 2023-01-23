@@ -159,6 +159,7 @@ const GScheduleUpcoming = () => {
                                                 </HStack>
                                                 <VStack paddingBottom={2}>
                                                     <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
+                                                    <Text numberOfLines={1} style={[RandomStyle.lItem2, {fontWeight:"700"}]}>{item.barangay}</Text>
                                                     <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
                                                 </VStack>
                                             </VStack>

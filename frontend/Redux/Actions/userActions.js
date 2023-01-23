@@ -93,7 +93,7 @@ export const login = (email, password, pushToken = '') => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.post(`${baseURL}/login`, { email, password, pushToken}, config)
+        const { data } = await axios.post(`${baseURL}/login`, { email, password, pushToken }, config)
         dispatch({
             type: LOGIN_SUCCESS,
             payload: data
@@ -231,14 +231,14 @@ export const loadUser = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${token}`,
             }
         }
-      
+
 
         const { data } = await axios.get(`${baseURL}/me`, config)
 
@@ -248,6 +248,7 @@ export const loadUser = () => async (dispatch) => {
         })
 
     } catch (error) {
+        console.log("error",error)
         dispatch({
             type: LOAD_USER_FAIL,
             payload: error.response.data.message
@@ -267,7 +268,7 @@ export const updateProfile = (userData) => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -303,7 +304,7 @@ export const updatePassword = (passwords) => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -339,7 +340,7 @@ export const forgotPassword = (email) => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -375,7 +376,7 @@ export const resetPassword = (code, passwords) => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -406,9 +407,10 @@ export const logout = (user_id = '', pushToken = '', ismobile = '') => async (di
         AsyncStorage.getItem("jwt")
             .then((res) => {
                 token = res
+
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -417,13 +419,14 @@ export const logout = (user_id = '', pushToken = '', ismobile = '') => async (di
         }
 
 
-        await axios.post(`${baseURL}/logout`,{user_id, pushToken, ismobile},config)
+        await axios.post(`${baseURL}/logout`, { user_id, pushToken, ismobile }, config)
 
         dispatch({
             type: LOGOUT_SUCCESS,
         })
 
     } catch (error) {
+        console.log("erroe", token)
         dispatch({
             type: LOGOUT_FAIL,
             payload: error.response.data.message
@@ -442,15 +445,15 @@ export const reportedDumps = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${token}`,
             }
         }
-      
-        const { data } = await axios.get(`${baseURL}/me/reported-dumps`,config)
+
+        const { data } = await axios.get(`${baseURL}/me/reported-dumps`, config)
 
         // axios.get(`${baseURL}/me/reported-dumps`, config)
         //     .then(res => console.log(res))
@@ -482,7 +485,7 @@ export const receiveItems = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -514,14 +517,14 @@ export const donatedItems = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${token}`,
             }
         }
-      
+
 
         const { data } = await axios.get(`${baseURL}/me/donated-items`, config)
 
@@ -548,7 +551,7 @@ export const claimedItems = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -556,7 +559,7 @@ export const claimedItems = () => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.get(`${baseURL}/me/claimed-items`,config)
+        const { data } = await axios.get(`${baseURL}/me/claimed-items`, config)
 
         dispatch({
             type: USER_CLAIMED_SUCCESS,
@@ -633,7 +636,7 @@ export const getUserDetails = (id) => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
@@ -641,7 +644,7 @@ export const getUserDetails = (id) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.get(`/api/v1/admin/user/${id}`,config)
+        const { data } = await axios.get(`/api/v1/admin/user/${id}`, config)
 
         dispatch({
             type: USER_DETAILS_SUCCESS,
@@ -681,19 +684,28 @@ export const deleteUser = (id) => async (dispatch) => {
 
 
 export const readNofication = (notifCode) => async (dispatch) => {
+
     try {
 
 
         dispatch({ type: READ_NOTIFICATION_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
         const config = {
             headers: {
-                'Content-Type': 'multipart/form-data'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
             }
         }
 
-        const { data } = await axios.put('/api/v1/me/read-notification', notifCode, config)
-
+        const { data } = await axios.post(`${baseURL}/me/read-notification`, notifCode, config)
+        
 
         dispatch({
             type: READ_NOTIFICATION_SUCCESS,
@@ -703,6 +715,78 @@ export const readNofication = (notifCode) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: READ_NOTIFICATION_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+
+
+export const readNoficationMobile = (notifCode) => async (dispatch) => {
+
+    try {
+
+
+        dispatch({ type: READ_NOTIFICATION_REQUEST })
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+
+        const { data } = await axios.post(`${baseURL}/me/read-notification`, notifCode, config)
+        
+
+        dispatch({
+            type: READ_NOTIFICATION_SUCCESS,
+            payload: data
+        })
+
+    } catch (error) {
+        dispatch({
+            type: READ_NOTIFICATION_FAIL,
+            payload: error.response.data.message
+        })
+    }
+
+    try {
+
+        dispatch({ type: LOAD_USER_REQUEST })
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`,
+            }
+        }
+
+
+        const { data } = await axios.get(`${baseURL}/me`, config)
+
+        dispatch({
+            type: LOAD_USER_SUCCESS,
+            payload: data
+        })
+
+    } catch (error) {
+        dispatch({
+            type: LOAD_USER_FAIL,
             payload: error.response.data.message
         })
     }
@@ -721,21 +805,23 @@ export const getLevelExp = () => async (dispatch) => {
                 token = res
             })
             .catch((error) => console.log(error))
-        
+
         const config = {
             headers: {
                 "Content-Type": "multipart/form-data",
                 Authorization: `Bearer ${token}`,
             }
         }
-      
 
-        const { data } = await axios.get(`${baseURL}/me/level-exp`, config)
+            const { data } = await axios.get(`${baseURL}/me/level-exp`, config)
 
-        dispatch({
-            type: GET_LEVEL_EXP_SUCCESS,
-            payload: data
-        })
+            dispatch({
+                type: GET_LEVEL_EXP_SUCCESS,
+                payload: data
+            })
+
+        
+
 
     } catch (error) {
         dispatch({

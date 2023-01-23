@@ -17,6 +17,8 @@ import { addComment } from "../../../Redux/Actions/dumpActions";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { APPEND_CHAT, GET_CHAT_RESET } from "../../../Redux/Constants/chatConstants";
 import Chat from "../../chat/chat";
+import NotificationSender from "../../extras/notificationSender";
+import RandomStringGenerator from "../../extras/randomStringGenerator";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
@@ -40,6 +42,7 @@ const PublicReportsView = (props) => {
     const [status, setStatus] = useState(item ? item.status : "")
     const [user, setUser] = useState()
     const [messageList, setMessageList] = useState([])
+    const [imagesPreview, setImagesPreview] = useState([])
 
     useFocusEffect(
         useCallback(() => {
@@ -58,7 +61,7 @@ const PublicReportsView = (props) => {
                 });
                 setModalVisible(!modalVisible)
                 dispatch({ type: DELETE_DUMP_RESET })
-                props.navigation.navigate('User', { screen: 'UserReportsList' });
+                props.navigation.navigate('User', { screen: 'MyReports' });
             }
             if (upDelError) {
                 Toast.show({
@@ -75,6 +78,11 @@ const PublicReportsView = (props) => {
                     text2: 'Comment: Something went wrong, please try again later'
                 });
             }
+
+            setImagesPreview([])
+            dump && dump.images && dump.images.forEach(i => {
+                setImagesPreview(items => [...items, { uri: i.url }])
+            })
 
             socket.connect()
             socket.emit("join_room", [dump && dump.chat_id && dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
@@ -96,7 +104,7 @@ const PublicReportsView = (props) => {
             setAllComments(item.comments)
             setStatus(item.status)
         }
-    }, [dumpDetail])
+    }, [dumpDetail, item])
 
     useEffect(() => {
         socket.on("receive_message", (data) => {
@@ -141,9 +149,16 @@ const PublicReportsView = (props) => {
                 text2: 'Empty comment is invalid'
             });
         } else {
+            const notifCodeForComment = RandomStringGenerator(40)
+            const linkForNotif = `/report/${dump&&dump._id}/${dump && dump.coordinates && dump.coordinates.longtitude}/${dump && dump.coordinates && dump.coordinates.latitude}/#Comments`
+            console.log('comment1', notifCodeForComment)
             const formData = new FormData();
             formData.append('author', author);
             formData.append('comment', comment);
+            formData.append('link', linkForNotif)
+			formData.append('notifCode', notifCodeForComment);
+
+
             dispatch(addComment(dump && dump._id, formData))
             let authorForNotif
 
@@ -172,6 +187,8 @@ const PublicReportsView = (props) => {
             socket.emit("send_message", commentData);
             setAllComments((oldComment) => [...oldComment, commentData])
             setComment('')
+            console.log('comment2', notifCodeForComment)
+            NotificationSender(`${authorForNotif} commented on your reported illegal dump: ${cleanCommentFil}`, user._id, dump && dump.user_id && dump.user_id._id, dump && dump.barangay, 'illegalDump-new-comment', notifCodeForComment, dump && dump)
 
         }
     }
@@ -186,7 +203,7 @@ const PublicReportsView = (props) => {
                         <VStack>
                             <HStack>
                                 <Text style={RandomStyle.vText2}>Status: </Text>
-                                <Text>{status === "newReport" ? "New Report" : status}</Text>
+                                <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status}</Text>
                             </HStack>
                             {dump && dump.date_cleaned != null ?
                                 <HStack>
@@ -198,14 +215,14 @@ const PublicReportsView = (props) => {
                             <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
                         </VStack>
                         <HStack>
-                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                            </TouchableOpacity>
-
-
+                            {String(dump && dump.user_id) === String(user && user._id) ?
+                                <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj:{_id: dump && dump._id, coordinates:{longtitude:dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude}, barangay:dump && dump.barangay  } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                    <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                                </TouchableOpacity> : null
+                            }
                             {/* <TouchableOpacity
                                 onPress={() => {
-                                    props.navigation.navigate("MyPublicReportsUpdate", { item: item })
+                                    props.navigation.navigate("TheAbout")
                                 }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="content-save-edit" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity> */}
@@ -290,7 +307,7 @@ const PublicReportsView = (props) => {
                         </TouchableOpacity>
                     )}
                     <ImageView
-                        images={images}
+                        images={imagesPreview}
                         imageIndex={imgIndex}
                         visible={openImages}
                         onRequestClose={() => setOpenImages(false)}

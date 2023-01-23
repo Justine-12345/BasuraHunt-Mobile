@@ -1,11 +1,12 @@
 import {
     NEWSFEED_LIST_REQUEST,
-    NEWSFEED_LIST_SUCCESS, 
+    NEWSFEED_LIST_SUCCESS,
     NEWSFEED_LIST_FAIL,
-    
+
     ALL_NEWSFEEDS_REQUEST,
-    ALL_NEWSFEEDS_SUCCESS, 
+    ALL_NEWSFEEDS_SUCCESS,
     ALL_NEWSFEEDS_FAIL,
+    ALL_NEWSFEEDS_RESET,
 
     NEWSFEED_DETAILS_REQUEST,
     NEWSFEED_DETAILS_SUCCESS,
@@ -13,7 +14,7 @@ import {
 
     NEW_NEWSFEED_REQUEST,
     NEW_NEWSFEED_SUCCESS,
-    NEW_NEWSFEED_RESET, 
+    NEW_NEWSFEED_RESET,
     NEW_NEWSFEED_FAIL,
 
     UPDATE_NEWSFEED_REQUEST,
@@ -26,41 +27,49 @@ import {
     DELETE_NEWSFEED_RESET,
     DELETE_NEWSFEED_FAIL,
 
-    CLEAR_ERRORS 
+    CLEAR_ERRORS
 } from '../Constants/newsfeedConstants'
 
-export const newsfeedsReducer = (state = { newsfeeds:[] }, action) => {
-    switch(action.type) {
+export const newsfeedsReducer = (state = { newsfeeds: [] }, action) => {
+    switch (action.type) {
         case NEWSFEED_LIST_REQUEST:
         case ALL_NEWSFEEDS_REQUEST:
-        return {
-            ...state,
-            loading: true
-        }
+            return {
+                ...state,
+                loading: true
+            }
         case NEWSFEED_LIST_SUCCESS:
         case ALL_NEWSFEEDS_SUCCESS:
-        return {
-            ...state,
-            loading:false,
-            newsfeeds: action.payload.newsfeeds,
-            tags: action.payload.tags
+            return {
+                ...state,
+                loading: false,
+                newsfeeds: action.payload.newsfeeds,
+                tags: action.payload.tags
 
-        }
+            }
         case NEWSFEED_LIST_FAIL:
         case ALL_NEWSFEEDS_FAIL:
-        return {
-            ...state,
-            loading:false,
-            error: action.payload
-        }
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            }
+
+        case ALL_NEWSFEEDS_RESET:
+            return {
+                ...state,
+                newsfeeds: undefined,
+                tags: undefined
+            }
+
         case CLEAR_ERRORS:
-        return {
-             ...state,
-             error: null
-        }
+            return {
+                ...state,
+                error: null
+            }
         default:
-        return state;
-     }
+            return state;
+    }
 }
 
 export const newsfeedReducer = (state = {}, action) => {
@@ -128,7 +137,7 @@ export const newsfeedDetailsReducer = (state = { newsfeed: {} }, action) => {
             return {
                 loading: false,
                 newsfeed: action.payload.newsfeed,
-                tags:action.payload.tags
+                tags: action.payload.tags
             }
         case NEWSFEED_DETAILS_FAIL:
             return {

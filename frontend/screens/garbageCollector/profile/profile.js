@@ -11,13 +11,17 @@ import { logout } from "../../../Redux/Actions/userActions";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CommonActions } from "@react-navigation/native";
 import { loadUser } from "../../../Redux/Actions/userActions";
-
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
 const Profile = ({ navigation }) => {
     const dispatch = useDispatch()
     const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
+    const [expoPushToken, setExpoPushToken] = useState('');
 
     useFocusEffect(
         useCallback(() => {
+
             AsyncStorage.getItem("isAuthenticated")
                 .then((res) => {
                     if (!res) {
@@ -40,24 +44,25 @@ const Profile = ({ navigation }) => {
 
     useFocusEffect(
         useCallback(() => {
+            registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
             dispatch(loadUser())
             // console.log("authUser", authUser)
         }, []))
 
 
     const logoutHandle = () => {
-        dispatch(logout())
+        dispatch(logout(authUser && authUser._id, expoPushToken, true))
     }
 
     const ageCounter = (user) => {
-		let age = null;
-		if(user) {
-			const dateToday = new Date();
-			const birthDate = new Date(user.birthday);
-			age = dateToday.getFullYear() - birthDate.getFullYear();
-		}
-		return age;
-	}
+        let age = null;
+        if (user) {
+            const dateToday = new Date();
+            const birthDate = new Date(user.birthday);
+            age = dateToday.getFullYear() - birthDate.getFullYear();
+        }
+        return age;
+    }
 
     return (
         <ScrollView style={RandomStyle.vContainer}>
@@ -72,10 +77,10 @@ const Profile = ({ navigation }) => {
                     </VStack> */}
                 </HStack>
                 <HStack position={"absolute"} right={0}>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => { navigation.navigate('CollectorProfile', { screen: 'ProfileUpdateCollector', params: { user: authUser } }) }}>
                         <Ionicons name="pencil" size={30} style={RandomStyle.pButton} />
                     </TouchableOpacity>
-                    <TouchableOpacity>
+                    <TouchableOpacity onPress={() => { navigation.navigate('CollectorProfile', { screen: 'ProfileUpdatePasswordCollector' }) }} >
                         <Ionicons name="key" size={30} style={RandomStyle.pButton} />
                     </TouchableOpacity>
                     <TouchableOpacity onPress={logoutHandle}>
@@ -112,6 +117,37 @@ const Profile = ({ navigation }) => {
 
         </ScrollView>
     )
+}
+
+async function registerForPushNotificationsAsync() {
+    let token;
+    if (Device.isDevice) {
+        const { status: existingStatus } = await Notifications.getPermissionsAsync();
+        let finalStatus = existingStatus;
+        if (existingStatus !== 'granted') {
+            const { status } = await Notifications.requestPermissionsAsync();
+            finalStatus = status;
+        }
+        if (finalStatus !== 'granted') {
+            alert('Failed to get push token for push notification!');
+            return;
+        }
+        token = (await Notifications.getExpoPushTokenAsync()).data;
+        console.log("Token", token);
+    } else {
+        alert('Must use physical device for Push Notifications');
+    }
+
+    if (Platform.OS === 'android') {
+        Notifications.setNotificationChannelAsync('default', {
+            name: 'default',
+            importance: Notifications.AndroidImportance.MAX,
+            vibrationPattern: [0, 250, 250, 250],
+            lightColor: '#FF231F7C',
+        });
+    }
+
+    return token;
 }
 
 export default Profile;

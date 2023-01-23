@@ -122,7 +122,7 @@ export const getDumps = (keyword = '', currentPage = 1, district = '', barangay 
         AsyncStorage.getItem("jwt")
             .then((res) => {
                 token = res
-                
+
             })
             .catch((error) => console.log(error))
 
@@ -161,7 +161,7 @@ export const getDumpList = () => async (dispatch) => {
         AsyncStorage.getItem("jwt")
             .then((res) => {
                 token = res
-                
+
             })
             .catch((error) => console.log(error))
 
@@ -173,7 +173,7 @@ export const getDumpList = () => async (dispatch) => {
         }
 
         const { data } = await axios.get(`${baseURL}/dump-list`, config)
-        
+
 
         dispatch({
             type: DUMP_LIST_SUCCESS,
@@ -222,7 +222,7 @@ export const getSingleDump = (id) => async (dispatch) => {
         AsyncStorage.getItem("jwt")
             .then((res) => {
                 token = res
-                
+
             })
             .catch((error) => console.log(error))
 
@@ -233,8 +233,8 @@ export const getSingleDump = (id) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.get(`${baseURL}/dump/${id}`,config)
-        console.log("data",data)
+        const { data } = await axios.get(`${baseURL}/dump/${id}`, config)
+        console.log("data", data)
         dispatch({
             type: DUMP_DETAILS_SUCCESS,
             payload: data
@@ -326,13 +326,22 @@ export const updateDumpStatus = (id, dumpData) => async (dispatch) => {
 
         dispatch({ type: UPDATE_DUMP_STATUS_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
         const config = {
             headers: {
-                'Content-Type': 'application/json'
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
             }
         }
 
-        const { data } = await axios.put(`/api/v1/admin/dump-status/${id}`, dumpData, config)
+
+        const { data } = await axios.put(`${baseURL}/admin/dump-status/${id}`, dumpData, config)
 
         dispatch({
             type: UPDATE_DUMP_STATUS_SUCCESS,
@@ -340,6 +349,7 @@ export const updateDumpStatus = (id, dumpData) => async (dispatch) => {
         })
 
     } catch (error) {
+        console.log("error", error)
         dispatch({
             type: UPDATE_DUMP_STATUS_FAIL,
             payload: error.response.data.message
@@ -403,7 +413,7 @@ export const addComment = (id, commentData) => async (dispatch) => {
         }
 
         const { data } = await axios.put(`${baseURL}/dump/comment/${id}`, commentData, config)
-       
+
         dispatch({
             type: DUMP_COMMENT_SUCCESS,
             payload: data

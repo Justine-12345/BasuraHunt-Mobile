@@ -87,7 +87,6 @@ export const getItemList = (keyword='', currentPage=1, district='', barangay='',
         let link = `${baseURL}/items?keyword=${keyword}&page=${currentPage}${item_typeQ}${districtQ}${barangayQ}${ismobileQ}`
 
         const {data} = await axios.get(link);
-        console.log(data)
         dispatch({
             type: ITEM_LIST_SUCCESS,
             payload: data
@@ -266,7 +265,6 @@ export const receiveItem = (id) => async (dispatch) => {
     try {
 
         dispatch({ type: RECEIVE_ITEM_REQUEST })
-        console.log("id",id)
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -288,10 +286,9 @@ export const receiveItem = (id) => async (dispatch) => {
         })
 
     } catch (error) {
-        console.log(error)
         dispatch({
             type: RECEIVE_ITEM_FAIL,
-            payload: error
+            payload: error.response.data.message
         })
     }
 }
@@ -409,7 +406,6 @@ export const deleteItem = (id) => async (dispatch) => {
         })
 
     } catch (error) {
-        console.log(error.response.data)
         dispatch({
             type: DELETE_ITEM_FAIL,
             payload: error.response.data.message

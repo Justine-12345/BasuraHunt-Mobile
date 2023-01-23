@@ -1,19 +1,36 @@
 
 const { Expo } = require('expo-server-sdk')
 
-const sendNotification = async (userTokens, message, screen, object_id) => {
+const sendNotification = async (userTokens, message, screen, object_id, code) => {
 	let expo = new Expo();
 	let messages = [];
 
-    let somePushTokens = []
+	let somePushTokens = []
 
 	userTokens.forEach(user => {
 		const userPushTokens = user.push_tokens
-		userPushTokens.forEach(push_token => {
-			somePushTokens.push(push_token.push_token)
-		})
+
+		// console.log(user.email,userPushTokens)
+
+
+		if (user.activeChat === "false") {
+			userPushTokens.forEach(push_token => {
+				somePushTokens.push(push_token.push_token)
+			})
+		}else{
+			if (screen !== 'PublicDonationsChat' && screen !== 'PublicReportsChat') {
+			userPushTokens.forEach(push_token => {
+				if (!somePushTokens.includes(push_token)) {
+					somePushTokens.push(push_token.push_token)
+				}
+
+			})
+		}
+		}
+		
+
 	})
-	console.log("somePushTokens",somePushTokens)
+	console.log("somePushTokens", somePushTokens)
 	for (let pushToken of somePushTokens) {
 		if (!Expo.isExpoPushToken(pushToken)) {
 			console.error(`Push token ${pushToken} is not a valid Expo push token`);
@@ -25,8 +42,10 @@ const sendNotification = async (userTokens, message, screen, object_id) => {
 			to: pushToken,
 			sound: 'default',
 			body: message,
-			data: { screen:screen, message:message, object:object_id},
+			data: { screen: screen, message: message, object: object_id, code:code },
 		})
+
+
 	}
 
 	let chunks = expo.chunkPushNotifications(messages);

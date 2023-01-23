@@ -8,6 +8,7 @@ import GarbageCollectorNav from "./garbageCollectorNav";
 import GarbageCollectorSchedNav from "./garbageCollectorSchedNav";
 import Profile from "../../screens/garbageCollector/profile/profile";
 import Start from "../../screens/garbageCollector/schedule/start";
+import MyProfile from "./myProfile";
 const Tab = createBottomTabNavigator();
 
 
@@ -61,11 +62,22 @@ const HomeCollectorNav = () => {
                         />
                     }
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('Assigned Illegal Dumps',{screen:'AssignedList'});
+                     
+
+                    },
+                })}
             />
 
             <Tab.Screen
                 name="CollectorProfile"
-                component={Profile}
+                component={MyProfile}
                 options={{
                     tabBarIcon: (props) => {
                         return <FontAwesome

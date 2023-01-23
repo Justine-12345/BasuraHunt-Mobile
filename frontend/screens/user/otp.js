@@ -5,7 +5,7 @@ import Form1 from "../../stylesheets/form1";
 import { VStack } from "native-base";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage"
-import { useFocusEffect } from "@react-navigation/native";
+import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import { checkOtp, clearErrors } from "../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
 
@@ -18,23 +18,32 @@ const OTP = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
 
-            AsyncStorage.getItem("user")
-                .then((res) => {
-                    setUser(JSON.parse(res))
-                })
-                .catch((error) => console.log(error))
+            // AsyncStorage.getItem("user")
+            //     .then((res) => {
+            //         setUser(JSON.parse(res))
+            //     })
+            //     .catch((error) => console.log(error))
 
-            if ((user && user.otp_status === "Verified") && user && user.role !== "administrator" || user && user.role !== "barangayAdministrator") {
-                if (isAuthenticated) {
-                    Toast.show({
-                        type: 'success',
-                        text1: 'Registered Successfully',
-                        text2: 'Welcome To BasuraHunt, you can log in now'
-                    });
+            // if ((user && user.otp_status === "Verified") && user && user.role !== "administrator" || user && user.role !== "barangayAdministrator") {
+            //     if (isAuthenticated) {
+            //         Toast.show({
+            //             type: 'success',
+            //             text1: 'Registered Successfully',
+            //             text2: 'Welcome To BasuraHunt, you can log in now'
+            //         });
 
-                    navigation.navigate('Main')
-                }
-            }
+            //         navigation.dispatch(
+            //             CommonActions.reset({
+            //                 index: 1,
+            //                 routes: [
+            //                     { name: 'Main' }
+            //                 ],
+            //             })
+            //         );
+
+            //         navigation.navigate('Main')
+            //     }
+            // }
 
             if (authError) {
                 Toast.show({
@@ -45,6 +54,64 @@ const OTP = ({ navigation }) => {
                 dispatch(clearErrors())
             }
 
+            let userInfo = {
+                user: {},
+                isAuthenticated: ''
+            }
+
+            AsyncStorage.multiGet(['user', 'isAuthenticated'], (err, stores) => {
+                stores.map((result, i, store) => {
+                    let key = store[i][0];
+                    let val = store[i][1];
+                    userInfo[key] = val
+                });
+
+                if (userInfo.isAuthenticated) {
+                    if (JSON.parse(userInfo.user).otp_status === "Verified") {
+                        if (JSON.parse(userInfo.user).role === "user" || JSON.parse(userInfo.user).role === "newUser") {
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'Main' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('Main')
+                        } else if (JSON.parse(userInfo.user).role === "garbageCollector") {
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'HomeCollectorNav' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('HomeCollectorNav')
+                        } else {
+                            AsyncStorage.clear()
+                            Toast.show({
+                                type: 'error',
+                                text1: 'Denied',
+                                text2: 'Access has been denied to this account'
+                            });
+                            navigation.dispatch(
+                                CommonActions.reset({
+                                    index: 1,
+                                    routes: [
+                                        { name: 'Login' }
+                                    ],
+                                })
+                            );
+                            navigation.navigate('Login')
+                        }
+                    } else if (JSON.parse(userInfo.user).otp_status === "Fresh") {
+                        navigation.navigate('OTP')
+                    }
+                }
+
+            });
+            
             return () => {
                 setUser();
             }

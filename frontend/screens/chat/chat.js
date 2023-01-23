@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment } from "react";
-import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions, ActivityIndicator } from "react-native";
+import { BackHandler, AppState, Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions, ActivityIndicator } from "react-native";
 import { HStack } from "native-base";
 import ReversedFlatList from 'react-native-reversed-flat-list';
 import ChatBubble from "../../stylesheets/chatBubble";
@@ -11,30 +11,41 @@ import { getChat, updateChat } from "../../Redux/Actions/chatActions";
 import { APPEND_CHAT, GET_CHAT_RESET } from "../../Redux/Constants/chatConstants";
 import { SOCKET_PORT } from "../../Redux/Constants/socketConstants";
 import * as io from 'socket.io-client';
+import { activeChat } from "../../Redux/Actions/chatActions";
+import { getSingleDump } from "../../Redux/Actions/dumpActions";
+import NotificationSender from "../extras/notificationSender";
+import RandomStringGenerator from "../extras/randomStringGenerator";
 const socket = io.connect(SOCKET_PORT);
 let deviceWidth = Dimensions.get('window').width
 const Chat = (props) => {
     const dispatch = useDispatch();
 
     const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
-
+    const { loading } = useSelector(state => state.chat)
 
     const chatDetail = props.route.params.chatDetail
     const chatId = props.route.params.chatId
     const chatLength = props.route.params.chatLength
     const dumpId = props.route.params.dumpId
     const dumpLocation = props.route.params.dumpLocation
+    const dumpObj = props.route.params.dumpObj
     const sampleData = require("../../assets/sampleData/chat.json");
     const [message, setMessage] = useState("");
     const flatlist = useRef();
     const animatedImage = new Animated.Value(0);
     const [user, setUser] = useState("")
+    const [userDetail, setUserDetail] = useState()
     const [chat, setChat] = useState([])
     const [messageList, setMessageList] = useState([])
 
+
     useFocusEffect(
         useCallback(() => {
-            // console.log(chatDetail.room)
+            console.log("dumpObj",dumpObj)
+            const formDataActive = new FormData();
+            formDataActive.append("activeChat", "true");
+            dispatch(activeChat(formDataActive))
+
             socket.disconnect()
 
             dispatch({ type: GET_CHAT_RESET })
@@ -44,17 +55,34 @@ const Chat = (props) => {
                 .then((res) => {
                     // user = res
                     setUser(JSON.parse(res)._id)
+                    setUserDetail(JSON.parse(res))
                 })
                 .catch((error) => console.log(error))
 
-
+            AppState.addEventListener('change', state => {
+                if (state === 'background') {
+                    const formDataDeactive = new FormData();
+                    formDataDeactive.append("activeChat", "false");
+                    dispatch(activeChat(formDataDeactive))
+                }
+            });
+         
             socket.connect()
             socket.emit("join_room", [chatDetail.room])
             return () => {
                 setMessageList([])
+                const formDataDeactive = new FormData();
+                formDataDeactive.append("activeChat", "false");
+                dispatch(activeChat(formDataDeactive))
+                // backHandler.remove();
+                dispatch(getSingleDump(dumpId))
+                props.navigation.navigate("User", { screen: 'MyReports', params: { screen: 'MyPublicReportsView', params: { item_id: dumpId } } })
             }
         }, [chatId])
     )
+
+
+
     useEffect(() => {
         socket.on("receive_message", (data) => {
             if (data.type) {
@@ -80,6 +108,8 @@ const Chat = (props) => {
         )
     }, [socket])
 
+
+
     useEffect(() => {
         // if (messageList === undefined || messageList.length <= 0) {
         setMessageList(chats && chats)
@@ -97,11 +127,12 @@ const Chat = (props) => {
                 message: message,
                 time: chatTime
             }
-
+            const linkForNotif = `/report/${dumpObj._id}/${dumpObj.coordinates.longtitude}/${dumpObj.coordinates.latitude}/true`
+            const notifCodeForChat = RandomStringGenerator(40)
             const formData = new FormData();
             formData.append('message', message);
-            // formData.append('notifCode', notifCodeForChat);
-            // formData.append('link', linkForNotif)
+            formData.append('notifCode', notifCodeForChat);
+            formData.append('link', linkForNotif)
             formData.append('time', chatTime)
             dispatch(updateChat(chatId, formData))
             // dispatch({
@@ -119,6 +150,8 @@ const Chat = (props) => {
             setMessage("")
 
             socket.emit("send_message", messageData);
+           
+            NotificationSender(`New Message From ${userDetail.first_name}: ${message}`, user, null, dumpObj && dumpObj.barangay, 'illegalDump-new-message', notifCodeForChat, dumpObj && dumpObj)
 
         }
     }
@@ -138,13 +171,18 @@ const Chat = (props) => {
                                 <Text style={styles.chatText}>{item.message}</Text>
                             </ChatBubble>
                             <ChatBubble time timeSender={item && item.author === user ? false : true}><Text style={styles.time}>{item.time}</Text></ChatBubble>
+
                         </View>
                     </> :
                     <View>
                         <ChatBubble style={styles.chatBubbles} sender={item && item.author === user ? false : true}>
                             <Text style={styles.chatText}>{item.message}</Text>
                         </ChatBubble>
-                        <ChatBubble time timeSender={item && item.author === user ? false : true}><Text style={styles.time}>{item.time}</Text></ChatBubble>
+                        <ChatBubble time timeSender={item && item.author === user ? false : true}><Text style={styles.time}>
+                            {
+                                item.time}
+
+                        </Text></ChatBubble>
                     </View>
                 }
             </View>
@@ -189,6 +227,8 @@ const Chat = (props) => {
             scrolledNotToTop()
         }
     }
+
+
 
     return (
         <>
@@ -274,6 +314,7 @@ const Chat = (props) => {
                         })
                     }]}>
                     Chat with Admin
+
                 </Animated.Text>
 
 
@@ -298,11 +339,16 @@ const Chat = (props) => {
 
             />
             {chatLoading ?
-                <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}> Retrieving chats </Text>
+                <>
+
+                    <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}> Retrieving chats </Text>
+                </>
                 :
                 <View style={styles.chatInputContainer}>
                     <TextInput cursorColor={"grey"} value={message} onChangeText={(text) => setMessage(text)} style={styles.chatInput} multiline={true} placeholder="Type your message here..." />
+                    {/* {loading ? <ActivityIndicator size="large" color="#1E5128" /> : */}
                     <TouchableOpacity onPress={sendHandler} style={styles.sendBtn}><MaterialCommunityIcons name="send" style={styles.sendBtn2} /></TouchableOpacity>
+
                 </View>
             }
         </>

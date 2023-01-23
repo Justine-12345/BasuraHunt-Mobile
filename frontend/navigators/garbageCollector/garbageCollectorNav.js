@@ -17,7 +17,7 @@ function MyTabs() {
                 tabBarLabelStyle: {
                     fontSize: 12,
                 },
-                tabBarIndicatorStyle:{
+                tabBarIndicatorStyle: {
                     backgroundColor: "#1E5128",
                 },
             }}
@@ -28,6 +28,16 @@ function MyTabs() {
                 options={{
                     title: "Assigned Illegal Dumps"
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+                        console.log('route', route)
+                        // Do something with the `navigation` object
+                        navigation.navigate('AssignedList');
+
+                    },
+                })}
             />
             <Tab.Screen
                 name="Finished"
@@ -35,12 +45,22 @@ function MyTabs() {
                 options={{
                     title: "Finished"
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+                        console.log('route', route)
+                        // Do something with the `navigation` object
+                        navigation.navigate('AssignedFinished');
+
+                    },
+                })}
             />
-      
+
         </Tab.Navigator>
     )
 }
 
-export default function GarbageCollectorNav(){
-    return <MyTabs/>
+export default function GarbageCollectorNav() {
+    return <MyTabs />
 }

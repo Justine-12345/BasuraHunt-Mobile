@@ -57,14 +57,14 @@ const UserReceivedDonations = ({ navigation }) => {
         if (item.item !== null) {
             let img =  item.item.images?item.item.images[0].url : "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png"
             const date = new Date(item.item.createdAt).toLocaleDateString()
-            let itemForProps = item.item
-            itemForProps.user_id = { _id: item.item.user_id }
+            // let itemForProps = item.item
+            // itemForProps.user_id = { _id: item.item.user_id }
             return (
                 <>
-                    {/* {console.log("item", item.ite)} */}
+                    {/* {console.log("item", item.item)} */}
                     <TouchableOpacity
                         onPress={() =>
-                            navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item: itemForProps } } })
+                            navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item: item.item, category:"received" } } })
                         }
                         activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
@@ -99,12 +99,14 @@ const UserReceivedDonations = ({ navigation }) => {
         <>
     
             <View style={RandomStyle.lContainer3}>
+            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Received Items</Text>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
                 </HStack>
-                <Text style={RandomStyle.vText1}>Total: {items && items.length}</Text>
+                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {items && items.length}</Text>
 
             </View>
+           
             {items && items.length > 0 ?
                 <FlatList
                     data={items}

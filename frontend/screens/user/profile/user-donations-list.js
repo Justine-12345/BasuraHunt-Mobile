@@ -58,15 +58,16 @@ const UserDonationsList = ({ navigation }) => {
         if (item.item !== null) {
             let img = item.item.images[0].url
             const date = new Date(item.item.createdAt).toLocaleDateString()
-            let itemForProps = item.item
-            itemForProps.user_id = { _id: item.item.user_id }
+            // let itemForProps = item.item
+            // itemForProps.user_id = { _id: item.item.user_id._id }
             // console.log("itemForProps",itemForProps)
+            
             return (
                 <>
-                    {/* {console.log("item", item.ite)} */}
+                    {/* {console.log("item", item.item)} */}
                     <TouchableOpacity
                         onPress={() =>
-                            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item: itemForProps } } })
+                            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item:  item.item, category:"donated" } } })
                         }
                         activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
@@ -99,12 +100,14 @@ const UserDonationsList = ({ navigation }) => {
     return (
         <>
             <View style={RandomStyle.lContainer3}>
+            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Donated Items</Text>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
                 </HStack>
-                <Text style={RandomStyle.vText1}>Total: {items && items.length}</Text>
+                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {items && items.length}</Text>
 
             </View>
+          
             {items && items.length > 0 ?
                 <FlatList
                     data={items}

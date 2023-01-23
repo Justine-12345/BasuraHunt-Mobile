@@ -177,7 +177,7 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 
 	const resPerPage = 5;
 	const dumpsCount = await Dump.countDocuments();
-	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id'), req.query).search().filter();
+	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id').populate('user_id'), req.query).search().filter();
 	// console.log("ismobile", req.query.ismobile == true)
 
 	if (req.query.ismobile === undefined) {
@@ -420,7 +420,7 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 
 
 	const NotifTitle = `Your Reported Illegal Dump Details Has Been Updated`
-	const NotifTitleForCollector = `An Illegal Dump Has Assigned To You`
+	const NotifTitleForCollector = `An Illegal Dump Has Assigned To You Has Been Updated`
 
 	//For User
 	const bulk = await User.find({ _id: dump.user_id._id }).updateMany({
@@ -440,7 +440,7 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 	const userForPushNotification = await User.find({ _id: dump.user_id._id })
-	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id)
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
 
 
 	if (typeof req.body.collectors == "string") {
@@ -460,11 +460,17 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
+		if (dump.status === "Cleaned") {
+			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Finished', dump._id, req.body.notifCode)
+		} else {
+			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Assigned Illegal Dumps', dump._id, req.body.notifCode)
+		}
 	}
 	else {
 		for (let i = 0; i < req.body.collectors.length; i++) {
 			const collector = req.body.collectors[i];
-			console.log("collectors", collector)
 			const bulk2 = await User.find({ _id: collector.collector, role: "garbageCollector" }).updateMany({
 				$push: {
 					notifications: {
@@ -481,6 +487,20 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 					}
 				}
 			});
+		}
+
+		for (let i = 0; i < req.body.collectors.length; i++) {
+			const collector = req.body.collectors[i];
+
+			if (dump.status === "Cleaned") {
+				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" })
+				expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Finished', dump._id, req.body.notifCode)
+			} else {
+				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" })
+				expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Assigned Illegal Dumps', dump._id, req.body.notifCode)
+			}
+
+
 		}
 	}
 
@@ -519,7 +539,6 @@ exports.deleteDump = catchAsyncErrors(async (req, res, next) => {
 
 //****** Update Dump Status******
 exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
-
 
 	let dump = await Dump.findById(req.params.id);
 
@@ -589,12 +608,13 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 					link: `/${userReporter.alias}`,
 					notifCode: req.body.notifCode1,
 					status: 'unread',
-					category: 'user-verified'
+					category: 'user-verified',
+					modelObj:{_id:updatedDump._id}
 				}
 			}
 		});
 		const userForPushNotification = await User.find({ _id: updatedDump.user_id._id });
-		expoSendNotification(userForPushNotification, notifTitle1, 'MyPublicReportsView', updatedDump._id)
+		expoSendNotification(userForPushNotification, notifTitle1, 'MyPublicReportsView', updatedDump._id, req.body.notifCode1)
 
 	}
 
@@ -627,7 +647,7 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 	});
 
 	const userForPushNotification = await User.find({ _id: updatedDump.user_id._id })
-	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', updatedDump._id)
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', updatedDump._id, req.body.notifCode)
 
 	res.status(200).json({
 		success: true,
@@ -885,7 +905,7 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 		});
 	}
 	const userForPushNotification = await User.find({ _id: dump.user_id })
-	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id)
+	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
 
 	let dumpComments = dump.comments
 
@@ -901,7 +921,7 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 //****** Get Comment Dump Status******
 exports.getComments = catchAsyncErrors(async (req, res, next) => {
 
-	let dump = await await Dump.findById(req.params.id);
+	let dump = await Dump.findById(req.params.id);
 	let dumpComments = dump.comments
 
 	res.status(200).json({

@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment } from "react";
-import { Keyboard, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions,ActivityIndicator } from "react-native";
+import { Keyboard, AppState, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions, ActivityIndicator } from "react-native";
 import { HStack } from "native-base";
 import ReversedFlatList from 'react-native-reversed-flat-list';
 import ChatBubble from "../../stylesheets/chatBubble";
@@ -11,30 +11,46 @@ import { getChat, updateChat } from "../../Redux/Actions/chatActions";
 import { APPEND_CHAT, GET_CHAT_RESET } from "../../Redux/Constants/chatConstants";
 import { SOCKET_PORT } from "../../Redux/Constants/socketConstants";
 import * as io from 'socket.io-client';
+import { activeChat } from "../../Redux/Actions/chatActions";
+import { getItemDetails } from "../../Redux/Actions/itemActions";
+import RandomStringGenerator from "../extras/randomStringGenerator";
+import NotificationSender from "../extras/notificationSender";
 const socket = io.connect(SOCKET_PORT);
 let deviceWidth = Dimensions.get('window').width
 const ChatDonation = (props) => {
     const dispatch = useDispatch();
 
     const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
-
+    
 
     const chatDetail = props.route.params.chatDetail
+    const category = props.route.params.category
     const chatId = props.route.params.chatId
     const chatLength = props.route.params.chatLength
     const itemName = props.route.params.itemName
     const itemId = props.route.params.itemId
+    const barangay_hall = props.route.params.barangay_hall
+    const user_id = props.route.params.user_id
+    const receiver_id = props.route.params.receiver_id
+    const receiver_name= props.route.params.receiver_name
+    const user_name = props.route.params.user_name
     const sampleData = require("../../assets/sampleData/chat.json");
     const [message, setMessage] = useState("");
     const flatlist = useRef();
     const animatedImage = new Animated.Value(0);
     const [user, setUser] = useState("")
+    const [userDetail, setUserDetail] = useState()
     const [chat, setChat] = useState([])
     const [messageList, setMessageList] = useState([])
 
     useFocusEffect(
         useCallback(() => {
-            // console.log(chatDetail.room)
+            console.log("barangay_hall", barangay_hall)
+            console.log("user_id", user_id)
+            console.log("receiver_id",receiver_id)
+            const formDataActive = new FormData();
+            formDataActive.append("activeChat", "true");
+            dispatch(activeChat(formDataActive))
             socket.disconnect()
 
             dispatch({ type: GET_CHAT_RESET })
@@ -44,14 +60,42 @@ const ChatDonation = (props) => {
                 .then((res) => {
                     // user = res
                     setUser(JSON.parse(res)._id)
+                    setUserDetail(JSON.parse(res))
                 })
                 .catch((error) => console.log(error))
 
+            // console.log("user",user)
+            AppState.addEventListener('change', state => {
+                if (state === 'background') {
+                    const formDataDeactive = new FormData();
+                    formDataDeactive.append("activeChat", "false");
+                    dispatch(activeChat(formDataDeactive))
+                } 
+            });
 
             socket.connect()
             socket.emit("join_room", [chatDetail.room])
             return () => {
                 setMessageList([])
+                const formDataDeactive = new FormData();
+                formDataDeactive.append("activeChat", "false");
+                dispatch(activeChat(formDataDeactive))
+
+                if (category === 'donated') {
+                    dispatch(getItemDetails(itemId))
+                    props.navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item_id: itemId } } })
+                }
+                else if (category === 'claimed') {
+                    dispatch(getItemDetails(itemId))
+                    props.navigation.navigate("User", { screen: 'MyClaimed', params: { screen: 'MyPublicClaimedDonationsView', params: { item_id: itemId } } })
+
+                }
+                else if (category === 'received') {
+                    dispatch(getItemDetails(itemId))
+                    props.navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item_id: itemId } } })
+                }
+
+
             }
         }, [chatId])
     )
@@ -59,7 +103,7 @@ const ChatDonation = (props) => {
 
         socket.on("receive_message", (data) => {
             if (data.message) {
-                setMessageList((list) => [data,...list]);
+                setMessageList((list) => [data, ...list]);
             }
         })
 
@@ -83,13 +127,22 @@ const ChatDonation = (props) => {
                 message: message,
                 time: chatTime
             }
-
+            const linkForNotif = `/donation/${itemId}/true`
+            const notifCodeForChat = RandomStringGenerator(40)
+            let chatReceiver
+			if (String(userDetail._id) === String(user_id)) {
+				chatReceiver = receiver_id
+			}
+			else {
+				chatReceiver = user_id
+			}
             const formData = new FormData();
             formData.append('message', message);
-            // formData.append('notifCode', notifCodeForChat);
-            // formData.append('link', linkForNotif)
+            formData.append('notifCode', notifCodeForChat);
+            formData.append('link', linkForNotif)
             formData.append('chatCategory', "donation")
             formData.append('time', chatTime)
+            formData.append('receiver', chatReceiver)
             dispatch(updateChat(chatId, formData))
             // dispatch({
             //     type: APPEND_CHAT,
@@ -105,13 +158,20 @@ const ChatDonation = (props) => {
 
             socket.emit("send_message", messageData);
 
+            if (String(userDetail._id) === String(user_id)) {
+				NotificationSender(`New message from ${userDetail.first_name}: ${message}`, user_id, receiver_id, barangay_hall, 'donation-new-message', notifCodeForChat, {_id: itemId})
+			}
+			else {
+				NotificationSender(`New message from ${userDetail.first_name}: ${message}`, receiver_id, user_id, barangay_hall, 'donation-new-message', notifCodeForChat,{_id: itemId})
+
+			}
+
         }
     }
 
     const chatBubbles = ({ item, index }) => {
         return (
             <View style={{ flex: 1 }}>
-            {console.log("chatLength",chatLength)}
                 {index == chatLength - 1 ?
                     <>
                         {<View>
@@ -143,8 +203,8 @@ const ChatDonation = (props) => {
                 {!item ?
                     <View>
                         {/* <ChatBubble admin style={styles.chatBubbles}> */}
-                        {chatLoading?  <ActivityIndicator size="large" color="#00ff00" />:
-                            <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical:24, fontStyle:"italic" }]}>*** No chat yet ***</Text>
+                        {chatLoading ? <ActivityIndicator size="large" color="#00ff00" /> :
+                            <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}>*** No chat yet ***</Text>
                         }
                         {/* </ChatBubble> */}
                     </View> :
@@ -261,13 +321,17 @@ const ChatDonation = (props) => {
                             outputRange: [0, 1]
                         })
                     }]}>
-                    Chat with Admin
+                    {user_id === user?
+                        `${receiver_name}(receiver)`:
+                        `${user_name}(donor)`
+                    }
+                   
                 </Animated.Text>
 
 
             </Animated.View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
-                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Report ID: {itemId}</Text>
+                <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Item ID: {itemId}</Text>
             </View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
                 <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Name: {itemName}</Text>
@@ -285,13 +349,13 @@ const ChatDonation = (props) => {
                 keyExtractor={item => Math.random().toString(36)}
 
             />
-            {chatLoading?
-                <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical:24, fontStyle:"italic" }]}> Retrieving chats </Text>
-            :
-            <View style={styles.chatInputContainer}>
-                <TextInput cursorColor={"grey"} value={message} onChangeText={(text) => setMessage(text)} style={styles.chatInput} multiline={true} placeholder="Type your message here..." />
-                <TouchableOpacity onPress={sendHandler} style={styles.sendBtn}><MaterialCommunityIcons name="send" style={styles.sendBtn2} /></TouchableOpacity>
-            </View>
+            {chatLoading ?
+                <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}> Retrieving chats </Text>
+                :
+                <View style={styles.chatInputContainer}>
+                    <TextInput cursorColor={"grey"} value={message} onChangeText={(text) => setMessage(text)} style={styles.chatInput} multiline={true} placeholder="Type your message here..." />
+                    <TouchableOpacity onPress={sendHandler} style={styles.sendBtn}><MaterialCommunityIcons name="send" style={styles.sendBtn2} /></TouchableOpacity>
+                </View>
             }
         </>
     )

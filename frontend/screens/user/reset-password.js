@@ -39,7 +39,7 @@ const ResetPassword = ({ navigation }) => {
 
                 if (userInfo.isAuthenticated) {
                     if (JSON.parse(userInfo.user).otp_status === "Verified") {
-                        if (JSON.parse(userInfo.user).role === "user") {
+                        if (JSON.parse(userInfo.user).role === "user" || JSON.parse(userInfo.user).role === "newUser") {
                             navigation.dispatch(
                                 CommonActions.reset({
                                     index: 1,

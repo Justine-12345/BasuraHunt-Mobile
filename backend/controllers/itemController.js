@@ -168,6 +168,9 @@ exports.addItem = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 
+	const userForPushNotification = await User.find({ _id: { $ne: req.user.id }, role: { $in: ['user'] } })
+	expoSendNotification(userForPushNotification, NotifTitle, 'PublicDonationsView', item._id)
+
 
 	res.status(201).json({
 		success: true,

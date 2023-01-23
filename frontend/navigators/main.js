@@ -61,6 +61,17 @@ const Main = () => {
                         />
                     }
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+                        navigation.navigate('Schedule',{screen:'TodaySchedNav', params:{screen:'ScheduleToday'}});
+                     
+
+                    },
+                })}
             />
             <Tab.Screen
                 name="ScheduleView"
@@ -129,6 +140,9 @@ const Main = () => {
                     tabBarButton: () => null,
                     tabBarVisible: false,
                 }}
+
+      
+
             />
 
             <Tab.Screen
@@ -138,6 +152,8 @@ const Main = () => {
                     tabBarButton: () => null,
                     tabBarVisible: false,
                 }}
+
+            
             />
         </Tab.Navigator>
     )

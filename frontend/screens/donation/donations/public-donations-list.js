@@ -131,10 +131,9 @@ const PublicDonationsList = ({ navigation }) => {
                             <HStack>
                                 <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                                 <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.name}</Text>
-                                    {/* item.additional_desciption change to item.addition_description */}
-                                    <Text numberOfLines={1} style={RandomStyle.lContent}>{item.additional_description}</Text>
-                                    <Text numberOfLines={1} style={RandomStyle.lType}>
+                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.name} <Text style={{fontWeight:"400", fontSize:10, fontStyle:"italic", color:"gray"}}>({date})</Text></Text>
+                                    <Text numberOfLines={2} style={RandomStyle.lContent}>{item.addional_desciption}</Text>
+                                    <Text numberOfLines={3} style={RandomStyle.lType}>
                                         {item.item_type.map((i, index) =>
                                             item.item_type.length - index == 1 ?
                                                 i.type :
@@ -142,9 +141,9 @@ const PublicDonationsList = ({ navigation }) => {
                                         )
                                         }
                                     </Text>
-                                    <View style={{ flex: 1, justifyContent: "flex-end", }}>
+                                    {/* <View style={{ flex: 1, justifyContent: "flex-end", }}>
                                         <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
-                                    </View>
+                                    </View> */}
                                 </VStack>
                             </HStack>
                         </View>

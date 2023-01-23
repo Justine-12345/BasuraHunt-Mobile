@@ -12,6 +12,9 @@ import Toast from 'react-native-toast-message';
 import { addCollectionnumOfTruck } from "../../../Redux/Actions/collectionPointActions";
 import { useDispatch, useSelector } from "react-redux";
 import { ADD_COLLECTION_NUMBER_OF_TRUCK_RESET } from "../../../Redux/Constants/collectionPointConstants";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import NotificationSender from "../../extras/notificationSender";
+import RandomStringGenerator from "../../extras/randomStringGenerator";
 const windowWidth = Dimensions.get('window').width;
 
 const Start = (props) => {
@@ -22,9 +25,21 @@ const Start = (props) => {
     const [collectionPoint, setCollectionPoint] = useState()
     const [numOfTruck, setNumOfTruck] = useState(0)
     const [numOfTruckHistory, setNumOfTruckHistory] = useState([])
+    const [user, setUser] = useState()
+    const [notifCode, setNotifCode] = useState("")
     useFocusEffect(
         useCallback(() => {
+            setNotifCode(RandomStringGenerator(40))
+            AsyncStorage.getItem("user")
+                .then((res) => {
+                    // user = res
+                    setUser(JSON.parse(res))
+                })
+                .catch((error) => console.log(error))
+
             if(isAdded){
+                NotificationSender(`New record has been added in Collection Point`, user._id, null, user.barangay, 'collection-mass-add', notifCode, collectionPoint&&collectionPoint)
+
                 Toast.show({
                     type: 'success',
                     text1: "Added Successfully",
@@ -81,7 +96,7 @@ const Start = (props) => {
         } else {
             const formData = new FormData();
             formData.append("numOfTruck", numOfTruck);
-            // formData.set('notifCode', notifCode);
+            formData.append('notifCode', notifCode);
             dispatch(addCollectionnumOfTruck(collectionPoint && collectionPoint._id, formData))
             setNumOfTruckHistory(oldArray=>[...oldArray, {_id:Math.random(), date:new Date(), numOfTruck, type: collectionPoint && collectionPoint.type}])
             setNumOfTruck(0)

@@ -12,6 +12,10 @@ import {
     UPDATE_CHAT_SUCCESS,
     UPDATE_CHAT_RESET,
     UPDATE_CHAT_FAIL,
+    ACTIVE_CHAT_REQUEST,
+    ACTIVE_CHAT_SUCCESS,
+    ACTIVE_CHAT_RESET,
+    ACTIVE_CHAT_FAIL,
     CLEAR_ERRORS
 } from '../Constants/chatConstants'
 
@@ -139,6 +143,47 @@ export const chatReducer = (state = {}, action) => {
             return {
                 ...state,
                 isUpdated: false,
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
+            }
+
+        default:
+            return state
+    }
+}
+
+
+export const activeChatReducer = (state = {}, action) => {
+    switch (action.type) {
+        case ACTIVE_CHAT_REQUEST:
+            return {
+                ...state,
+                loading: true
+            }
+
+        case ACTIVE_CHAT_SUCCESS:
+            return {
+                ...state,
+                loading: false,
+                isActive: action.payload
+            }
+
+
+        case ACTIVE_CHAT_FAIL:
+            return {
+                ...state,
+                error: action.payload
+            }
+
+
+        case ACTIVE_CHAT_RESET:
+            return {
+                ...state,
+                isActive: false,
             }
 
         case CLEAR_ERRORS:

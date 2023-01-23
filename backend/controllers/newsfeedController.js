@@ -3,6 +3,7 @@ const User = require('../models/user');
 const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const APIFeatures = require('../utils/apiFeatures');
 const cloudinary = require('cloudinary').v2;
+const expoSendNotification = require('../utils/expoSendNotification')
 
 // Newsfeed Page--------------------------------------------
 exports.getNewsfeedList = catchAsyncErrors(async(req,res,next) => {
@@ -151,6 +152,8 @@ exports.newNewsfeed = catchAsyncErrors(async(req,res,next) => {
 		status:'unread',
 		category:'newsfeeds-add'} } }  );
 
+		const userForPushNotification = await User.find( { role: "user" } )
+		expoSendNotification(userForPushNotification, NotifTitle, 'NewsfeedNav', newsfeed._id)
 
 
 	

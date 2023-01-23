@@ -1,6 +1,6 @@
 import {
     ITEM_LIST_REQUEST,
-    ITEM_LIST_SUCCESS, 
+    ITEM_LIST_SUCCESS,
     ITEM_LIST_FAIL,
 
     ADD_ITEM_REQUEST,
@@ -27,18 +27,19 @@ import {
     RECEIVE_ITEM_SUCCESS,
     RECEIVE_ITEM_RESET,
     RECEIVE_ITEM_FAIL,
-    
+
     ALL_ITEMS_REQUEST,
-    ALL_ITEMS_SUCCESS, 
+    ALL_ITEMS_SUCCESS,
     ALL_ITEMS_FAIL,
 
     ITEM_DETAILS_REQUEST,
     ITEM_DETAILS_SUCCESS,
     ITEM_DETAILS_FAIL,
+    ITEM_DETAILS_RESET,
 
     NEW_ITEM_REQUEST,
     NEW_ITEM_SUCCESS,
-    NEW_ITEM_RESET, 
+    NEW_ITEM_RESET,
     NEW_ITEM_FAIL,
 
     UPDATE_ITEM_REQUEST,
@@ -51,42 +52,42 @@ import {
     DELETE_ITEM_RESET,
     DELETE_ITEM_FAIL,
 
-    CLEAR_ERRORS 
+    CLEAR_ERRORS
 } from '../Constants/itemConstants'
 
-export const itemsReducer = (state = { items:[] }, action) => {
-    switch(action.type) {
+export const itemsReducer = (state = { items: [] }, action) => {
+    switch (action.type) {
         case ITEM_LIST_REQUEST:
         case ALL_ITEMS_REQUEST:
-        return {
-            ...state,
-            loading: true
-        }
+            return {
+                ...state,
+                loading: true
+            }
         case ITEM_LIST_SUCCESS:
         case ALL_ITEMS_SUCCESS:
-        return {
-            ...state,
-            loading:false,
-            items: action.payload.items,
-            itemsCount: action.payload.itemsCount,
-            filteredItemCount: action.payload.filteredItemCount,
-            resPerPage: action.payload.resPerPage
-        }
+            return {
+                ...state,
+                loading: false,
+                items: action.payload.items,
+                itemsCount: action.payload.itemsCount,
+                filteredItemCount: action.payload.filteredItemCount,
+                resPerPage: action.payload.resPerPage
+            }
         case ITEM_LIST_FAIL:
         case ALL_ITEMS_FAIL:
-        return {
-            ...state,
-            loading:false,
-            error: action.payload
-        }
+            return {
+                ...state,
+                loading: false,
+                error: action.payload
+            }
         case CLEAR_ERRORS:
-        return {
-            ...state,
-            error: null
-        }
+            return {
+                ...state,
+                error: null
+            }
         default:
-        return state;
-     }
+            return state;
+    }
 }
 
 export const itemReducer = (state = {}, action) => {
@@ -154,7 +155,7 @@ export const itemReducer = (state = {}, action) => {
             return {
                 ...state,
                 error: action.payload
-            }            
+            }
 
         case CLAIM_ITEM_RESET:
             return {
@@ -179,7 +180,7 @@ export const itemReducer = (state = {}, action) => {
                 ...state,
                 isReceived: false
             }
-            
+
         case DELETE_ITEM_RESET:
             return {
                 ...state,
@@ -221,6 +222,12 @@ export const itemDetailsReducer = (state = { item: {} }, action) => {
                 ...state,
                 error: action.payload
             }
+
+        case ITEM_DETAILS_RESET:
+            return {
+                ...state,
+                item: undefined
+            }
         case CLEAR_ERRORS:
             return {
                 ...state,
@@ -255,7 +262,7 @@ export const newItemReducer = (state = { item: {} }, action) => {
                 ...state,
                 error: action.payload
             }
-        
+
         case ADD_ITEM_RESET:
         case NEW_ITEM_RESET:
             return {

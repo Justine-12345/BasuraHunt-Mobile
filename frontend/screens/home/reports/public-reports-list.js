@@ -250,6 +250,9 @@ const PublicReportsList = ({ navigation }) => {
         <>
             {/* <Text>{console.log(dumps&&dumps.length)}</Text> */}
             <View style={RandomStyle.lContainer3}>
+            {/* <Text onPress={()=>
+            { navigation.navigate("NewsfeedNav", {screen:'Newsfeed'})}
+            }>Go</Text> */}
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
 

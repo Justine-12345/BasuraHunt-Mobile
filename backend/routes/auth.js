@@ -32,7 +32,7 @@ router.route('/me/receive-items').get(isAuthenticatedUser, receiveItems);
 router.route('/me/donated-items').get(isAuthenticatedUser, donatedItems);
 router.route('/me/claimed-items').get(isAuthenticatedUser, claimedItems);
 
-router.route('/me/read-notification').put(isAuthenticatedUser, readNofication);
+router.route('/me/read-notification').post(isAuthenticatedUser, readNofication);
 
 router.route('/me/level-exp').get(isAuthenticatedUser, getLevelExp);
 module.exports = router;

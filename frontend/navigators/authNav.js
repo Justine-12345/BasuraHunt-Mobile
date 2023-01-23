@@ -11,6 +11,7 @@ import ForgotPassword from "../screens/user/forgot-password";
 import ResetPassword from "../screens/user/reset-password";
 import LoadingStart from "../screens/extras/loadingPages/loading-start";
 import HomeCollectorNav from "./garbageCollector/homeCollectorNav";
+import About from "../screens/home/extras/about";
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -32,6 +33,15 @@ function MyStack() {
                     headerShown: false
                 }}
             />
+
+            <Stack.Screen
+                name="About"
+                component={About}
+                options={{
+                    headerShown: false
+                }}
+            />
+
 
             <Stack.Screen
                 name="Register"

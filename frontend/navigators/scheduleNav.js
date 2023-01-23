@@ -30,6 +30,16 @@ function MyTabs() {
                 options={{
                     title: "Collection Today"
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+                        console.log('route', route)
+                        // Do something with the `navigation` object
+                        navigation.navigate('ScheduleToday');
+
+                    },
+                })}
             />
 
             {/* <Tab.Screen

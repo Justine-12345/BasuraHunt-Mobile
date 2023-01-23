@@ -1,6 +1,6 @@
 import React from "react";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
-
+import { FontAwesome, FontAwesome5, MaterialCommunityIcons, Octicons, Foundation  } from "@expo/vector-icons";
 // import Profile from "../screens/user/profile/profile";
 import Profile from "../screens/user/profile/profile";
 import ProfileNav from "./profileNav";
@@ -32,7 +32,15 @@ function MyTabs() {
                 name="ProfileNav"
                 component={ProfileNav}
                 options={{
-                    title: "Profile"
+                    tabBarIcon: (props) => {
+                        return <FontAwesome
+                            name="user"
+                            color={"#1E5128"}
+                            size={30}
+                        />
+                    },
+                    tabBarShowLabel:false
+
                 }}
             />
 
@@ -48,14 +56,19 @@ function MyTabs() {
                 name="MyReports"
                 component={MyReports}
                 options={{
-                    title: "Reports"
+                    tabBarIcon: (props) => {
+                        return  <Foundation 
+                        name="target-two" size={25} color="#1E5128" />
+                    },
+                    tabBarShowLabel:false,
+
                 }}
 
                 listeners={({ navigation, route }) => ({
                     tabPress: (e) => {
                         // Prevent default action
                         e.preventDefault();
-
+                        console.log('route', route)
                         // Do something with the `navigation` object
                         navigation.navigate('UserReportsList');
 
@@ -66,9 +79,15 @@ function MyTabs() {
                 name="MyDonations"
                 component={MyDonations}
                 options={{
-                    title: "Donated Items"
+                    tabBarIcon: (props) => {
+                        return <FontAwesome5
+                            name="box"
+                            color={'#1E5128'}
+                            size={20}
+                        />
+                    },
+                    tabBarShowLabel:false
                 }}
-
                 listeners={({ navigation, route }) => ({
                     tabPress: (e) => {
                         // Prevent default action
@@ -85,7 +104,10 @@ function MyTabs() {
                 name="MyClaimed"
                 component={MyClaimed}
                 options={{
-                    title: "Claimed Items"
+                    tabBarIcon: (props) => {
+                        return <FontAwesome5 name="stamp" size={20} color="#1E5128" />
+                    },
+                    tabBarShowLabel:false
                 }}
 
                 listeners={({ navigation, route }) => ({
@@ -104,7 +126,10 @@ function MyTabs() {
                 name="MyReceived"
                 component={MyReceived}
                 options={{
-                    title: "Received Items"
+                    tabBarIcon: (props) => {
+                        return <FontAwesome5 name="box-open" size={19} color="#1E5128" />
+                    },
+                    tabBarShowLabel:false
                 }}
 
                 listeners={({ navigation, route }) => ({

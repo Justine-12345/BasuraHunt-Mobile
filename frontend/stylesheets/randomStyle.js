@@ -119,7 +119,7 @@ const RandomStyle = StyleSheet.create({
         elevation: 3
     },
     lContainer3: {
-        padding: 10
+        padding: 10,
     },
     lLatestTitle: {
         color: "#f7faf7",

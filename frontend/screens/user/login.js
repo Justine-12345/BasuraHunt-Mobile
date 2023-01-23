@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Text, View, Image, Dimensions, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { HStack } from 'native-base';
+import { SimpleLineIcons  } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { findEmail } from "../../Redux/Actions/userActions";
@@ -80,7 +81,7 @@ const Login = ({ navigation }) => {
 
                 if (userInfo.isAuthenticated) {
                     if (JSON.parse(userInfo.user).otp_status === "Verified") {
-                        if (JSON.parse(userInfo.user).role === "user") {
+                        if (JSON.parse(userInfo.user).role === "user" || JSON.parse(userInfo.user).role === "newUser") {
                             navigation.dispatch(
                                 CommonActions.reset({
                                     index: 1,
@@ -150,6 +151,9 @@ const Login = ({ navigation }) => {
     return (
         <>
             <View style={Styles.container}>
+            <TouchableOpacity onPress={()=> navigation.navigate('About')} style={{position:"relative", top:-15}}>
+            <SimpleLineIcons name="info" size={24} color="#757575" style={{marginHorizontal:8, alignSelf: "flex-end"}} />
+            </TouchableOpacity>
                 <Image
 
                     source={require("../../assets/BasuraHunt-logo.png")}

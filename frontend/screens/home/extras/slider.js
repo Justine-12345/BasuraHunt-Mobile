@@ -9,9 +9,9 @@ import {
   Button,
 } from 'react-native';
 import AppIntroSlider from 'react-native-app-intro-slider';
-import Main from '../../../navigators/main'
+import Main from '../../../navigators/main';
 
-const Slider = () => {
+export default function Slider() {
   const [showRealApp, setShowRealApp] = useState(false);
 
   const onDone = () => {
@@ -69,7 +69,7 @@ const Slider = () => {
   );
 };
 
-export default Slider;
+// export default Slider;
 
 const styles = StyleSheet.create({
   container: {

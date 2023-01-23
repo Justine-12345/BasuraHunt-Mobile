@@ -28,7 +28,8 @@ import {
 import {
     newChatReducer,
     chatDetailsReducer,
-    chatReducer
+    chatReducer,
+    activeChatReducer
 } from './Reducers/chatReducers';
 
 import {
@@ -99,6 +100,7 @@ const reducers = combineReducers({
     newChat: newChatReducer,
     chatDetails: chatDetailsReducer,
     chat: chatReducer,
+    activeChat: activeChatReducer,
 
     items: itemsReducer,
     item: itemReducer,

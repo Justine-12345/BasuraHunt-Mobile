@@ -63,8 +63,9 @@ const Account = ({ navigation }) => {
 
 
 
-        if (!result.cancelled) {
-            let imageUri = result ? `data:image/jpg;base64,${result.base64}` : null;
+        if (!result.canceled) {
+            let imageUri = result ?
+            `data:image/jpg;base64,${result.assets[0].base64}` : null;
             setImage(imageUri);
             setUser({ ...user, ["avatar"]: imageUri }) 
         }

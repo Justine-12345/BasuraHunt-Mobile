@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { FlatList, Text, View, TouchableOpacity } from "react-native";
 import { Button, HStack, VStack } from "native-base";
@@ -11,11 +11,14 @@ import { TODAY_COLLECTION_POINT_LIST_RESET } from "../../../Redux/Constants/coll
 import { liveMapNotification } from "../../../Redux/Actions/collectionPointActions";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
 import NotificationSender from "../../extras/notificationSender";
+import { getSingleDump } from "../../../Redux/Actions/dumpActions";
+import { DUMP_DETAILS_RESET } from "../../../Redux/Constants/dumpConstants";
 const CScheduleToday = ({ navigation }) => {
     const [userID, setUserID] = useState("");
     const { isRefreshed, collectionPointsToday } = useSelector(state => state.collectionPointsToday);
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
+    const { screen, object, message } = useSelector(state => state.pushNotification);
 
     useFocusEffect(
         useCallback(() => {
@@ -37,6 +40,23 @@ const CScheduleToday = ({ navigation }) => {
             }
         }, [])
     )
+
+
+    useEffect(() => {
+        
+        if (screen === 'SchedNotifView') {
+            navigation.navigate('GarbageCollectorSchedNav', { screen: 'TodayNav', params: { screen: 'SchedNotifView', params: { title: message } } })
+        }
+        else if (screen === 'Assigned Illegal Dumps') {
+            dispatch(getSingleDump(object))
+            navigation.navigate('GarbageCollectorNav', { screen: 'Assigned Illegal Dumps', params: { screen: 'AssignedView', params: { item_id: object } } })
+        }
+        else if (screen === 'Finished') {
+            dispatch(getSingleDump(object))
+            navigation.navigate('GarbageCollectorNav', { screen: 'Finished', params: { screen: 'AssignedView', params: { item_id: object } } })
+        }
+
+    }, [screen, object, message])
 
     const collectionPointTime = (collectionPoint) => {
         const startTimeArray = collectionPoint.startTime.split(":");
@@ -81,18 +101,18 @@ const CScheduleToday = ({ navigation }) => {
         }
     }
 
-    const sendNotificationStart = (collpoint)=> {
+    const sendNotificationStart = (collpoint) => {
         const notifCode = RandomStringGenerator(40)
 
-		const formData = new FormData();
-        	formData.append('liveStatus', 'start');
-        	formData.append('notifCode', notifCode);	
-            dispatch(liveMapNotification(collpoint._id,formData))
+        const formData = new FormData();
+        formData.append('liveStatus', 'start');
+        formData.append('notifCode', notifCode);
+        dispatch(liveMapNotification(collpoint._id, formData))
 
-	 	    NotificationSender(`Garbage Collector ${userID && userID.first_name} started a live map`,userID && userID._id, null,userID && userID.barangay, 'live', notifCode, collpoint)
+        NotificationSender(`Garbage Collector ${userID && userID.first_name} started a live map`, userID && userID._id, null, collpoint.barangay, 'live', notifCode, collpoint)
 
 
-	}
+    }
 
     const getWatchBtn = (collectionPoint) => {
         const today = new Date();
@@ -117,11 +137,11 @@ const CScheduleToday = ({ navigation }) => {
 
         if (checkTime) {
             return (
-            <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
-                onPress={() => navigation.navigate("Start", { collectionPoint: collectionPoint, collectionPoint_roomCode: collectionPoint.roomCode }, sendNotificationStart(collectionPoint))}
-            >
-                <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
-            </TouchableOpacity>);
+                <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
+                    onPress={() => navigation.navigate("Start", { collectionPoint: collectionPoint, collectionPoint_roomCode: collectionPoint.roomCode }, sendNotificationStart(collectionPoint))}
+                >
+                    <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
+                </TouchableOpacity>);
         }
         else if (timeNow <= startTimeArray[0] + "" + startTimeArray[1]) {
             return "";
@@ -171,6 +191,7 @@ const CScheduleToday = ({ navigation }) => {
                                             </HStack>
                                             <VStack>
                                                 <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
+                                                <Text numberOfLines={1} style={[RandomStyle.lItem2, {fontWeight:"700"}]}>{item.barangay}</Text>
                                                 <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
                                             </VStack>
                                             {getWatchBtn(item)}
@@ -194,7 +215,8 @@ const CScheduleToday = ({ navigation }) => {
     return (
         <>
             <View style={RandomStyle.lContainer3}>
-                <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text>
+                {/* <Text onPress={()=>{ navigation.navigate('GarbageCollectorSchedNav', { screen: 'TodayNav', params: { screen: 'SchedNotifView', params: { title: "zxczxcxz|ZXczxC|XZCXZ|CZXczx|ZXCzxczx|ZXc" } } })}}>Go</Text> */}
+                {/* <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text> */}
             </View>
             {collectionPointsToday && collectionPointsToday.length > 0 ?
                 <FlatList

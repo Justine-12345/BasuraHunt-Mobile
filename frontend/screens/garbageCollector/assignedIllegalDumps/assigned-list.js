@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator } from "react-native";
 import { HStack, VStack, Select, Toast } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -15,7 +15,7 @@ const AssignedList = ({ navigation }) => {
     const [userID, setUserID] = useState("");
 
     const dispatch = useDispatch();
-    const { dumps, error } = useSelector(state => state.dumps)
+    const { dumps, error, loading } = useSelector(state => state.dumps)
 
     const [filter, setFilter] = useState(false);
     const [currentPage, setCurrentPage] = useState(1)
@@ -99,7 +99,7 @@ const AssignedList = ({ navigation }) => {
     )
 
     useEffect(() => {
-        if (filter === false){
+        if (filter === false) {
             setDistrict("");
             setBarangay("");
             setSize("");
@@ -153,39 +153,44 @@ const AssignedList = ({ navigation }) => {
 
         return isTrue;
     }
+   
+
 
     const reportsItem = ({ item, index }) => {
 
-        let img = item.images.map(img => img.url)[0]
-        const date = new Date(item.createdAt).toLocaleDateString()
-        return (
-            <>
-                {collector(item) && item.status !== "Cleaned" && (
-                    <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
-                        <View style={RandomStyle.lContainer2}>
-                            <HStack>
+        if (item.user_id !== null) {
+            let img = item.images.map(img => img.url)[0]
+            const date = new Date(item.createdAt).toLocaleDateString()
+           
+            return (
+                <>
+                    {collector(item) && (item.status === "Confirmed" || item.status === "Unfinish") && (
+                        <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
 
-                                <Text style={RandomStyle.vBadge}> Assigned </Text>
+                            <View style={RandomStyle.lContainer2}>
+                                <HStack>
+                                    <Text style={RandomStyle.vBadge}> {item.status} </Text>
 
-                                <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
-                                <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
-                                    {/* item.additional_desciption change to item.addition_description */}
-                                    <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_description}</Text>
-                                    <View style={{ flex: 1, justifyContent: "flex-end", }}>
-                                        <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
-                                    </View>
-                                </VStack>
-                            </HStack>
-                        </View>
-                    </TouchableOpacity>
-                )}
-            </>
-        )
+                                    <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
+                                    <VStack>
+                                        <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                        {/* item.additional_desciption change to item.addition_description */}
+                                        <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                        <View style={{ flex: 1, justifyContent: "flex-end", }}>
+                                            <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
+                                        </View>
+                                    </VStack>
+                                </HStack>
+                            </View>
+                        </TouchableOpacity>
+                    )}
+                </>
+            )
+        }
     }
     return (
         <>
-            {console.log(dumps)}
+
             <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
@@ -200,13 +205,15 @@ const AssignedList = ({ navigation }) => {
                 <FlatList
                     data={dumps}
                     renderItem={reportsItem}
-                    keyExtractor={item => item._id.$oid}
+                    keyExtractor={item => item._id}
                 />
                 :
                 <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No reports yet!
-                    </Text>
+                    {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
+                        <Text style={Empty1.text1}>
+                            No assined reports yet!
+                        </Text>
+                    }
                 </View>
             }
         </>

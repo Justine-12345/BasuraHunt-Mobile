@@ -299,7 +299,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 	}
 
 	const user = await User.findOne({ email }).select('password otp_status role first_name last_name avatar alias barangay push_tokens')
-	
+
 	if (!user) {
 		return next(new ErrorHandler('Invalid Email or Password', 401));
 	}
@@ -460,7 +460,7 @@ exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
 
 //******Update User's Profile******
 exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
-	
+
 	const newUserData = {
 		first_name: req.body.first_name,
 		middle_name: req.body.middle_name,
@@ -476,8 +476,8 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 		alias: req.body.alias,
 		// password: req.body.password,
 	}
-	
-	
+
+
 	// Update avatar
 	if (req.body.avatar) {
 		const user = await User.findById(req.user.id)
@@ -868,9 +868,17 @@ exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 		path: 'received_items',
 		populate: {
 			path: 'item',
-			populate: {
-				path: 'chat_id'
-			}
+			populate: [
+				{
+					path: 'chat_id',
+				},
+				{
+					path: 'user_id',
+				},
+				{
+					path: 'receiver_id',
+				}
+			]
 		}
 	}).select('received_items');
 
@@ -889,17 +897,26 @@ exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 exports.donatedItems = catchAsyncErrors(async (req, res, next) => {
 	// const userDonatedItems = await User.findById(req.user.id).populate('donated_items.item').select('donated_items');
 
-	
+
 
 	const userDonatedItems = await User.findById(req.user.id).populate({
 		path: 'donated_items',
 		populate: {
 			path: 'item',
-			populate: {
-				path: 'chat_id'
-			}
+			populate: [
+				{
+					path: 'chat_id',
+				},
+				{
+					path: 'user_id',
+				},
+				{
+					path: 'receiver_id',
+				}
+			]
 		}
-	}).select('donated_items');
+	})
+		.select('donated_items');
 
 
 	if (!userDonatedItems) {
@@ -918,8 +935,8 @@ exports.donatedItems = catchAsyncErrors(async (req, res, next) => {
 //******Claimed Items By User******
 exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
 	'Confirmed'
-	const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).populate('chat_id').sort( { "date_claimed": -1 } )
-	;
+	const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).populate('chat_id').populate("receiver_id").populate("user_id").sort({ "date_claimed": -1 })
+		;
 
 	console.log(req.user.id)
 
@@ -935,7 +952,7 @@ exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
 	// 	}
 	// })
 
-	console.log("userClaimedItems",userClaimedItems)
+	console.log("userClaimedItems", userClaimedItems)
 	res.status(200).json({
 		success: true,
 		userClaimedItems
@@ -949,13 +966,12 @@ exports.readNofication = catchAsyncErrors(async (req, res, next) => {
 	const user = await User.findById(req.user.id);
 
 	notifications = []
-
 	for (var i = 0; i < user.notifications.length; i++) {
 		notification = user.notifications[i]
-
-		if (req.body.notifCode == notification.notifCode) {
+		if (String(req.body.notifCode).trim() == String(notification.notifCode).trim()) {
 			notification.status = 'read'
 			notifications.push(notification)
+			// console.log(notification)
 		} else {
 			notifications.push(notification)
 		}
@@ -977,37 +993,37 @@ exports.readNofication = catchAsyncErrors(async (req, res, next) => {
 })
 
 
-exports.readNofication = catchAsyncErrors(async (req, res, next) => {
+// exports.readNofication = catchAsyncErrors(async (req, res, next) => {
 
-	const user = await User.findById(req.user.id);
+// 	const user = await User.findById(req.user.id);
 
-	notifications = []
+// 	notifications = []
 
-	for (var i = 0; i < user.notifications.length; i++) {
-		notification = user.notifications[i]
+// 	for (var i = 0; i < user.notifications.length; i++) {
+// 		notification = user.notifications[i]
 
-		if (req.body.notifCode == notification.notifCode) {
-			notification.status = 'read'
-			notifications.push(notification)
-		} else {
-			notifications.push(notification)
-		}
-
-
-	}
+// 		if (req.body.notifCode == notification.notifCode) {
+// 			notification.status = 'read'
+// 			notifications.push(notification)
+// 		} else {
+// 			notifications.push(notification)
+// 		}
 
 
-	if (!user) {
-		return next(new ErrorHandler('User Notification not found', 404));
-	}
+// 	}
 
-	await user.save();
 
-	res.status(200).json({
-		success: true,
-		user
-	})
-})
+// 	if (!user) {
+// 		return next(new ErrorHandler('User Notification not found', 404));
+// 	}
+
+// 	await user.save();
+
+// 	res.status(200).json({
+// 		success: true,
+// 		user
+// 	})
+// })
 
 
 

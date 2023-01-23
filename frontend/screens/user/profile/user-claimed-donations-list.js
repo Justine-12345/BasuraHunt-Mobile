@@ -59,7 +59,7 @@ const UserClaimedDonations = ({navigation}) => {
         return(
             <>
             <TouchableOpacity onPress={()=>
-            navigation.navigate("User", {screen:'MyClaimed', params:{screen:'MyPublicClaimedDonationsView', params:{item:item}}} )
+            navigation.navigate("User", {screen:'MyClaimed', params:{screen:'MyPublicClaimedDonationsView', params:{item:item, category:"claimed"}}} )
             } activeOpacity={.8}>
                 <View style={RandomStyle.lContainer2}>
                     <HStack>
@@ -90,10 +90,11 @@ const UserClaimedDonations = ({navigation}) => {
     return (
         <> 
             <View style={RandomStyle.lContainer3}>
+            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Claimed Items</Text>
                 <HStack style={RandomStyle.searchContainer}>  
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text)=>search(text)}/>
                 </HStack>
-                <Text style={RandomStyle.vText1}>Total: {items&&items.length}</Text>
+                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {items&&items.length}</Text>
 
             </View>
             {items&&items.length > 0 ? 

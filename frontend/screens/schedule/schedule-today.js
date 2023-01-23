@@ -104,7 +104,7 @@ const ScheduleToday = ({ navigation }) => {
         console.log(checkTime)
 
         if (checkTime) {
-            return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", {collectionPoint:collectionPoint})} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
+        return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", {collectionPoint:collectionPoint})} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
                 <Text style={RandomStyle.pButton2}>Watch Now</Text>
             </TouchableOpacity>;
         }

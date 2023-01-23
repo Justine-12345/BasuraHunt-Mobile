@@ -91,11 +91,11 @@ const UserReportsList = (props) => {
         <>
 
             <View style={RandomStyle.lContainer3}>
-
+            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Reported Illegal Dumps</Text>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
                 </HStack>
-                <Text style={RandomStyle.vText1}>Total: {reports && reports.length}</Text>
+                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {reports && reports.length}</Text>
             </View>
             {reports && reports.length > 0 ?
                 <FlatList

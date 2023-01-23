@@ -12,6 +12,10 @@ import {
     UPDATE_CHAT_SUCCESS,
     UPDATE_CHAT_RESET,
     UPDATE_CHAT_FAIL,
+    ACTIVE_CHAT_REQUEST,
+    ACTIVE_CHAT_SUCCESS,
+    ACTIVE_CHAT_RESET,
+    ACTIVE_CHAT_FAIL,
     CLEAR_ERRORS
 } from '../Constants/chatConstants'
 
@@ -109,6 +113,42 @@ export const updateChat = (id, chatData) => async (dispatch) => {
     } catch (error) {
         dispatch({
             type: UPDATE_CHAT_FAIL,
+            payload: error.response.data.message
+        })
+    }
+}
+
+
+// active chat
+export const activeChat = (activeData) => async (dispatch) => {
+    try {
+
+        dispatch({ type: ACTIVE_CHAT_REQUEST })
+
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+        const { data } = await axios.post(`${baseURL}/chat/active-chat`, activeData, config)
+
+        dispatch({
+            type: ACTIVE_CHAT_SUCCESS,
+            payload: data.success
+        })
+
+    } catch (error) {
+        dispatch({
+            type: ACTIVE_CHAT_FAIL,
             payload: error.response.data.message
         })
     }

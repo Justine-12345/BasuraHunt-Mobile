@@ -13,9 +13,16 @@ exports.getTodayCollectionPointList = catchAsyncErrors(async (req, res, next) =>
 
 	const day = days[dateToday.getDay()];
 
-	const collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).countDocuments();
-	const collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).populate('collectors.collector').sort({ startTime: 1 });
+	let collectionPointsCount
+	let collectionPoints
+	if (req.user.role === 'garbageCollector') {
+		collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).countDocuments();
+		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).populate('collectors.collector').sort({ startTime: 1 });
+	} else {
+		collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).countDocuments();
+		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).populate('collectors.collector').sort({ startTime: 1 });
 
+	}
 
 	res.status(200).json({
 		success: true,
@@ -27,9 +34,17 @@ exports.getTodayCollectionPointList = catchAsyncErrors(async (req, res, next) =>
 // Upcoming Collection Point Page--------------------------------------------
 exports.getUpcomingCollectionPointList = catchAsyncErrors(async (req, res, next) => {
 
-	const collectionPointsCount = await CollectionPoint.find({ "barangay": req.user.barangay }).countDocuments();
+	let collectionPointsCount
+	let collectionPoints
+	if (req.user.role === 'garbageCollector') {
+		collectionPointsCount = await CollectionPoint.find().countDocuments();
+		collectionPoints = await CollectionPoint.find();
+	} else {
+		collectionPointsCount = await CollectionPoint.find({ "barangay": req.user.barangay }).countDocuments();
+		collectionPoints = await CollectionPoint.find({ "barangay": req.user.barangay });
+	}
 
-	const collectionPoints = await CollectionPoint.find({ "barangay": req.user.barangay });
+
 
 	res.status(200).json({
 		success: true,
@@ -248,7 +263,7 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	});
 
 	const userForPushNotification = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } })
-	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView')
+	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView', null, req.body.notifCode)
 
 
 	if (typeof req.body.collectors == "string") {
@@ -268,6 +283,10 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
+
+		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+		expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
+
 	}
 	else {
 		for (let i = 0; i < req.body.collectors.length; i++) {
@@ -289,9 +308,12 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 				}
 			});
 		}
+		for (let i = 0; i < req.body.collectors.length; i++) {
+			const collector = req.body.collectors[i];
+			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" })
+			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
+		}
 	}
-
-
 
 
 	res.status(201).json({
@@ -474,7 +496,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	});
 	const userForPushNotification = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } })
 	// console.log("userForPushNotification",userForPushNotification)
-	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView')
+	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView', null, req.body.notifCode)
 
 
 	if (typeof req.body.collectors == "string") {
@@ -494,6 +516,8 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
+		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+		expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 	}
 	else {
 		for (let i = 0; i < req.body.collectors.length; i++) {
@@ -514,6 +538,12 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 					}
 				}
 			});
+		}
+
+		for (let i = 0; i < req.body.collectors.length; i++) {
+			const collector = req.body.collectors[i];
+			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" })
+			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 		}
 	}
 
@@ -590,7 +620,7 @@ exports.liveMapNotification = catchAsyncErrors(async (req, res, next) => {
 	const collectionPoints = await CollectionPoint.findById(req.params.id)
 	const NotifTitle = `Garbage Collector ${req.user.first_name} started a live Map`
 
-	const bulk = await User.find({ barangay: req.user.barangay, _id: { $ne: req.user.id } }).updateMany({
+	const bulk = await User.find({ barangay: collectionPoints.barangay, _id: { $ne: req.user.id }, role: { $ne: 'administrator' } }).updateMany({
 		$push: {
 			notifications: {
 				room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
@@ -606,8 +636,8 @@ exports.liveMapNotification = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
-	const userForPushNotification = await User.find({ barangay: req.user.barangay, _id: { $ne: req.user.id } })
-	expoSendNotification(userForPushNotification, NotifTitle, 'ScheduleView', collectionPoints._id)
+	const userForPushNotification = await User.find({ barangay: collectionPoints.barangay, _id: { $ne: req.user.id } })
+	expoSendNotification(userForPushNotification, NotifTitle, 'ScheduleView', collectionPoints._id, req.body.notifCode)
 
 	res.status(200).json({
 		success: true,

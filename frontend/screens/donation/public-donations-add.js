@@ -13,7 +13,9 @@ import Toast from 'react-native-toast-message';
 
 import { addItem, clearErrors } from "../../Redux/Actions/itemActions";
 import { ADD_ITEM_RESET } from "../../Redux/Constants/itemConstants";
-
+import NotificationSender from "../extras/notificationSender";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import RandomStringGenerator from "../extras/randomStringGenerator";
 const PublicReportsAdd = ({ navigation }) => {
 
     const dispatch = useDispatch();
@@ -42,15 +44,17 @@ const PublicReportsAdd = ({ navigation }) => {
     const [typeOther, setTypeOther] = useState(false);
 
     const [btnAdd, setBtnAdd] = useState(false);
-
-    (async () => {
-        if (Platform.OS !== "web") {
-            const { status } = await ImagePicker.requestCameraPermissionsAsync();
-            if (status !== "granted") {
-                alert("Permission to access camera is needed to upload images")
+    const [user, setUser] = useState();
+    const [notifCode, setNotifCode] = useState();
+    // const [notifCode, setNotifCode] = useState("")
+        (async () => {
+            if (Platform.OS !== "web") {
+                const { status } = await ImagePicker.requestCameraPermissionsAsync();
+                if (status !== "granted") {
+                    alert("Permission to access camera is needed to upload images")
+                }
             }
-        }
-    })();
+        })();
 
     const pickImage = async () => {
 
@@ -63,7 +67,7 @@ const PublicReportsAdd = ({ navigation }) => {
             quality: 0.1
         });
 
-        if (!result.canceled){
+        if (!result.canceled) {
             let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
             setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
@@ -81,7 +85,7 @@ const PublicReportsAdd = ({ navigation }) => {
             quality: 0.1
         });
 
-        if(!result.canceled){
+        if (!result.canceled) {
             let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
             setImages(oldArray => [...oldArray, imageUri])
             setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
@@ -132,6 +136,13 @@ const PublicReportsAdd = ({ navigation }) => {
     ];
 
     useEffect(() => {
+
+        AsyncStorage.getItem("user")
+            .then((res) => {
+                setUser(JSON.parse(res))
+            })
+            .catch((error) => console.log(error))
+            setNotifCode(RandomStringGenerator(40))
         if (success) {
             Toast.show({
                 type: 'success',
@@ -148,9 +159,10 @@ const PublicReportsAdd = ({ navigation }) => {
             setItemDesc('')
             setDonateUsing('')
             dispatch({ type: ADD_ITEM_RESET })
-            console.log("success")
-            navigation.navigate("User", {screen:'MyDonations', params:{screen:'UserDonationsList'}} )
-        
+
+            NotificationSender(`New donated item has been added`, user._id, null, barangay, 'donation-new', notifCode, item && item)
+            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'UserDonationsList' } })
+
         }
 
         if (error) {
@@ -198,7 +210,7 @@ const PublicReportsAdd = ({ navigation }) => {
         })
 
         formData.append("donate_using", donateUsing)
-
+        formData.append('notifCode', notifCode);
         // console.log(formData)
         dispatch(addItem(formData))
     }

@@ -17,12 +17,13 @@ import { SOCKET_PORT } from "../../../Redux/Constants/socketConstants";
 import io from "socket.io-client"
 import NotificationSender from "../../extras/notificationSender";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
+import { ITEM_DETAILS_RESET } from "../../../Redux/Constants/itemConstants";
 const socket = io.connect(SOCKET_PORT);
 const PublicDonationsView = (props) => {
     const dispatch = useDispatch();
     const item_data = props.route.params.item
     const item_id = props.route.params.item_id
-
+    const category = props.route.params.category
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
     const [identity, setIdentity] = useState("");
@@ -33,7 +34,7 @@ const PublicDonationsView = (props) => {
     const [rateError, setRateError] = useState(false)
     // const creationDate = new Date(item.createdAt).toLocaleDateString()
 
-    const { error: itemError, item: itemDetail } = useSelector(state => state.itemDetails);
+    const { error: itemError, item: itemDetail, loading: itemLoading } = useSelector(state => state.itemDetails);
     const { loading, error, isClaimed, isCanceled, isConfirmed, isReceived, isDeleted } = useSelector(state => state.item);
 
     const barangays = {
@@ -144,6 +145,15 @@ const PublicDonationsView = (props) => {
     const deleteItemHandler = (id) => {
         dispatch(deleteItem(id));
     }
+    useFocusEffect(
+        useCallback(() => {
+            return () => {
+                console.log("reset")
+                setItem(null)
+                dispatch({ type: ITEM_DETAILS_RESET })
+            }
+        }, [])
+    )
 
     useFocusEffect(
         useCallback(() => {
@@ -234,6 +244,8 @@ const PublicDonationsView = (props) => {
             socket.connect()
             socket.emit("join_room", [item && item.chat_id && item.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
 
+            // console.log("category",category)
+
         }, [isClaimed, isCanceled, isConfirmed, isReceived, isDeleted, item, item_data])
     )
 
@@ -291,7 +303,8 @@ const PublicDonationsView = (props) => {
                                 }
 
                                 <>
-                                    {   
+                                    {/* {console.log("item", item && item.user_id)} */}
+                                    {
                                         ((item && item.user_id && item.user_id._id) !== (userID && userID._id)) ? (
                                             item && item.status !== "Received" ? (
                                                 <>
@@ -409,10 +422,14 @@ const PublicDonationsView = (props) => {
                                 </>
                             </>
                         }
+                        {/* {console.log(item&&item)} */}
+                        {item && item.status !== 'Unclaimed' ?
+                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicDonationsChat', { chat: item && item.chat_id && item.chat_id.chats, chatDetail: item && item.chat_id, chatId: item && item.chat_id && item.chat_id._id, itemId: item && item._id, itemName: item && item.name, chatLength: item && item.chat_id && item.chat_id.chats && item.chat_id.chats.length, category: category, barangay_hall: item && item.barangay_hall, user_id: item && item.user_id && item.user_id._id, receiver_id: item && item.receiver_id && item.receiver_id._id, receiver_name: item && item.receiver_id && item.receiver_id.first_name, user_name: item && item.user_id && item.user_id.first_name }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                            </TouchableOpacity> : null
+                        }
 
-                        <TouchableOpacity onPress={() => { props.navigation.navigate('PublicDonationsChat', { chat: item && item.chat_id && item.chat_id.chats, chatDetail: item && item.chat_id, chatId: item && item.chat_id && item.chat_id._id, itemId: item && item._id, itemName: item && item.name, chatLength: item && item.chat_id && item.chat_id.chats && item.chat_id.chats.length }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                            <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                        </TouchableOpacity>
+
                     </HStack>
                 </View>
                 <HStack>

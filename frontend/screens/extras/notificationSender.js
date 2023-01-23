@@ -29,6 +29,7 @@ const NotificationSender = (title, sender = null, receiver = null, barangay, cat
 
    if (category === "illegalDump-new-comment") {
       categoryLink = `/report/${model._id}/${model.coordinates.longtitude}/${model.coordinates.latitude}/`
+   
    }
 
    if (category === "donation-new") {
