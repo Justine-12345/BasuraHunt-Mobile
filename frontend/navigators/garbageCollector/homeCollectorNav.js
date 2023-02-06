@@ -68,7 +68,7 @@ const HomeCollectorNav = () => {
                         e.preventDefault();
 
                         // Do something with the `navigation` object
-                        navigation.navigate('Assigned Illegal Dumps',{screen:'AssignedList'});
+                        navigation.navigate('GarbageCollectorNav',{screen:'Assigned Illegal Dumps',params:{screen:'AssignedList'}});
                      
 
                     },

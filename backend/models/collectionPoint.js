@@ -80,11 +80,12 @@ const collectionPointSchema = new mongoose.Schema({
         }
     },
 
-    collectionPoint : {
-        type: String,
-        required: [true, 'Please enter collection point'],
-        trim: true    
-    },
+    collectionPoints:[{
+        collectionPoint:{
+            type:String,
+            required: [true, 'Please input collection points'],
+        }
+    }],
 
     collectionPerTruck:[{
         numOfTruck:{

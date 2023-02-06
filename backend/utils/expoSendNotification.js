@@ -6,7 +6,6 @@ const sendNotification = async (userTokens, message, screen, object_id, code) =>
 	let messages = [];
 
 	let somePushTokens = []
-
 	userTokens.forEach(user => {
 		const userPushTokens = user.push_tokens
 
@@ -17,17 +16,18 @@ const sendNotification = async (userTokens, message, screen, object_id, code) =>
 			userPushTokens.forEach(push_token => {
 				somePushTokens.push(push_token.push_token)
 			})
-		}else{
+		} else {
 			if (screen !== 'PublicDonationsChat' && screen !== 'PublicReportsChat') {
-			userPushTokens.forEach(push_token => {
-				if (!somePushTokens.includes(push_token)) {
-					somePushTokens.push(push_token.push_token)
-				}
+				userPushTokens.forEach(push_token => {
+					if (push_token !== undefined) {
+						if (!somePushTokens.includes(push_token)) {
+							somePushTokens.push(push_token.push_token)
+						}
+					}
+				})
+			}
+		}
 
-			})
-		}
-		}
-		
 
 	})
 	console.log("somePushTokens", somePushTokens)
@@ -42,7 +42,7 @@ const sendNotification = async (userTokens, message, screen, object_id, code) =>
 			to: pushToken,
 			sound: 'default',
 			body: message,
-			data: { screen: screen, message: message, object: object_id, code:code },
+			data: { screen: screen, message: message, object: object_id, code: code },
 		})
 
 
@@ -57,7 +57,7 @@ const sendNotification = async (userTokens, message, screen, object_id, code) =>
 		for (let chunk of chunks) {
 			try {
 				let ticketChunk = await expo.sendPushNotificationsAsync(chunk);
-				console.log(ticketChunk);
+				// console.log(ticketChunk);
 				tickets.push(...ticketChunk);
 				// NOTE: If a ticket contains an error code in ticket.details.error, you
 				// must handle it appropriately. The error codes are listed in the Expo

@@ -8,11 +8,12 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getTodayCollectionPointList } from "../../Redux/Actions/collectionPointActions"
 import Empty1 from "../../stylesheets/empty1";
 import { TODAY_COLLECTION_POINT_LIST_RESET } from "../../Redux/Constants/collectionPointConstants";
+import LoadingSchedule from "../extras/loadingPages/loading-schedule";
 
 const ScheduleToday = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
-    const { isRefreshed, collectionPointsToday } = useSelector(state => state.collectionPointsToday);
+    const { isRefreshed, collectionPointsToday, loading } = useSelector(state => state.collectionPointsToday);
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
 
@@ -80,7 +81,7 @@ const ScheduleToday = ({ navigation }) => {
         }
     }
 
-    
+
 
     const getWatchBtn = (collectionPoint) => {
         const today = new Date();
@@ -104,7 +105,7 @@ const ScheduleToday = ({ navigation }) => {
         console.log(checkTime)
 
         if (checkTime) {
-        return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", {collectionPoint:collectionPoint})} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
+            return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", { collectionPoint: collectionPoint })} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
                 <Text style={RandomStyle.pButton2}>Watch Now</Text>
             </TouchableOpacity>;
         }
@@ -130,10 +131,27 @@ const ScheduleToday = ({ navigation }) => {
         return date;
     }
 
+    const collectionPointsList = (collectionPoints) => {
+        let collectionPointsList = "";
+
+        for (let i = 0; i < collectionPoints.length; i++) {
+
+            if (i !== collectionPoints.length - 1) {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint + ", "
+            }
+            else {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint
+            }
+        }
+
+        return collectionPointsList;
+    }
+
     const schedulesList = ({ item }) => {
         // const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
+
                 <View style={RandomStyle.lContainer4}>
                     <HStack>
                         {checkTime(item)}
@@ -153,7 +171,7 @@ const ScheduleToday = ({ navigation }) => {
                             </HStack>
                             <VStack>
                                 <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
-                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
+                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{collectionPointsList(item.collectionPoints)}</Text>
                             </VStack>
                             {getWatchBtn(item)}
                             {/* <TouchableOpacity onPress={() => navigation.navigate("ScheduleView")} activeOpacity={0.8} style={{width: 250, alignSelf: "center"}}>
@@ -168,22 +186,26 @@ const ScheduleToday = ({ navigation }) => {
 
     return (
         <>
+            {loading ? <LoadingSchedule /> :
+                <>
 
-            <View style={RandomStyle.lContainer3}>
-                <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text>
-            </View>
-            {collectionPointsToday && collectionPointsToday.length > 0 ?
-                <FlatList
-                    data={collectionPointsToday}
-                    renderItem={schedulesList}
-                    keyExtractor={item => item._id}
-                />
-                :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No collection for today!
-                    </Text>
-                </View>
+                    <View style={RandomStyle.lContainer3}>
+                        <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text>
+                    </View>
+                    {collectionPointsToday && collectionPointsToday.length > 0 ?
+                        <FlatList
+                            data={collectionPointsToday}
+                            renderItem={schedulesList}
+                            keyExtractor={item => item._id}
+                        />
+                        :
+                        <View style={Empty1.container}>
+                            <Text style={Empty1.text1}>
+                                No collection for today!
+                            </Text>
+                        </View>
+                    }
+                </>
             }
         </>
     )

@@ -52,6 +52,9 @@ import {
     DELETE_ITEM_RESET,
     DELETE_ITEM_FAIL,
 
+    ITEM_PAGE_SET,
+    ITEM_PAGE_RESET,
+
     CLEAR_ERRORS
 } from '../Constants/itemConstants'
 
@@ -275,6 +278,32 @@ export const newItemReducer = (state = { item: {} }, action) => {
                 ...state,
                 error: null,
                 loading: false
+            }
+
+        default:
+            return state
+    }
+}
+
+export const itemPageReducer = (state = {}, action) => {
+    switch (action.type) {
+
+        case ITEM_PAGE_SET:
+            return {
+                ...state,
+                page: action.payload
+            }
+
+        case ITEM_PAGE_RESET:
+            return {
+                ...state,
+                page: null
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
             }
 
         default:

@@ -129,6 +129,22 @@ const GScheduleUpcoming = () => {
         return exist;
     }
 
+    const collectionPointsList = (collectionPoints) => {
+        let collectionPointsList = "";
+
+        for (let i = 0; i < collectionPoints.length; i++) {
+
+            if (i !== collectionPoints.length - 1) {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint + ", "
+            }
+            else {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint
+            }
+        }
+
+        return collectionPointsList;
+    }
+
     const schedulesList = ({ item }) => {
         // const date = new Date(item.createdAt).toLocaleDateString()
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
@@ -160,7 +176,7 @@ const GScheduleUpcoming = () => {
                                                 <VStack paddingBottom={2}>
                                                     <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
                                                     <Text numberOfLines={1} style={[RandomStyle.lItem2, {fontWeight:"700"}]}>{item.barangay}</Text>
-                                                    <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
+                                                    <Text numberOfLines={1} style={RandomStyle.lItem2}>{collectionPointsList(item.collectionPoints)}</Text>
                                                 </VStack>
                                             </VStack>
                                         </HStack>

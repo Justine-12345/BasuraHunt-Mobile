@@ -18,6 +18,7 @@ import io from "socket.io-client"
 import NotificationSender from "../../extras/notificationSender";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
 import { ITEM_DETAILS_RESET } from "../../../Redux/Constants/itemConstants";
+import LoadingPublicDonationsView from "../../extras/loadingPages/loading-donations-view";
 const socket = io.connect(SOCKET_PORT);
 const PublicDonationsView = (props) => {
     const dispatch = useDispatch();
@@ -148,7 +149,7 @@ const PublicDonationsView = (props) => {
     useFocusEffect(
         useCallback(() => {
             return () => {
-                console.log("reset")
+                // console.log("reset")
                 setItem(null)
                 dispatch({ type: ITEM_DETAILS_RESET })
             }
@@ -266,226 +267,231 @@ const PublicDonationsView = (props) => {
     }, [itemDetail, images, item, item_id])
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            <View style={RandomStyle.vContainer}>
-                <View style={RandomStyle.vHeader}>
-                    <Text style={RandomStyle.vText1}>Donation ({item && item.name})</Text>
-                    <HStack justifyContent={"space-between"}>
-                        <VStack>
-                            <HStack>
-                                <Text style={RandomStyle.vText2}>Status: </Text>
+        <>{itemLoading ?
+            <LoadingPublicDonationsView /> :
 
-
-                                <Text>{item && item.status}</Text>
-                            </HStack>
-                            {item && item.date_recieved != null ?
+            <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                <View style={RandomStyle.vContainer}>
+                    <View style={RandomStyle.vHeader}>
+                        <Text style={RandomStyle.vText1}>Donation ({item && item.name})</Text>
+                        <HStack justifyContent={"space-between"}>
+                            <VStack>
                                 <HStack>
-                                    <Text style={RandomStyle.vText2}>Date Received: </Text>
-                                    <Text>{item && (formatDate(item.date_recieved))}</Text>
+                                    <Text style={RandomStyle.vText2}>Status: </Text>
+
+
+                                    <Text>{item && item.status}</Text>
                                 </HStack>
-                                : null
-                            }
-                        </VStack>
-                        <Text>{new Date(item && item.createdAt).toLocaleDateString()}</Text>
-                    </HStack>
-                    {/* Claim */}
-                    <HStack style={RandomStyle.vHeaderBtns}>
-                        {
-                            <>
-                                {
-                                    (item && item.user_id && item.user_id._id) === (userID && userID._id) && (
-                                        item && item.status === "Unclaimed" && (
-                                            <TouchableOpacity>
-                                                <Text style={RandomStyle.vDonationBtn} onPress={() => { deleteItemHandler(item._id) }}>Delete</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    )
+                                {item && item.date_recieved != null ?
+                                    <HStack>
+                                        <Text style={RandomStyle.vText2}>Date Received: </Text>
+                                        <Text>{item && (formatDate(item.date_recieved))}</Text>
+                                    </HStack>
+                                    : null
                                 }
-
+                            </VStack>
+                            <Text>{new Date(item && item.createdAt).toLocaleDateString()}</Text>
+                        </HStack>
+                        {/* Claim */}
+                        <HStack style={RandomStyle.vHeaderBtns}>
+                            {
                                 <>
-                                    {/* {console.log("item", item && item.user_id)} */}
                                     {
-                                        ((item && item.user_id && item.user_id._id) !== (userID && userID._id)) ? (
-                                            item && item.status !== "Received" ? (
-                                                <>
-                                                    {
-                                                        item && item.status === "Unclaimed" && (
-                                                            <TouchableOpacity>
-                                                                <Text style={RandomStyle.vDonationBtn} onPress={() => { claimHandler(item._id) }}>Claim</Text>
-                                                            </TouchableOpacity>
-                                                        )
-                                                    }
+                                        (item && item.user_id && item.user_id._id) === (userID && userID._id) && (
+                                            item && item.status === "Unclaimed" && (
+                                                <TouchableOpacity>
+                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { deleteItemHandler(item._id) }}>Delete</Text>
+                                                </TouchableOpacity>
+                                            )
+                                        )
+                                    }
 
-                                                    {
-                                                        item && item.status === "Claimed" ? (
-                                                            <>
+                                    <>
+                                        {/* {console.log("item", item && item.user_id)} */}
+                                        {
+                                            ((item && item.user_id && item.user_id._id) !== (userID && userID._id)) ? (
+                                                item && item.status !== "Received" ? (
+                                                    <>
+                                                        {
+                                                            item && item.status === "Unclaimed" && (
                                                                 <TouchableOpacity>
-                                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
+                                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { claimHandler(item._id) }}>Claim</Text>
                                                                 </TouchableOpacity>
-                                                                <TouchableOpacity>
-                                                                    <Text style={{ fontSize: 10 }}>Confirmation in progress...</Text>
-                                                                </TouchableOpacity>
-                                                            </>
-                                                        ) : item && item.status === "Confirmed" && (
-                                                            <>
+                                                            )
+                                                        }
+
+                                                        {
+                                                            item && item.status === "Claimed" ? (
+                                                                <>
+                                                                    <TouchableOpacity>
+                                                                        <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
+                                                                    </TouchableOpacity>
+                                                                    <TouchableOpacity>
+                                                                        <Text style={{ fontSize: 10 }}>Confirmation in progress...</Text>
+                                                                    </TouchableOpacity>
+                                                                </>
+                                                            ) : item && item.status === "Confirmed" && (
+                                                                <>
 
 
-                                                                <Modal
-                                                                    animationType="slide"
-                                                                    transparent={true}
-                                                                    visible={modalVisible}
-                                                                    onRequestClose={() => {
-                                                                        // Alert.alert("Modal has been closed.");
-                                                                        setModalVisible(!modalVisible);
-                                                                    }}
-                                                                >
-                                                                    {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
-                                                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                                                    <Modal
+                                                                        animationType="slide"
+                                                                        transparent={true}
+                                                                        visible={modalVisible}
+                                                                        onRequestClose={() => {
+                                                                            // Alert.alert("Modal has been closed.");
+                                                                            setModalVisible(!modalVisible);
+                                                                        }}
+                                                                    >
+                                                                        {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
+                                                                            <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
 
-                                                                            <View style={styles.modalView}>
-                                                                                <Text style={styles.modalText}>Are you sure, Already received the item?</Text>
+                                                                                <View style={styles.modalView}>
+                                                                                    <Text style={styles.modalText}>Are you sure, Already received the item?</Text>
 
-                                                                                {/* {dumpLoading ? */}
-                                                                                {/* <ActivityIndicator size="small" color="#00ff00" />
+                                                                                    {/* {dumpLoading ? */}
+                                                                                    {/* <ActivityIndicator size="small" color="#00ff00" />
                                                                                 : */}
-                                                                                <>
+                                                                                    <>
 
-                                                                                    <Rating
-                                                                                        showRating
-                                                                                        startingValue={0}
-                                                                                        onFinishRating={(rating_value) => setRate(rating_value)}
-                                                                                        style={{ paddingVertical: 10 }}
-
-
-                                                                                    />
-
-                                                                                    <Pressable
-                                                                                        style={[styles.button, styles.buttonClose]}
-                                                                                        onPress={() => setModalVisible(!modalVisible)}
-                                                                                    >
-                                                                                        <Text style={styles.textStyle}>No</Text>
-                                                                                    </Pressable>
-                                                                                    {rateError ?
-                                                                                        <Text style={[styles.textStyle, { color: "red", fontWeight: "normal", fontStyle: "italic" }]}>*Rate the item first</Text> : null
-                                                                                    }
-                                                                                    <Pressable
-                                                                                        style={[styles.button, styles.buttonClose]}
-                                                                                        onPress={() => { receiveHandler(item._id) }}
-                                                                                    >
-                                                                                        <Text style={styles.textStyle}>Yes, I Received it!</Text>
-                                                                                    </Pressable>
+                                                                                        <Rating
+                                                                                            showRating
+                                                                                            startingValue={0}
+                                                                                            onFinishRating={(rating_value) => setRate(rating_value)}
+                                                                                            style={{ paddingVertical: 10 }}
 
 
-                                                                                </>
-                                                                                {/* } */}
+                                                                                        />
 
+                                                                                        <Pressable
+                                                                                            style={[styles.button, styles.buttonClose]}
+                                                                                            onPress={() => setModalVisible(!modalVisible)}
+                                                                                        >
+                                                                                            <Text style={styles.textStyle}>No</Text>
+                                                                                        </Pressable>
+                                                                                        {rateError ?
+                                                                                            <Text style={[styles.textStyle, { color: "red", fontWeight: "normal", fontStyle: "italic" }]}>*Rate the item first</Text> : null
+                                                                                        }
+                                                                                        <Pressable
+                                                                                            style={[styles.button, styles.buttonClose]}
+                                                                                            onPress={() => { receiveHandler(item._id) }}
+                                                                                        >
+                                                                                            <Text style={styles.textStyle}>Yes, I Received it!</Text>
+                                                                                        </Pressable>
+
+
+                                                                                    </>
+                                                                                    {/* } */}
+
+
+                                                                                </View>
 
                                                                             </View>
 
-                                                                        </View>
+                                                                        }
 
-                                                                    }
-
-                                                                </Modal>
+                                                                    </Modal>
 
 
-                                                                <TouchableOpacity>
-                                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => setModalVisible(true)}>Receive</Text>
-                                                                </TouchableOpacity>
-                                                                <TouchableOpacity>
-                                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
-                                                                </TouchableOpacity>
-                                                            </>
-                                                        )
-                                                    }
+                                                                    <TouchableOpacity>
+                                                                        <Text style={RandomStyle.vDonationBtn} onPress={() => setModalVisible(true)}>Receive</Text>
+                                                                    </TouchableOpacity>
+                                                                    <TouchableOpacity>
+                                                                        <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
+                                                                    </TouchableOpacity>
+                                                                </>
+                                                            )
+                                                        }
+                                                    </>
+                                                ) : (
+                                                    <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>Received</Text>
+                                                )
+                                            ) : item && item.status === "Claimed" ? (
+                                                <>
+                                                    <TouchableOpacity>
+                                                        <Text style={RandomStyle.vDonationBtn} onPress={() => { confirmHandler(item._id) }}>Confirm</Text>
+                                                    </TouchableOpacity>
+                                                    <TouchableOpacity>
+                                                        <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
+                                                    </TouchableOpacity>
                                                 </>
-                                            ) : (
-                                                <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>Received</Text>
+                                            ) : item && item.status === "Confirmed" ? (
+                                                <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>To receive...</Text>
+                                            ) : item && item.status === "Received" && (
+                                                <TouchableOpacity>
+                                                    <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>Received</Text>
+                                                </TouchableOpacity>
                                             )
-                                        ) : item && item.status === "Claimed" ? (
-                                            <>
-                                                <TouchableOpacity>
-                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { confirmHandler(item._id) }}>Confirm</Text>
-                                                </TouchableOpacity>
-                                                <TouchableOpacity>
-                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { cancelHandler(item._id) }}>Cancel</Text>
-                                                </TouchableOpacity>
-                                            </>
-                                        ) : item && item.status === "Confirmed" ? (
-                                            <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>To receive...</Text>
-                                        ) : item && item.status === "Received" && (
-                                            <TouchableOpacity>
-                                                <Text style={[RandomStyle.vDonationBtn, { fontWeight: "bold", backgroundColor: "gray" }]}>Received</Text>
-                                            </TouchableOpacity>
-                                        )
-                                    }
+                                        }
+                                    </>
                                 </>
-                            </>
-                        }
-                        {/* {console.log(item&&item)} */}
-                        {item && item.status !== 'Unclaimed' ?
-                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicDonationsChat', { chat: item && item.chat_id && item.chat_id.chats, chatDetail: item && item.chat_id, chatId: item && item.chat_id && item.chat_id._id, itemId: item && item._id, itemName: item && item.name, chatLength: item && item.chat_id && item.chat_id.chats && item.chat_id.chats.length, category: category, barangay_hall: item && item.barangay_hall, user_id: item && item.user_id && item.user_id._id, receiver_id: item && item.receiver_id && item.receiver_id._id, receiver_name: item && item.receiver_id && item.receiver_id.first_name, user_name: item && item.user_id && item.user_id.first_name }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                            </TouchableOpacity> : null
-                        }
+                            }
+                            {/* {console.log(item&&item)} */}
+                            {item && item.status !== 'Unclaimed' ?
+                                <TouchableOpacity onPress={() => { props.navigation.navigate('PublicDonationsChat', { chat: item && item.chat_id && item.chat_id.chats, chatDetail: item && item.chat_id, chatId: item && item.chat_id && item.chat_id._id, itemId: item && item._id, itemName: item && item.name, chatLength: item && item.chat_id && item.chat_id.chats && item.chat_id.chats.length, category: category, barangay_hall: item && item.barangay_hall, user_id: item && item.user_id && item.user_id._id, receiver_id: item && item.receiver_id && item.receiver_id._id, receiver_name: item && item.receiver_id && item.receiver_id.first_name, user_name: item && item.user_id && item.user_id.first_name }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                    <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                                </TouchableOpacity> : null
+                            }
 
 
-                    </HStack>
-                </View>
-                <HStack>
-                    <Text style={RandomStyle.vText2}>Drop point: </Text>
-                    <Text>{item && item.barangay_hall}</Text>
-                </HStack>
-                <View style={RandomStyle.vMapContainer}>
-                    {/* {console.log("item",item&&item)} */}
-                    {item && item.barangay_hall ?
-                        <MapViewer long={barangays && barangays[item && item.barangay_hall][0]} lati={barangays && barangays[item && item.barangay_hall][1]} /> : null
-                    }
-                </View>
-                <View style={RandomStyle.vImages}>
-                    {item && item.images && item.images.map((img, index) =>
-                        <TouchableOpacity key={Math.random()} onPress={() => showImages(Math.random())}>
-                            <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
-                        </TouchableOpacity>
-                    )}
-                    <ImageView
-                        images={images}
-                        imageIndex={imgIndex}
-                        visible={openImages}
-                        onRequestClose={() => setOpenImages(false)}
-                    />
-                </View>
-
-                <Text style={RandomStyle.vText2}>Type</Text>
-                <View style={RandomStyle.vContainer2}>
-                    {item && item.item_type && item.item_type.forEach(it => {
-                        if (!uniqueIt.includes(it.type)) {
-                            uniqueIt.push(it.type)
-                        }
-                    }
-                    )}
-                    {uniqueIt.map(it =>
-                        <Text key={it} style={RandomStyle.vOption}>{it}</Text>
-                    )}
-                </View>
-                {typeArray(item && item.item_type).includes('Other') && (
-                    <View style={RandomStyle.vContainer2}>
-                        <Text style={{ alignSelf: "flex-end" }}>{item && item.item_desc}</Text>
+                        </HStack>
                     </View>
-                )}
+                    <HStack>
+                        <Text style={RandomStyle.vText2}>Drop point: </Text>
+                        <Text>{item && item.barangay_hall}</Text>
+                    </HStack>
+                    <View style={RandomStyle.vMapContainer}>
+                        {/* {console.log("item",item&&item)} */}
+                        {item && item.barangay_hall ?
+                            <MapViewer long={barangays && barangays[item && item.barangay_hall][0]} lati={barangays && barangays[item && item.barangay_hall][1]} /> : null
+                        }
+                    </View>
+                    <View style={RandomStyle.vImages}>
+                        {item && item.images && item.images.map((img, index) =>
+                            <TouchableOpacity key={Math.random()} onPress={() => showImages(Math.random())}>
+                                <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
+                            </TouchableOpacity>
+                        )}
+                        <ImageView
+                            images={images}
+                            imageIndex={imgIndex}
+                            visible={openImages}
+                            onRequestClose={() => setOpenImages(false)}
+                        />
+                    </View>
 
-                <Text style={RandomStyle.vText2}>Additional Details</Text>
-                <View style={RandomStyle.vContainer2}>
-                    <Text>{item && item.addional_desciption}</Text>
+                    <Text style={RandomStyle.vText2}>Type</Text>
+                    <View style={RandomStyle.vContainer2}>
+                        {item && item.item_type && item.item_type.forEach(it => {
+                            if (!uniqueIt.includes(it.type)) {
+                                uniqueIt.push(it.type)
+                            }
+                        }
+                        )}
+                        {uniqueIt.map(it =>
+                            <Text key={it} style={RandomStyle.vOption}>{it}</Text>
+                        )}
+                    </View>
+                    {typeArray(item && item.item_type).includes('Other') && (
+                        <View style={RandomStyle.vContainer2}>
+                            <Text style={{ alignSelf: "flex-end" }}>{item && item.item_desc}</Text>
+                        </View>
+                    )}
+
+                    <Text style={RandomStyle.vText2}>Additional Details</Text>
+                    <View style={RandomStyle.vContainer2}>
+                        <Text>{item && item.addional_desciption}</Text>
+                    </View>
+
+                    <Text style={RandomStyle.vText2}>Donated by</Text>
+                    <View style={RandomStyle.vContainer2}>
+                        <Text>*{donatedUsing(item && item)}*</Text>
+                    </View>
+
                 </View>
-
-                <Text style={RandomStyle.vText2}>Donated by</Text>
-                <View style={RandomStyle.vContainer2}>
-                    <Text>*{donatedUsing(item && item)}*</Text>
-                </View>
-
-            </View>
-        </ScrollView>
+            </ScrollView>
+        }
+        </>
     )
 }
 

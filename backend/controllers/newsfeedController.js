@@ -10,12 +10,12 @@ exports.getNewsfeedList = catchAsyncErrors(async(req,res,next) => {
 	const resPerPage = 4;
 	const newsfeedsCount = await Newsfeed.countDocuments();
 
-	const apiFeatures = new APIFeatures(Newsfeed.find().sort({createdAt: -1}),req.query).search().filter();
+	const apiFeatures = new APIFeatures(Newsfeed.find().sort({createdAt: -1}).select("-content -tags"),req.query).search().filter();
 
 	apiFeatures.pagination(resPerPage);
 	const newsfeeds = await apiFeatures.query;
 
-
+	console.log("meron")
 
 
     res.status(200).json({
@@ -27,31 +27,31 @@ exports.getNewsfeedList = catchAsyncErrors(async(req,res,next) => {
 })
 
 exports.getSingleNewsfeed = catchAsyncErrors(async(req,res,next) => {
-	const newsfeed = await Newsfeed.findById(req.params.id).populate("user_id");
+	const newsfeed = await Newsfeed.findById(req.params.id).populate("user_id", "first_name last_name");
 
-	const newsFeedForTags = await Newsfeed.find({},{"tags.tag":1}).distinct("tags.tag")
-	let tags = []
+	// const newsFeedForTags = await Newsfeed.find({},{"tags.tag":1}).distinct("tags.tag")
+	// let tags = []
 
-		newsFeedForTags.forEach((tag)=>{
+	// 	newsFeedForTags.forEach((tag)=>{
 		
-				tags.push({
-					value: tag,
-					label: tag
-				})
+	// 			tags.push({
+	// 				value: tag,
+	// 				label: tag
+	// 			})
 
-	})
+	// })
 
 	res.status(200).json({
 	 	success: true,
 	 	newsfeed,
-	 	tags
+	 	// tags
 	})
 })
 
 // Newsfeed CRUD--------------------------------------------
 exports.getNewsfeeds = catchAsyncErrors(async (req, res, next) => {
 
-    const newsfeeds = await Newsfeed.find().sort({createdAt: -1});
+    const newsfeeds = await Newsfeed.find().sort({createdAt: -1}).select("-content -tags");
 	const newsfeedsCount = await Newsfeed.countDocuments();
 
 	const newsFeedForTags = await Newsfeed.find({},{"tags.tag":1}).distinct("tags.tag")
@@ -66,9 +66,6 @@ exports.getNewsfeeds = catchAsyncErrors(async (req, res, next) => {
 
 		})
 	
-
-
-
     res.status(200).json({
         success: true,
         newsfeeds,
@@ -152,8 +149,8 @@ exports.newNewsfeed = catchAsyncErrors(async(req,res,next) => {
 		status:'unread',
 		category:'newsfeeds-add'} } }  );
 
-		const userForPushNotification = await User.find( { role: "user" } )
-		expoSendNotification(userForPushNotification, NotifTitle, 'NewsfeedNav', newsfeed._id)
+		const userForPushNotification = await User.find( { role: "user" } ).select('push_tokens activeChat')
+		expoSendNotification(userForPushNotification, NotifTitle, 'NewsfeedNav', newsfeed._id,  req.body.notifCode)
 
 
 	

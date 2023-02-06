@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Keyboard, View } from "react-native";
 import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -10,10 +10,32 @@ import PublicReportsAdd from "../screens/home/reports/public-reports-add";
 import Chat from "../screens/chat/chat";
 import ChatDonation from "../screens/chat/chat-donation";
 import ScheduleView from "../screens/schedule/schedule-view";
+import AccessDenied from "../screens/extras/access-denied";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { useSelector } from "react-redux";
 const Tab = createBottomTabNavigator();
 
 
 const Main = () => {
+    const [user, setUser] = useState()
+    const {user: authUser } = useSelector(state => state.auth);
+    useEffect(() => {
+
+        AsyncStorage.getItem("user")
+            .then((res) => {
+                setUser(JSON.parse(res))
+            })
+            .catch((error) => console.log(error))
+
+            return ()=>{
+                setUser()
+            }
+
+    }, [authUser])
+
+
+
+
     const [keyboardShown, setKeyboardShown] = useState(false);
 
     Keyboard.addListener("keyboardDidShow", () => {
@@ -67,8 +89,8 @@ const Main = () => {
                         e.preventDefault();
 
                         // Do something with the `navigation` object
-                        navigation.navigate('Schedule',{screen:'TodaySchedNav', params:{screen:'ScheduleToday'}});
-                     
+                        navigation.navigate('Schedule', { screen: 'TodaySchedNav', params: { screen: 'ScheduleToday' } });
+
 
                     },
                 })}
@@ -107,7 +129,32 @@ const Main = () => {
                         />
                     }
                 }}
+                listeners={({ navigation, route }) => ({
+                    tabPress: (e) => {
+                        // Prevent default action
+                        e.preventDefault();
+
+                        // Do something with the `navigation` object
+
+                        if (user.role === 'newUser') {
+                            navigation.navigate('AccessDeniedDonation')
+                        } else {
+                            navigation.navigate('Donation', { screen: 'PublicDonationsList'});
+                        }
+
+
+                    },
+                })}
             />
+            <Tab.Screen
+                name="AccessDeniedDonation"
+                component={AccessDenied}
+                options={{
+                    tabBarButton: () => null
+                }}
+            />
+
+
             <Tab.Screen
                 name="User"
                 component={UserNav}
@@ -126,8 +173,8 @@ const Main = () => {
                         e.preventDefault();
 
                         // Do something with the `navigation` object
-                        navigation.navigate('User',{screen:'ProfileNav'});
-                     
+                        navigation.navigate('User', { screen: 'ProfileNav' });
+
 
                     },
                 })}
@@ -141,7 +188,7 @@ const Main = () => {
                     tabBarVisible: false,
                 }}
 
-      
+
 
             />
 
@@ -153,7 +200,7 @@ const Main = () => {
                     tabBarVisible: false,
                 }}
 
-            
+
             />
         </Tab.Navigator>
     )

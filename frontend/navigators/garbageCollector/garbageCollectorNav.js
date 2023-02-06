@@ -11,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 function MyTabs() {
     return (
         <Tab.Navigator
-            backBehavior="history"
+            backBehavior="none"
             screenOptions={{
                 tabBarActiveTintColor: "black",
                 tabBarLabelStyle: {
@@ -45,16 +45,16 @@ function MyTabs() {
                 options={{
                     title: "Finished"
                 }}
-                listeners={({ navigation, route }) => ({
-                    tabPress: (e) => {
-                        // Prevent default action
-                        e.preventDefault();
-                        console.log('route', route)
-                        // Do something with the `navigation` object
-                        navigation.navigate('AssignedFinished');
+                // listeners={({ navigation, route }) => ({
+                //     tabPress: (e) => {
+                //         // Prevent default action
+                //         e.preventDefault();
+                //         console.log('route', route)
+                //         // Do something with the `navigation` object
+                //         navigation.navigate('AssignedFinished');
 
-                    },
-                })}
+                //     },
+                // })}
             />
 
         </Tab.Navigator>

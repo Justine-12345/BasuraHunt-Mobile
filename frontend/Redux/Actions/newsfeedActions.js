@@ -35,7 +35,7 @@ export const getNewsfeedList = (currentPage = 1) => async (dispatch) => {
         dispatch({
             type: NEWSFEED_LIST_REQUEST
         })
-
+       
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -50,7 +50,7 @@ export const getNewsfeedList = (currentPage = 1) => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.get(`${baseURL}/newsfeeds?page=${currentPage}`, config)
+        const { data } = await axios.get(`${baseURL}/newsfeed?page=${currentPage}`, config)
 
         dispatch({
             type: NEWSFEED_LIST_SUCCESS,
@@ -67,7 +67,7 @@ export const getNewsfeedList = (currentPage = 1) => async (dispatch) => {
 export const getNewsfeedDetails = (id) => async (dispatch) => {
     try {
         dispatch({ type: NEWSFEED_DETAILS_REQUEST })
-        const { data } = await axios.get(`/api/v1/newsfeed/${id}`)
+        const { data } = await axios.get(`${baseURL}/newsfeed/${id}`)
         dispatch({
             type: NEWSFEED_DETAILS_SUCCESS,
             payload: data

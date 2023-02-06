@@ -56,7 +56,7 @@ exports.newFeedback = catchAsyncErrors(async(req, res, next) => {
 })
 
 exports.getFeedbacks = catchAsyncErrors(async(req,res,next) => {
-	const feedbacks = await Feedback.find().sort({_id: -1}).populate('user_id')
+	const feedbacks = await Feedback.find().sort({_id: -1}).populate('user_id',"first_name last_name")
 
 	res.status(200).json({
 	 	success: true,

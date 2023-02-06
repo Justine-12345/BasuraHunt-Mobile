@@ -17,10 +17,10 @@ exports.getTodayCollectionPointList = catchAsyncErrors(async (req, res, next) =>
 	let collectionPoints
 	if (req.user.role === 'garbageCollector') {
 		collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).countDocuments();
-		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).populate('collectors.collector').sort({ startTime: 1 });
+		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).sort({ startTime: 1 });
 	} else {
 		collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).countDocuments();
-		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).populate('collectors.collector').sort({ startTime: 1 });
+		collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"], "barangay": req.user.barangay }).sort({ startTime: 1 }).select("-collectionPerTruck");
 
 	}
 
@@ -69,9 +69,9 @@ exports.getCollectors = catchAsyncErrors(async (req, res, next) => {
 
 	let users
 	if (req.user.role == 'administrator') {
-		users = await User.find({ role: "garbageCollector" });
+		users = await User.find({ role: "garbageCollector" }).select('first_name last_name jobDesc barangay');
 	} else {
-		users = await User.find({ role: "garbageCollector", barangay: req.user.barangay });
+		users = await User.find({ role: "garbageCollector", barangay: req.user.barangay }).select('first_name last_name jobDesc barangay');
 	}
 	let collectors = [];
 
@@ -89,14 +89,27 @@ exports.getCollectors = catchAsyncErrors(async (req, res, next) => {
 })
 
 // Collection Point CRUD--------------------------------------------
+
+
 exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
 
-	const collectionPoints = await CollectionPoint.find().sort({ _id: -1 });
+	const collectionPoints = await CollectionPoint.find().sort({ _id: -1 }).select('-collectors -repeats -district -collectionPerTruck');
 	const collectionPointsCount = await CollectionPoint.countDocuments();
+
+	const scheduleForCP = await CollectionPoint.find({},{"collectionPoints.collectionPoint":1}).distinct("collectionPoints.collectionPoint")
+	let collectionPointsList = []
+
+	scheduleForCP.forEach((collectionPoint)=>{
+		collectionPointsList.push({
+			value: collectionPoint,
+			label: collectionPoint
+		})
+	})
 
 	res.status(200).json({
 		success: true,
 		collectionPoints,
+		collectionPointsList,
 		collectionPointsCount
 	})
 })
@@ -111,7 +124,6 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		const hoursNow = today.getHours();
 		const minutesNow = today.getMinutes();
 		const startTimeArray = req.body.startTime.split(":");
-
 		let dateToday = new Date(Date.now());
 		let upcomingDay = new Date();
 		const indexToday = dateToday.getDay();
@@ -221,7 +233,19 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		district = 2
 	}
 
-	const { name, startTime, endTime, barangay, type, status, collectionPoint } = req.body;
+	let collectionPointsList = [];
+
+    if(typeof req.body.collectionPoints == "string"){
+		collectionPointsList.push({collectionPoint:req.body.collectionPoints})
+		}
+	else{
+	    for (let i = 0; i < req.body.collectionPoints.length ; i++) {
+	    	const collectionPoint = req.body.collectionPoints[i];
+	        collectionPointsList.push({collectionPoint})
+	    }
+	}
+
+	const { name, startTime, endTime, barangay, type, status } = req.body;
 	const collectionPoints = await CollectionPoint.create({
 		name,
 		collectors,
@@ -232,7 +256,7 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		district,
 		type,
 		status,
-		collectionPoint
+		collectionPoints: collectionPointsList
 	})
 
 
@@ -241,8 +265,8 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 
 	await collectionPoints.save();
 
-	const NotifTitle = `New Trash Collection Schedule Has Added To Your Barangay | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPoint} | Type: ${type}`
-	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assign To You | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPoint} | Type: ${type}`
+	const NotifTitle = `New Trash Collection Schedule Has Added To Your Barangay | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPointsList} | Type: ${type}`
+	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assign To You | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPointsList} | Type: ${type}`
 
 
 	const bulk = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).updateMany({
@@ -262,7 +286,7 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 
-	const userForPushNotification = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } })
+	const userForPushNotification = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).select('push_tokens activeChat')
 	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView', null, req.body.notifCode)
 
 
@@ -284,7 +308,7 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 			}
 		});
 
-		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" }).select('push_tokens activeChat')
 		expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 
 	}
@@ -310,7 +334,7 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		}
 		for (let i = 0; i < req.body.collectors.length; i++) {
 			const collector = req.body.collectors[i];
-			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" })
+			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" }).select('push_tokens activeChat')
 			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 		}
 	}
@@ -331,7 +355,6 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		const hoursNow = today.getHours();
 		const minutesNow = today.getMinutes();
 		const startTimeArray = req.body.startTime.split(":");
-
 		let dateToday = new Date(Date.now());
 		let upcomingDay = new Date();
 		const indexToday = dateToday.getDay();
@@ -397,7 +420,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		}
 	}
 
-	console.log(req.body)
+	// console.log(req.body)
 
 	let collectionNumOfTruck = [];
 
@@ -451,7 +474,17 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		district = 2
 	}
 
+	let collectionPointsList = [];
 
+    if(typeof req.body.collectionPoints == "string"){
+		collectionPointsList.push({collectionPoint:req.body.collectionPoints})
+		}
+	else{
+	    for (let i = 0; i < req.body.collectionPoints.length ; i++) {
+	    	const collectionPoint = req.body.collectionPoints[i];
+	        collectionPointsList.push({collectionPoint})
+	    }
+	}
 
 	const newCollectionPointData = {
 		name: req.body.name,
@@ -463,7 +496,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		district: district,
 		type: req.body.type,
 		status: req.body.status,
-		collectionPoint: req.body.collectionPoint,
+		collectionPoints: collectionPointsList,
 		collectionPerTruck: collectionNumOfTruck
 	}
 
@@ -494,7 +527,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
-	const userForPushNotification = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } })
+	const userForPushNotification = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).select('push_tokens activeChat')
 	// console.log("userForPushNotification",userForPushNotification)
 	expoSendNotification(userForPushNotification, NotifTitle, 'SchedNotifView', null, req.body.notifCode)
 
@@ -516,7 +549,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
-		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+		const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" }).select('push_tokens activeChat')
 		expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 	}
 	else {
@@ -542,7 +575,7 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 
 		for (let i = 0; i < req.body.collectors.length; i++) {
 			const collector = req.body.collectors[i];
-			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" })
+			const userForPushNotification = await User.find({ _id: collector, role: "garbageCollector" }).select('push_tokens activeChat')
 			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'SchedNotifView', null, req.body.notifCode)
 		}
 	}
@@ -636,7 +669,7 @@ exports.liveMapNotification = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
-	const userForPushNotification = await User.find({ barangay: collectionPoints.barangay, _id: { $ne: req.user.id } })
+	const userForPushNotification = await User.find({ barangay: collectionPoints.barangay, _id: { $ne: req.user.id } }).select('push_tokens activeChat')
 	expoSendNotification(userForPushNotification, NotifTitle, 'ScheduleView', collectionPoints._id, req.body.notifCode)
 
 	res.status(200).json({

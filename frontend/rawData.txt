@@ -19,47 +19,67 @@
  migrate from heroku to netlify and render
  comment in Dump
 
-PR = ()
+PR = (used)
  dump PublicReportsList with search and sort
  chat
  forgot and reset password
  user profile
  live map
  
- --- cant chat if not their report
- --- Schedule notif view time AM and PM
- Dont send if no token
- --- Dont send notification if in chat or dumpview
+ PR = ()
+ cant chat if not their report
+ Schedule notif view time AM and PM
+ ---cant donated new user
+ ---cant access donation ranking when new user
+ --- token after registration
+
  
 ******NOTIFICATION***
+PR = (used)
 schedule
 live 
+Dont send notification if in chat or dumpview
+ Dont send if no token
+
+PR = ()
 illegalDump-new 
 illegalDump-update  
 illegalDump-update-status 
 illegalDump-new-message
 illegalDump-new-comment
+
+PR = ()
 donation-new
 donation-update-claim
 donation-update-cancel
 donation-update-confirm
 donation-update-receive (Rate)
 donation-new-message
+
+PR = ()
 collection-mass-add collector M to admin W
 newsfeeds-add
 user-verified (try nalang)
 user donated
 user claimed
----cant donated new user
+
 update dumps status for collector
 add recieve item tab in profile
 fix image preview
 ---feedback-new (pagawan ng desing feedback)
 collector update dump
----cant access donation ranking when new user
---- web: not require collector when confirmed dump
+web: not require collector when confirmed dump
 
  web and mobile: collector collection today, even if his not barangay
+--- web users record
 --- hide e-cert Button
---- mobile: seperate header for auth and visitor
+mobile: seperate header for auth and visitor
+--- refresh
 --- donation code
+---load map before report
+---report dump firt page 
+--- edit capture button
+---logout loading
+---profile loading : mobile
+--- infinite loading of level in profile, revise
+*** tinangal sa backend socket.io

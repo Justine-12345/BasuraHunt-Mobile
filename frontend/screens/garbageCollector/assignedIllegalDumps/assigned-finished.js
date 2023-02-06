@@ -8,7 +8,7 @@ import { Ionicons } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux'
-import { getDumps } from '../../../Redux/Actions/dumpActions'
+import { getDumps, getDumpList, allDumps } from '../../../Redux/Actions/dumpActions'
 
 
 const AssignedFinished = ({ navigation }) => {
@@ -16,7 +16,7 @@ const AssignedFinished = ({ navigation }) => {
     const [userID, setUserID] = useState("");
 
     const dispatch = useDispatch();
-    const { dumps, error, loading } = useSelector(state => state.dumps)
+    const { dumps, error, loading } = useSelector(state => state.allDumps)
 
     const [filter, setFilter] = useState(false);
     const [currentPage, setCurrentPage] = useState(1)
@@ -92,12 +92,12 @@ const AssignedFinished = ({ navigation }) => {
                 .catch((error) => console.log(error))
 
 
-            dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
-
+            // dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
+            dispatch(getDumpList());
             return () => {
 
             }
-        }, [dispatch, error, keyword, currentPage, district, barangay, size, type])
+        }, [dispatch, dumps, error, keyword, currentPage, district, barangay, size, type])
     )
 
     useEffect(() => {
@@ -146,7 +146,7 @@ const AssignedFinished = ({ navigation }) => {
         let isTrue = false;
 
         if (userID) {
-            dump && dump.collectors.forEach((collector) => {
+            dump && dump.collectors&& dump.collectors.forEach((collector) => {
                 if (collector.collector === userID._id) {
                     isTrue = true;
                 }
@@ -158,18 +158,19 @@ const AssignedFinished = ({ navigation }) => {
     let counter
     const reportsItem = ({ item, index }) => {
         if (item.user_id !== null) {
-            console.log(item.complete_address, item.status + " " + collector(item))
+            // console.log(item.complete_address, item.status + " " + collector(item))
             let img = item.images.map(img => img.url)[0]
             const date = new Date(item.createdAt).toLocaleDateString()
             counter +=1
+           
             return (
                 <>
-                    {collector(item) && item.status === "Cleaned" && (
+                    { item.status == "Cleaned" ?
                         <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
-                            {console.log(item.user_id._id)}
+                            {/* {console.log(item.user_id._id)} */}
                             <View style={RandomStyle.lContainer2}>
                                 <HStack>
-                                    {console.log("Cleaned_illegal dump", item.complete_address)}
+                                    {/* {console.log("Cleaned_illegal dump", item.complete_address)} */}
                                     <Text style={RandomStyle.vBadge}> Finished </Text>
 
                                     <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
@@ -184,7 +185,7 @@ const AssignedFinished = ({ navigation }) => {
                                 </HStack>
                             </View>
                         </TouchableOpacity>
-                    )}
+                    :null}
                 </>
             )
         } else {
@@ -203,7 +204,7 @@ const AssignedFinished = ({ navigation }) => {
                 </HStack>
                 {filter == false ? null : <FilterOptions />}
             </View>
-
+            {console.log("dumps",dumps)}
             {dumps && dumps.length > 0 ?
                 <FlatList
                     data={dumps}

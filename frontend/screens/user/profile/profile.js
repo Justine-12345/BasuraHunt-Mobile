@@ -19,7 +19,7 @@ import * as Print from 'expo-print';
 
 const Profile = ({ navigation }) => {
     const dispatch = useDispatch()
-    const { loading: authLoading, isAuthenticated, error: authError, user: authUser, userBrgyRank, userCityRank } = useSelector(state => state.auth);
+    const { loading: authLoading, isAuthenticated, error: authError, user: authUser, userBrgyRank, userCityRank, reportedDumpCounts, donatedItemsCount } = useSelector(state => state.auth);
     const { levelExp } = useSelector(state => state.levelExp)
     const [user, setUser] = useState()
     const [expoPushToken, setExpoPushToken] = useState('');
@@ -326,14 +326,14 @@ const Profile = ({ navigation }) => {
                         <Text style={RandomStyle.pText4}>Statistics</Text>
                         <View style={[RandomStyle.pContainer2, { borderBottomColor: "lightgrey", borderBottomWidth: 0.5, paddingBottom: 10 }]}>
                             <VStack style={RandomStyle.pContainer3}>
-                                <LinearGradient colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
-                                    <Text style={RandomStyle.pText6}>{authUser && authUser.reported_dumps && authUser.reported_dumps.length}</Text>
+                                <LinearGradient  colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
+                                    <Text onPress={()=>{ navigation.navigate('MyReports', {screen:'UserReportsList'})}} style={RandomStyle.pText6}>{reportedDumpCounts && reportedDumpCounts}</Text>
                                 </LinearGradient>
                                 <Text style={RandomStyle.pInfo}>Reported Dumps</Text>
                             </VStack>
                             <VStack style={RandomStyle.pContainer3}>
                                 <LinearGradient colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
-                                    <Text style={RandomStyle.pText6}>{authUser && authUser.donated_items && authUser.donated_items.length}</Text>
+                                    <Text onPress={()=>{ navigation.navigate('MyDonations', {screen:'UserDonationsList'})}} style={RandomStyle.pText6}>{donatedItemsCount && donatedItemsCount}</Text>
                                 </LinearGradient>
                                 <Text style={RandomStyle.pInfo}>Donated Items</Text>
                             </VStack>

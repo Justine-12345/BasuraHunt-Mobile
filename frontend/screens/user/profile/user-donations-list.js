@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { Text, View, FlatList, TouchableOpacity, Image, TextInput } from "react-native";
 import { HStack, VStack } from "native-base";
@@ -6,6 +6,8 @@ import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
 import { useDispatch, useSelector } from "react-redux";
 import { donatedItems } from "../../../Redux/Actions/userActions";
+import LoadingList from "../../extras/loadingPages/loading-list";
+import { getItemDetails } from "../../../Redux/Actions/itemActions";
 const UserDonationsList = ({ navigation }) => {
     const dispatch = useDispatch()
     const sampleDonations = require("../../../assets/sampleData/items.json");
@@ -15,22 +17,29 @@ const UserDonationsList = ({ navigation }) => {
     const [searching, setSearching] = useState(false);
     const [itemCount, setItemCount] = useState(0);
 
+
+
     useFocusEffect(
         useCallback(() => {
 
 
             if (searching === false || searching === undefined || !items) {
                 dispatch(donatedItems())
-                setItems(userDonatedItems)
+
             }
             // setDumpCount(reports && reports.length)
             return () => {
-                donatedItems();
+                setItems();
                 setSearching();
             }
-        }, [userDonatedItems])
+        }, [])
 
     )
+
+    useEffect(() => {
+        setItems(userDonatedItems && userDonatedItems)
+    }, [userDonatedItems])
+
 
 
     const search = (text) => {
@@ -61,14 +70,15 @@ const UserDonationsList = ({ navigation }) => {
             // let itemForProps = item.item
             // itemForProps.user_id = { _id: item.item.user_id._id }
             // console.log("itemForProps",itemForProps)
-            
+
             return (
                 <>
                     {/* {console.log("item", item.item)} */}
                     <TouchableOpacity
-                        onPress={() =>
-                            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item:  item.item, category:"donated" } } })
-                        }
+                        onPress={() => {
+                            dispatch(getItemDetails(item.item._id))
+                            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item_id: item.item._id, category: "donated" } } })
+                        }}
                         activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
                             <HStack>
@@ -100,26 +110,33 @@ const UserDonationsList = ({ navigation }) => {
     return (
         <>
             <View style={RandomStyle.lContainer3}>
-            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Donated Items</Text>
+                <Text style={[RandomStyle.vText1, { marginVertical: 8 }]}>My Donated Items</Text>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
                 </HStack>
-                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {items && items.length}</Text>
+                <Text style={[RandomStyle.vText1, { fontSize: 15 }]}>Total: {items && items.length}</Text>
 
             </View>
-          
-            {items && items.length > 0 ?
-                <FlatList
-                    data={items}
-                    renderItem={donationsItem}
-                    keyExtractor={item => item._id}
-                />
-                :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No donations yet!
-                    </Text>
-                </View>
+            {loading ?
+                <LoadingList /> :
+
+                <>
+                    {items && items.length > 0 ?
+                        <FlatList
+
+                            data={items}
+                            renderItem={donationsItem}
+                            keyExtractor={item => item._id}
+
+                        />
+                        :
+                        <View style={Empty1.container}>
+                            <Text style={Empty1.text1}>
+                                No donations yet!
+                            </Text>
+                        </View>
+                    }
+                </>
             }
         </>
     )

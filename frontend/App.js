@@ -105,7 +105,7 @@ export default function App() {
 
     });
 
-    
+
 
   }, [lastNotificationResponse]);
 
@@ -136,7 +136,6 @@ export default function App() {
         <Provider store={store}>
           <NavigationContainer ref={navigationRef} theme={Theme}>
             <NativeBaseProvider>
-
               <Header />
               <AuthNav />
               {/* <SchedNotifView/> */}

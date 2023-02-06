@@ -27,6 +27,9 @@ import {
     DELETE_NEWSFEED_RESET,
     DELETE_NEWSFEED_FAIL,
 
+    NEWSFEED_PAGE_SET,
+    NEWSFEED_PAGE_RESET,
+
     CLEAR_ERRORS
 } from '../Constants/newsfeedConstants'
 
@@ -43,6 +46,8 @@ export const newsfeedsReducer = (state = { newsfeeds: [] }, action) => {
             return {
                 ...state,
                 loading: false,
+                newsfeedsCount: action.payload.newsfeedsCount,
+                resPerPage: action.payload.resPerPage,
                 newsfeeds: action.payload.newsfeeds,
                 tags: action.payload.tags
 
@@ -59,7 +64,9 @@ export const newsfeedsReducer = (state = { newsfeeds: [] }, action) => {
             return {
                 ...state,
                 newsfeeds: undefined,
-                tags: undefined
+                tags: undefined,
+                newsfeedsCount: undefined,
+                resPerPage: undefined,
             }
 
         case CLEAR_ERRORS:
@@ -180,6 +187,32 @@ export const newNewsfeedReducer = (state = { newsfeed: {} }, action) => {
             return {
                 ...state,
                 success: false
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
+            }
+
+        default:
+            return state
+    }
+}
+
+export const newsfeedPageReducer = (state = {}, action) => {
+    switch (action.type) {
+
+        case NEWSFEED_PAGE_SET:
+            return {
+                ...state,
+                page: action.payload
+            }
+
+        case NEWSFEED_PAGE_RESET:
+            return {
+                ...state,
+                page: null
             }
 
         case CLEAR_ERRORS:

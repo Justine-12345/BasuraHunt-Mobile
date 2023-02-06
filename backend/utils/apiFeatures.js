@@ -2,6 +2,7 @@ class APIFeatures{
 	constructor(query, queryStr){
 		this.query = query;
 		this.queryStr = queryStr;
+		this.query2
 	}
 
 	search(){
@@ -28,7 +29,6 @@ class APIFeatures{
 
 
 		this.query = this.query.find({...keyword});
-		console.log(keyword)
 		return this;
 
 	}
@@ -49,12 +49,11 @@ class APIFeatures{
 
 		// console.log(JSON.parse(queryStr));
 		this.query = this.query.find(JSON.parse(queryStr));
-
 		return this;
 
 	}
 
-	
+
 	pagination(resPerPage){
 		const currentPath = Number(this.queryStr.page) || 1;
 		const skip = resPerPage * (currentPath - 1)
@@ -62,6 +61,8 @@ class APIFeatures{
 		this.query = this.query
 		return this;
 	}
+
+
 
 }
 

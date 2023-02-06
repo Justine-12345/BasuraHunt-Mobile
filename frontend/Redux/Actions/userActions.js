@@ -205,7 +205,7 @@ export const checkOtp = (otp) => async (dispatch) => {
 
         const { data } = await axios.put(`${baseURL}/otp/check/`, otp, config)
 
-        console.log(data)
+        // console.log(data)
 
         dispatch({
             type: CHECK_OTP_SUCCESS,
@@ -248,7 +248,7 @@ export const loadUser = () => async (dispatch) => {
         })
 
     } catch (error) {
-        console.log("error",error)
+        // console.log("error",error)
         dispatch({
             type: LOAD_USER_FAIL,
             payload: error.response.data.message
@@ -426,7 +426,7 @@ export const logout = (user_id = '', pushToken = '', ismobile = '') => async (di
         })
 
     } catch (error) {
-        console.log("erroe", token)
+        // console.log("erroe", token)
         dispatch({
             type: LOGOUT_FAIL,
             payload: error.response.data.message

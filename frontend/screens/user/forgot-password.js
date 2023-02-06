@@ -14,7 +14,7 @@ const ForgotPassword = ({ navigation }) => {
     useEffect(() => {
         if (success) {
             dispatch({type:FORGOT_PASSWORD_RESET})
-            navigation.navigate("ResetPassword")
+            navigation.navigate("ResetPassword", {email})
         }
 
         if (forgotPasswordError) {

@@ -95,7 +95,7 @@ exports.getCleanedDumps = catchAsyncErrors(async (req, res, next) => {
 						$gte: new Date(req.body.cdStartDate),
 						$lte: new Date(req.body.cdEndDate)
 					},
-					"status":  { $in: ["Cleaned"] },
+					"status": { $in: ["Cleaned"] },
 					"barangay": req.user.barangay
 				}
 			},
@@ -542,7 +542,6 @@ exports.getReportsPerCategory = catchAsyncErrors(async (req, res, next) => {
 			{
 				_id: {
 					waste_type: "$waste_type.type",
-					year: { $year: "$createdAt" }
 				},
 				total: { $sum: 1 }
 			}
@@ -555,6 +554,7 @@ exports.getReportsPerCategory = catchAsyncErrors(async (req, res, next) => {
 		}
 	])
 
+	console.log("reportPerCAt", reportsPerCategory)
 
 	res.status(200).json({
 		success: true,
@@ -565,7 +565,7 @@ exports.getReportsPerCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 	let donationsPerCategory = [];
-
+	
 	donationsPerCategory = await Item.aggregate([
 		{
 			$unwind: "$item_type"
@@ -584,7 +584,6 @@ exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 			{
 				_id: {
 					item_type: "$item_type.type",
-					year: { $year: "$createdAt" }
 				},
 				total: { $sum: 1 }
 			}
@@ -596,8 +595,7 @@ exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	])
-
-
+	
 	res.status(200).json({
 		success: true,
 		donationsPerCategory
@@ -606,3 +604,126 @@ exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 
 
 
+
+
+exports.getTopUserDonation = catchAsyncErrors(async (req, res, next) => {
+
+	let TopUserDonation = await Item.aggregate([
+		{
+			$lookup: {
+				from: "users",
+				localField: "user_id",
+				foreignField: "_id",
+				as: "userDetail"
+			}
+		},
+		
+		{
+			$match:
+			{
+				"createdAt": {
+					$gte: new Date(req.body.tudStartDate),
+					$lte: new Date(req.body.tudEndDate)
+				}
+			}
+		},
+		
+		{
+			$addFields:
+			{
+				"alias": '$userDetail.alias'
+			}
+		},
+		{ 
+			$limit : 10
+		},
+		{
+			$group:
+			{
+				_id: {
+					user_id: "$user_id",
+					user_name:"$alias"
+				},
+				
+				total: { $sum: 1 }
+
+			}
+		},
+		{
+			$sort:
+			{
+				total:-1,
+				user_id: 1
+			}
+		}
+	])
+
+
+	res.status(200).json({
+		success: true,
+		TopUserDonation
+	})
+})
+
+
+
+
+exports.getTopUserReport = catchAsyncErrors(async (req, res, next) => {
+
+	let TopUserReport = await Dump.aggregate([
+		{
+			$lookup: {
+				from: 'users',
+				localField: "user_id",
+				foreignField: "_id",
+				as: "userDetail"
+			}
+		},
+		
+		{
+			$match:
+			{
+				"createdAt": {
+					$gte: new Date(req.body.turStartDate),
+					$lte: new Date(req.body.turEndDate)
+				},
+				"status": { $nin: [ "newReport", "Rejected"] } 
+			}
+		},
+		
+		{
+			$addFields:
+			{
+				"alias": '$userDetail.alias'
+			}
+		},
+		{
+			$group:
+			{
+				_id: {
+					user_id: "$user_id",
+					user_name:"$alias"
+				},
+				
+				total: { $sum: 1 }
+
+			}
+		},
+		{ 
+			$limit : 10
+		},
+		{
+			$sort:
+			{
+				total:-1,
+				user_id: 1
+			}
+		}
+	])
+
+
+	res.status(200).json({
+		success: true,
+		TopUserReport
+	})
+})

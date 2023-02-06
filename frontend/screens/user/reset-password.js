@@ -10,7 +10,7 @@ import Toast from 'react-native-toast-message';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CommonActions } from "@react-navigation/native";
 import { FORGOT_PASSWORD_RESET } from "../../Redux/Constants/userConstants";
-const ResetPassword = ({ navigation }) => {
+const ResetPassword = (props) => {
     const dispatch = useDispatch();
 
     const { loading, isAuthenticated, error, user } = useSelector(state => state.auth);
@@ -21,7 +21,7 @@ const ResetPassword = ({ navigation }) => {
     const [code, setCode] = useState('')
     const [passwordError, setPasswordError] = useState(null)
     const [passwordMatchError, setPasswordMatchError] = useState(null)
-
+    const email = props.route.params.email
     useEffect(() => {
 
         if (success) {
@@ -148,7 +148,7 @@ const ResetPassword = ({ navigation }) => {
     return (
         <View style={Styles.container2}>
             <Text style={[Styles.text0, Styles.text1]}>Reset Password</Text>
-            <Text style={[Styles.textI, { color: "grey", padding: 20, textAlign: "center" }]}>Enter the 6-digit code sent to your email lorem@gmail.com</Text>
+            <Text style={[Styles.textI, { color: "grey", padding: 20, textAlign: "center" }]}>Enter the 6-digit code sent to your email {email}</Text>
 
             <View style={Form1.otpContainer}>
                 <OtpInput

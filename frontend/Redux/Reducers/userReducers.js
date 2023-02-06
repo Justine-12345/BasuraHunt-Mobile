@@ -109,6 +109,8 @@ export const authReducer = (state = { user: {} }, action) => {
                 user: action.payload.user,
                 userBrgyRank: action.payload.userBrgyRank,
                 userCityRank: action.payload.userCityRank,
+                reportedDumpCounts: action.payload.reportedDumpCounts,
+				donatedItemsCount: action.payload.donatedItemsCount,
                 otp_status: action.payload.otp_status
             }
 
@@ -408,7 +410,7 @@ export const userReportsAndItemsReducer = (state = {}, action) => {
             return {
                 ...state,
                 loading: false,
-                userReceiveItems: action.payload.userReceiveItems.received_items
+                userReceiveItems: action.payload.userReceiveItems
             }
 
         case USER_DUMPS_SUCCESS:
@@ -422,7 +424,7 @@ export const userReportsAndItemsReducer = (state = {}, action) => {
             return {
                 ...state,
                 loading: false,
-                userDonatedItems: action.payload.userDonatedItems.donated_items
+                userDonatedItems: action.payload.userDonatedItems
             }
 
         case USER_DUMPS_FAIL:

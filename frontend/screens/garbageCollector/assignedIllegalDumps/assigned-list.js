@@ -8,15 +8,15 @@ import { Ionicons } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux'
-import { getDumps } from '../../../Redux/Actions/dumpActions'
+import { getDumps, getDumpList } from '../../../Redux/Actions/dumpActions'
 
 const AssignedList = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
 
     const dispatch = useDispatch();
-    const { dumps, error, loading } = useSelector(state => state.dumps)
-
+    const { dumps, error, loading } = useSelector(state => state.allDumps)
+    const [reports, setReports] = useState(false);
     const [filter, setFilter] = useState(false);
     const [currentPage, setCurrentPage] = useState(1)
     const [district, setDistrict] = useState("");
@@ -90,13 +90,15 @@ const AssignedList = ({ navigation }) => {
                 })
                 .catch((error) => console.log(error))
 
-            dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
-
+            // dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
+            dispatch(getDumpList());
             return () => {
-
+                
             }
         }, [dispatch, error, keyword, currentPage, district, barangay, size, type])
     )
+
+ 
 
     useEffect(() => {
         if (filter === false) {
@@ -144,7 +146,8 @@ const AssignedList = ({ navigation }) => {
         let isTrue = false;
 
         if (userID) {
-            dump && dump.collectors.forEach((collector) => {
+            dump && dump.collectors && dump.collectors.forEach((collector) => {
+                console.log(dump.status)
                 if (collector.collector === userID._id) {
                     isTrue = true;
                 }
@@ -153,37 +156,45 @@ const AssignedList = ({ navigation }) => {
 
         return isTrue;
     }
-   
+
 
 
     const reportsItem = ({ item, index }) => {
 
         if (item.user_id !== null) {
             let img = item.images.map(img => img.url)[0]
-            const date = new Date(item.createdAt).toLocaleDateString()
-           
+            const date = new Date(item.createdAt).toLocaleDateString()   
+          
             return (
                 <>
-                    {collector(item) && (item.status === "Confirmed" || item.status === "Unfinish") && (
-                        <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
+                    { item.status === "Confirmed" || item.status === "Unfinish"?
 
-                            <View style={RandomStyle.lContainer2}>
-                                <HStack>
-                                    <Text style={RandomStyle.vBadge}> {item.status} </Text>
 
-                                    <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
-                                    <VStack>
-                                        <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
-                                        {/* item.additional_desciption change to item.addition_description */}
-                                        <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
-                                        <View style={{ flex: 1, justifyContent: "flex-end", }}>
-                                            <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
-                                        </View>
-                                    </VStack>
-                                </HStack>
-                            </View>
-                        </TouchableOpacity>
-                    )}
+                        <>
+                                <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
+                                    <View style={RandomStyle.lContainer2}>
+                                        <HStack>
+                                            <Text style={RandomStyle.vBadge}> {item.status} </Text>
+
+                                            <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
+                                            <VStack>
+                                                <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                                {/* item.additional_desciption change to item.addition_description */}
+                                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                                <View style={{ flex: 1, justifyContent: "flex-end", }}>
+                                                    <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
+                                                </View>
+                                            </VStack>
+                                        </HStack>
+                                    </View>
+                                </TouchableOpacity>
+                                
+                        </>
+
+
+
+
+                        : null}
                 </>
             )
         }

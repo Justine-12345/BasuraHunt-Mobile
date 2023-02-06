@@ -19,6 +19,7 @@ import { APPEND_CHAT, GET_CHAT_RESET } from "../../../Redux/Constants/chatConsta
 import Chat from "../../chat/chat";
 import NotificationSender from "../../extras/notificationSender";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
+import LoadingPublicReportsView from "../../extras/loadingPages/loading-reports-view";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
@@ -29,7 +30,7 @@ const PublicReportsView = (props) => {
 
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
     const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
-    const { dump: dumpDetail } = useSelector(state => state.dumpDetails)
+    const { dump: dumpDetail, loading: dumpDetailLoading } = useSelector(state => state.dumpDetails)
 
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
@@ -108,7 +109,7 @@ const PublicReportsView = (props) => {
 
     useEffect(() => {
         socket.on("receive_message", (data) => {
-            console.log("data", data)
+            // console.log("data", data)
             if (data.type) {
                 if (data.type === "status") {
                     setStatus(data.message)
@@ -150,13 +151,13 @@ const PublicReportsView = (props) => {
             });
         } else {
             const notifCodeForComment = RandomStringGenerator(40)
-            const linkForNotif = `/report/${dump&&dump._id}/${dump && dump.coordinates && dump.coordinates.longtitude}/${dump && dump.coordinates && dump.coordinates.latitude}/#Comments`
-            console.log('comment1', notifCodeForComment)
+            const linkForNotif = `/report/${dump && dump._id}/${dump && dump.coordinates && dump.coordinates.longtitude}/${dump && dump.coordinates && dump.coordinates.latitude}/#Comments`
+            // console.log('comment1', notifCodeForComment)
             const formData = new FormData();
             formData.append('author', author);
             formData.append('comment', comment);
             formData.append('link', linkForNotif)
-			formData.append('notifCode', notifCodeForComment);
+            formData.append('notifCode', notifCodeForComment);
 
 
             dispatch(addComment(dump && dump._id, formData))
@@ -187,56 +188,66 @@ const PublicReportsView = (props) => {
             socket.emit("send_message", commentData);
             setAllComments((oldComment) => [...oldComment, commentData])
             setComment('')
-            console.log('comment2', notifCodeForComment)
+            // console.log('comment2', notifCodeForComment)
             NotificationSender(`${authorForNotif} commented on your reported illegal dump: ${cleanCommentFil}`, user._id, dump && dump.user_id && dump.user_id._id, dump && dump.barangay, 'illegalDump-new-comment', notifCodeForComment, dump && dump)
 
         }
     }
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            {/* {console.log("dump", dump)} */}
-            <View style={RandomStyle.vContainer}>
-                <View style={RandomStyle.vHeader}>
-                    <Text style={RandomStyle.vText1}>Illegal Dump No. {dump && dump._id}</Text>
-                    <HStack justifyContent={"space-between"}>
-                        <VStack>
-                            <HStack>
-                                <Text style={RandomStyle.vText2}>Status: </Text>
-                                <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status}</Text>
-                            </HStack>
-                            {dump && dump.date_cleaned != null ?
+        <>
+            {dumpDetailLoading ?
+                <LoadingPublicReportsView /> :
+
+
+                <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+                    {/* {console.log("dump", dump)} */}
+                    <View style={RandomStyle.vContainer}>
+                        <View style={RandomStyle.vHeader}>
+                            <Text style={RandomStyle.vText1}>Illegal Dump No. {dump && dump._id}</Text>
+                            <HStack justifyContent={"space-between"}>
+                                <VStack>
+                                    <HStack>
+                                        <Text style={RandomStyle.vText2}>Status: </Text>
+                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status}</Text>
+                                    </HStack>
+                                    {dump && dump.date_cleaned != null ?
+                                        <HStack>
+                                            <Text style={RandomStyle.vText2}>Date Cleaned: </Text>
+                                            <Text>{new Date(dump.date_cleaned).toLocaleDateString()}</Text>
+                                        </HStack>
+                                        : null
+                                    }
+                                    <HStack>
+                                        <Text style={RandomStyle.vText2}>Date Reported: </Text>
+                                        <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
+                                    </HStack>
+                                </VStack>
                                 <HStack>
-                                    <Text style={RandomStyle.vText2}>Date Cleaned: </Text>
-                                    <Text>{new Date(dump.date_cleaned).toLocaleDateString()}</Text>
-                                </HStack>
-                                : null
-                            }
-                            <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
-                        </VStack>
-                        <HStack>
-                            {String(dump && dump.user_id) === String(user && user._id) ?
-                                <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj:{_id: dump && dump._id, coordinates:{longtitude:dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude}, barangay:dump && dump.barangay  } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                    <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                                </TouchableOpacity> : null
-                            }
-                            {/* <TouchableOpacity
+                               
+                                    {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) ?
+                                        <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj: { _id: dump && dump._id, coordinates: { longtitude: dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude }, barangay: dump && dump.barangay } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                            <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                                        </TouchableOpacity> 
+                                        : null
+                                    }
+                                    {/* <TouchableOpacity
                                 onPress={() => {
                                     props.navigation.navigate("TheAbout")
                                 }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="content-save-edit" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity> */}
 
-                            <Modal
-                                animationType="slide"
-                                transparent={true}
-                                visible={modalVisible}
-                                onRequestClose={() => {
-                                    Alert.alert("Modal has been closed.");
-                                    setModalVisible(!modalVisible);
-                                }}
-                            >
-                                {/* <View style={styles.centeredView}>
+                                    <Modal
+                                        animationType="slide"
+                                        transparent={true}
+                                        visible={modalVisible}
+                                        onRequestClose={() => {
+                                            Alert.alert("Modal has been closed.");
+                                            setModalVisible(!modalVisible);
+                                        }}
+                                    >
+                                        {/* <View style={styles.centeredView}>
                                     <View style={styles.modalView}>
                                         <Text style={styles.modalText}>Hello World!</Text>
                                         <Pressable
@@ -247,153 +258,155 @@ const PublicReportsView = (props) => {
                                         </Pressable>
                                     </View>
                                 </View> */}
-                                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
 
-                                    <View style={styles.modalView}>
-                                        <Text style={styles.modalText}>Are you sure, you want to delete this Dump?</Text>
+                                            <View style={styles.modalView}>
+                                                <Text style={styles.modalText}>Are you sure, you want to delete this Dump?</Text>
 
-                                        {dumpLoading ?
-                                            <ActivityIndicator size="small" color="#00ff00" />
-                                            :
-                                            <>
-                                                <Pressable
-                                                    style={[styles.button, styles.buttonClose]}
-                                                    onPress={() => { dispatch(deleteDump(item._id)) }}
-                                                >
-                                                    <Text style={styles.textStyle}>Yes, Delete it!</Text>
-                                                </Pressable>
+                                                {dumpLoading ?
+                                                    <ActivityIndicator size="small" color="#00ff00" />
+                                                    :
+                                                    <>
+                                                        <Pressable
+                                                            style={[styles.button, styles.buttonClose]}
+                                                            onPress={() => { dispatch(deleteDump(item._id)) }}
+                                                        >
+                                                            <Text style={styles.textStyle}>Yes, Delete it!</Text>
+                                                        </Pressable>
 
-                                                <Pressable
-                                                    style={[styles.button, styles.buttonClose]}
-                                                    onPress={() => setModalVisible(!modalVisible)}
-                                                >
-                                                    <Text style={styles.textStyle}>No</Text>
-                                                </Pressable>
-                                            </>
-                                        }
-
-
+                                                        <Pressable
+                                                            style={[styles.button, styles.buttonClose]}
+                                                            onPress={() => setModalVisible(!modalVisible)}
+                                                        >
+                                                            <Text style={styles.textStyle}>No</Text>
+                                                        </Pressable>
+                                                    </>
+                                                }
 
 
-                                    </View>
-
-                                </View>
-                            </Modal>
 
 
-                            {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                            </View>
+
+                                        </View>
+                                    </Modal>
+
+
+                                    {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                 <MaterialCommunityIcons name="trash-can" size={40} style={RandomStyle.vChat} />
                             </TouchableOpacity> */}
+                                </HStack>
+                            </HStack>
+                        </View>
+                        <HStack style={{ flexWrap: 'wrap', alignItems: "flex-start" }}>
+                            <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
+                            <Text>{dump && dump.complete_address}</Text>
                         </HStack>
-                    </HStack>
-                </View>
-                <HStack style={{ flexWrap: 'wrap', alignItems: "flex-start" }}>
-                    <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                    <Text>{dump && dump.complete_address}</Text>
-                </HStack>
-                <HStack>
-                    <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
-                    <Text>{dump && dump.landmark}</Text>
-                </HStack>
-                {dump && dump.coordinates && dump.coordinates.longtitude ?
-                    <View style={RandomStyle.vMapContainer}>
-                        <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
-                    </View> : null
-                }
-                <View style={RandomStyle.vImages}>
-                    {dump && dump.images && dump.images.map((img, index) =>
-                        <TouchableOpacity key={index} onPress={() => showImages(index)}>
-                            <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
-                        </TouchableOpacity>
-                    )}
-                    <ImageView
-                        images={imagesPreview}
-                        imageIndex={imgIndex}
-                        visible={openImages}
-                        onRequestClose={() => setOpenImages(false)}
-                    />
-                </View>
-
-                <Text style={RandomStyle.vText2}>Type of Waste</Text>
-                <View style={RandomStyle.vContainer2}>
-                    {dump && dump.waste_type && dump.waste_type.forEach(wt => {
-                        if (!uniqueWt.includes(wt.type)) {
-                            uniqueWt.push(wt.type)
+                        <HStack>
+                            <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
+                            <Text>{dump && dump.landmark}</Text>
+                        </HStack>
+                        {dump && dump.coordinates && dump.coordinates.longtitude ?
+                            <View style={RandomStyle.vMapContainer}>
+                                <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
+                            </View> : null
                         }
-                    }
-                    )}
-                    {uniqueWt.map(wt =>
-                        <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
-                    )}
-                </View>
-                {dump && dump.waste_size ?
-                    <>
-                        <Text style={RandomStyle.vText2}>Size of Waste</Text>
+                        <View style={RandomStyle.vImages}>
+                            {dump && dump.images && dump.images.map((img, index) =>
+                                <TouchableOpacity key={index} onPress={() => showImages(index)}>
+                                    <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
+                                </TouchableOpacity>
+                            )}
+                            <ImageView
+                                images={imagesPreview}
+                                imageIndex={imgIndex}
+                                visible={openImages}
+                                onRequestClose={() => setOpenImages(false)}
+                            />
+                        </View>
+
+                        <Text style={RandomStyle.vText2}>Type of Waste</Text>
                         <View style={RandomStyle.vContainer2}>
-                            <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
+                            {dump && dump.waste_type && dump.waste_type.forEach(wt => {
+                                if (!uniqueWt.includes(wt.type)) {
+                                    uniqueWt.push(wt.type)
+                                }
+                            }
+                            )}
+                            {uniqueWt.map(wt =>
+                                <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
+                            )}
                         </View>
-                    </>
-                    :
-                    ""}
+                        {dump && dump.waste_size ?
+                            <>
+                                <Text style={RandomStyle.vText2}>Size of Waste</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
+                                </View>
+                            </>
+                            :
+                            ""}
 
-                {dump && dump.accessible_by ?
-                    <>
-                        <Text style={RandomStyle.vText2}>Accessible by</Text>
+                        {dump && dump.accessible_by ?
+                            <>
+                                <Text style={RandomStyle.vText2}>Accessible by</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
+                                </View>
+                            </>
+                            : ""
+                        }
+
+                        <Text style={RandomStyle.vText2}>Category of Violation</Text>
                         <View style={RandomStyle.vContainer2}>
-                            <Text style={RandomStyle.vOption}>{dump && dump.waste_size}</Text>
+                            <Text>{dump && dump.category_violation}</Text>
                         </View>
-                    </>
-                    : ""
-                }
 
-                <Text style={RandomStyle.vText2}>Category of Violation</Text>
-                <View style={RandomStyle.vContainer2}>
-                    <Text>{dump && dump.category_violation}</Text>
-                </View>
-
-                <Text style={RandomStyle.vText2}>Additional Details</Text>
-                <View style={RandomStyle.vContainer2}>
-                    <Text>{dump && dump.additional_desciption}</Text>
-                </View>
-
-                <Text style={RandomStyle.vText2}>Reported by</Text>
-                <View style={RandomStyle.vContainer2}>
-                    <Text>{dump && dump.report_using}</Text>
-                </View>
-
-                <Text style={RandomStyle.vText2}>Comment Section</Text>
-
-                <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={author} onValueChange={item => setAuthor(item)}>
-                    <Select.Item label="Anonymous" value="Anonymous" />
-                    <Select.Item label="Real Name" value="Real Name" />
-                    <Select.Item label="Alias/Username" value="Alias" />
-                </Select>
-                <TextInput
-                    placeholder="Type your comment here..."
-                    style={RandomStyle.vMultiline}
-                    multiline={true}
-                    value={comment}
-                    numberOfLines={5}
-                    onChangeText={e => setComment(e)}
-                />
-                <BhButton right onPress={commentSubmit}>
-                    <Text style={RandomStyle.vText4}>Post</Text>
-                </BhButton>
-
-                {allComments && allComments.length > 0 ?
-                    allComments.map((item) =>
-                        <View key={Math.random()} style={RandomStyle.vComment}>
-                            <Text style={RandomStyle.vText2}>{item.author}</Text>
-                            <Text>{item.comment}</Text>
-                            <Text style={RandomStyle.vCommentDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                        <Text style={RandomStyle.vText2}>Additional Details</Text>
+                        <View style={RandomStyle.vContainer2}>
+                            <Text>{dump && dump.additional_desciption}</Text>
                         </View>
-                    ).reverse()
-                    :
-                    <Text>No comments yet.</Text>
-                }
 
-            </View>
-        </ScrollView>
+                        <Text style={RandomStyle.vText2}>Reported by</Text>
+                        <View style={RandomStyle.vContainer2}>
+                            <Text>{dump && dump.report_using}</Text>
+                        </View>
+
+                        <Text style={RandomStyle.vText2}>Comment Section</Text>
+
+                        <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={author} onValueChange={item => setAuthor(item)}>
+                            <Select.Item label="Anonymous" value="Anonymous" />
+                            <Select.Item label="Real Name" value="Real Name" />
+                            <Select.Item label="Alias/Username" value="Alias" />
+                        </Select>
+                        <TextInput
+                            placeholder="Type your comment here..."
+                            style={RandomStyle.vMultiline}
+                            multiline={true}
+                            value={comment}
+                            numberOfLines={5}
+                            onChangeText={e => setComment(e)}
+                        />
+                        <BhButton right onPress={commentSubmit}>
+                            <Text style={RandomStyle.vText4}>Post</Text>
+                        </BhButton>
+
+                        {allComments && allComments.length > 0 ?
+                            allComments.map((item) =>
+                                <View key={Math.random()} style={RandomStyle.vComment}>
+                                    <Text style={RandomStyle.vText2}>{item.author}</Text>
+                                    <Text>{item.comment}</Text>
+                                    <Text style={RandomStyle.vCommentDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                                </View>
+                            ).reverse()
+                            :
+                            <Text>No comments yet.</Text>
+                        }
+
+                    </View>
+                </ScrollView>
+            }
+        </>
     )
 }
 

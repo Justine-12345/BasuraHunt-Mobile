@@ -11,7 +11,9 @@ const{
 	getCollectionPerTruck,
 	getCollectionPoints,
 	getReportsPerCategory,
-	getDonationsPerCategory
+	getDonationsPerCategory,
+	getTopUserDonation,
+	getTopUserReport
 } = require(`../controllers/dashboardController`);
 
 const { isAuthenticatedUser,authorizeRoles } = require('../middlewares/auth');
@@ -28,5 +30,7 @@ router.route(`/dashboard/totalDonations`).get(isAuthenticatedUser, authorizeRole
 
 router.route(`/dashboard/reportsPerCategory`).post(isAuthenticatedUser, authorizeRoles('administrator'), getReportsPerCategory);
 router.route(`/dashboard/donationsPerCategory`).post(isAuthenticatedUser, authorizeRoles('administrator'), getDonationsPerCategory);
+router.route(`/dashboard/topUserDonation`).post(isAuthenticatedUser, authorizeRoles('administrator'), getTopUserDonation);
+router.route(`/dashboard/topUserReport`).post(isAuthenticatedUser, authorizeRoles('administrator'), getTopUserReport);
 
 module.exports = router;

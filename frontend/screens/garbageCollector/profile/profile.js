@@ -66,7 +66,7 @@ const Profile = ({ navigation }) => {
 
     return (
         <ScrollView style={RandomStyle.vContainer}>
-            {console.log(authUser && authUser)}
+            {/* {console.log(authUser && authUser)} */}
             <View marginVertical={5} style={RandomStyle.pContainer}>
                 <HStack borderBottomColor={"lightgrey"} borderBottomWidth={0.5} paddingBottom={2.5}>
                     <VStack width={"40%"} alignItems={"center"}>
@@ -133,7 +133,7 @@ async function registerForPushNotificationsAsync() {
             return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;
-        console.log("Token", token);
+        // console.log("Token", token);
     } else {
         alert('Must use physical device for Push Notifications');
     }

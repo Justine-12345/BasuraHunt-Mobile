@@ -104,7 +104,9 @@ exports.newDump = catchAsyncErrors(async (req, res, next) => {
 		req.body.district = 2
 	}
 
-
+	if (req.user.role == "administrator") {
+		req.body.status = "Confirmed"
+	}
 
 
 
@@ -177,12 +179,19 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 
 	const resPerPage = 5;
 	const dumpsCount = await Dump.countDocuments();
-	const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id').populate('user_id'), req.query).search().filter();
-	// console.log("ismobile", req.query.ismobile == true)
-
-	if (req.query.ismobile === undefined) {
+	// const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id').populate('user_id'), req.query).search().filter();
+	let apiFeatures
+	if (req.query.ismobile == "true") {
+		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("complete_address additional_desciption images createdAt"), req.query).search().filter();
+		if (!req.query.keyword) {
+			apiFeatures.pagination(resPerPage);
+		}
+	} else {
+		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("-barangay -district -landmark -waste_desc -waste_size -accessible_by -category_violation -report_using -comments -collectors"), req.query).search().filter();
 		apiFeatures.pagination(resPerPage);
 	}
+
+
 
 	const dumps = await apiFeatures.query;
 
@@ -202,8 +211,28 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
+	let dumps
+	if (req.user.role == 'garbageCollector') {
+		
+		findDumps = await Dump.find().sort({ _id: -1 });
 
-	const dumps = await Dump.find().populate("user_id").populate("chat_id").sort({ _id: -1 });
+		let dumpsArry = []
+
+		findDumps.forEach(dump => {
+			dump.collectors.forEach((collector) => {
+				if (String(collector.collector) === String(req.user.id)) {
+					dumpsArry.push(dump)
+				}
+			});
+		});
+		dumps = dumpsArry
+	
+		
+
+
+	} else {
+		dumps = await Dump.find().populate("user_id").populate("chat_id").sort({ _id: -1 });
+	}
 	res.status(200).json({
 		success: true,
 		dumps
@@ -212,29 +241,27 @@ exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
 
 //******Get User List (Admin/table)******
 exports.allDumps = catchAsyncErrors(async (req, res, next) => {
-	const dumps = await Dump.find().sort({ _id: -1 }).populate('user_id').populate('chat_id');
-
+	const dumps = await Dump.find().sort({ _id: -1 }).populate('user_id', 'first_name last_name role').populate('chat_id', 'room').select('-images -landmark -waste_desc -additional_desciption -report_using -score -comments -collectors');
 	res.status(200).json({
 		success: true,
 		dumps
 	})
-
-
-
 })
 
 
 
 //******View Dump******
 exports.getSingleDump = catchAsyncErrors(async (req, res, next) => {
-	const dump = await Dump.findById(req.params.id).populate('user_id').populate('chat_id').populate('collectors.collector').populate('chat_id.chat.chats');
+	const dump = await Dump.findById(req.params.id).populate('user_id', 'role first_name last_name alias barangay').populate('chat_id', 'room').populate('collectors.collector', 'first_name').populate('chat_id.chat.chats');
 
 
 	if (!dump) {
 		return next(new ErrorHandler('Dump not found', 404))
 	}
 
-	const chat = dump.chat_id.chats
+	const dumpForChat = await Dump.findById(req.params.id).populate('chat_id');
+
+	const chat = dumpForChat.chat_id.chats
 
 	res.status(200).json({
 		success: true,
@@ -248,7 +275,6 @@ exports.getSingleDump = catchAsyncErrors(async (req, res, next) => {
 
 //****** Update Dump******
 exports.updateDump = catchAsyncErrors(async (req, res, next) => {
-
 
 	let dump = await Dump.findById(req.params.id).populate('user_id');
 
@@ -326,35 +352,39 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 	req.body.images = allImages
 
 
-	let types = [];
 
 
-	if (req.body.waste_type) {
-		if (typeof req.body.waste_type == "string") {
-			types.push({ type: req.body.waste_type })
-		}
-		else {
-			for (let i = 0; i < req.body.waste_type.length; i++) {
-				const type = req.body.waste_type[i];
-				types.push({ type })
+	if (req.body.waste_type === "confirmOnly") {
+		req.body.waste_type = dump.waste_type;
+	} else {
+		let types = [];
+		if (req.body.waste_type) {
+			if (typeof req.body.waste_type == "string") {
+				types.push({ type: req.body.waste_type })
+			}
+			else {
+				for (let i = 0; i < req.body.waste_type.length; i++) {
+					const type = req.body.waste_type[i];
+					types.push({ type })
+				}
 			}
 		}
+		req.body.waste_type = types;
 	}
+
 
 
 	let coordinates = { latitude: req.body.latitude, longtitude: req.body.longtitude };
 
-	req.body.waste_type = types;
+
 	req.body.coordinates = coordinates;
 
-	if (req.user.id == dump.user_id._id) {
-		req.body.report_using = req.user.alias;
-	}
-
-	if (req.body.report_using) {
-		req.body.report_using = req.body.reportUsing === "Alias" ? req.user.alias : req.body.reportUsing === "Real Name" ? req.user.first_name + " " + req.user.last_name : req.body.reportUsing === "Anonymous" ? "Anonymous" : "";
-	}
-
+	// if (req.user.id == dump.user_id._id) {
+	// 	req.body.report_using = req.user.alias;
+	// }else{
+		req.body.report_using = dump.report_using
+	// }
+	
 	let district
 
 	const district1 = ["Bagumbayan",
@@ -439,7 +469,7 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	});
-	const userForPushNotification = await User.find({ _id: dump.user_id._id })
+	const userForPushNotification = await User.find({ _id: dump.user_id._id }).select('push_tokens activeChat')
 	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
 
 
@@ -461,10 +491,10 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 			}
 		});
 		if (dump.status === "Cleaned") {
-			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" }).select('push_tokens activeChat')
 			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Finished', dump._id, req.body.notifCode)
 		} else {
-			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" })
+			const userForPushNotification = await User.find({ _id: req.body.collectors, role: "garbageCollector" }).select('push_tokens activeChat')
 			expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Assigned Illegal Dumps', dump._id, req.body.notifCode)
 		}
 	}
@@ -493,10 +523,10 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 			const collector = req.body.collectors[i];
 
 			if (dump.status === "Cleaned") {
-				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" })
+				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" }).select('push_tokens activeChat')
 				expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Finished', dump._id, req.body.notifCode)
 			} else {
-				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" })
+				const userForPushNotification = await User.find({ _id: collector.collector, role: "garbageCollector" }).select('push_tokens activeChat')
 				expoSendNotification(userForPushNotification, NotifTitleForCollector, 'Assigned Illegal Dumps', dump._id, req.body.notifCode)
 			}
 
@@ -504,10 +534,11 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 		}
 	}
 
-	let updatedDump = await Dump.findById(req.params.id).populate('user_id').populate('chat_id');
+	// let updatedDump = await Dump.findById(req.params.id).populate('user_id').populate('chat_id');
 
+	let updatedDump = await Dump.findById(req.params.id).populate('chat_id', 'room');
 
-	console.log(dump)
+	// console.log(dump)
 	res.status(200).json({
 		success: true,
 		dump: updatedDump
@@ -609,7 +640,7 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 					notifCode: req.body.notifCode1,
 					status: 'unread',
 					category: 'user-verified',
-					modelObj:{_id:updatedDump._id}
+					modelObj: { _id: updatedDump._id }
 				}
 			}
 		});
@@ -921,7 +952,7 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 //****** Get Comment Dump Status******
 exports.getComments = catchAsyncErrors(async (req, res, next) => {
 
-	let dump = await Dump.findById(req.params.id);
+	let dump = await Dump.findById(req.params.id).select('comments');
 	let dumpComments = dump.comments
 
 	res.status(200).json({
@@ -951,4 +982,13 @@ exports.deleteComment = catchAsyncErrors(async (req, res, next) => {
 })
 
 
+exports.getDumpsCoordinates = catchAsyncErrors(async (req, res, next) => {
+
+	let dumpsCoordinates = await Dump.find().select('coordinates status').sort({ _id: -1 });
+	
+	res.status(200).json({
+		success: true,
+		dumpsCoordinates
+	})
+})
 

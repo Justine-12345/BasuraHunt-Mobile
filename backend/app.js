@@ -3,6 +3,8 @@ const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser')
 const fileUpload = require('express-fileupload')
 const morgan = require("morgan");
+const compression = require('compression')
+
 const path = require('path')
 const cors = require('cors')
 const app = express();
@@ -16,7 +18,7 @@ const chat = require('./routes/chat');
 const feedback = require('./routes/feedback');
 const errorMiddleware = require('./middlewares/errors')
 
-
+app.use(compression())
 app.use(morgan('tiny'));
 app.use(express.json());
 app.use(cors())

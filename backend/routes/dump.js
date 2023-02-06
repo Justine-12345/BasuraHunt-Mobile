@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const { getDumpList, newDump, getDumps, getSingleDump, updateDump, deleteDump, updateDumpStatus, rankings, allDumps, addComment, getComments, deleteComment } = require('../controllers/dumpController');
+const { getDumpsCoordinates, getDumpList, newDump, getDumps, getSingleDump, updateDump, deleteDump, updateDumpStatus, rankings, allDumps, addComment, getComments, deleteComment } = require('../controllers/dumpController');
 
 const { isAuthenticatedUser, authorizeRoles } = require('../middlewares/auth');
 
@@ -13,6 +13,7 @@ router.route('/dump-list').get(isAuthenticatedUser, authorizeRoles('administrato
 
 router.route('/public-dump').get(getDumpList);
 
+router.route('/dumps-coordinates').get(getDumpsCoordinates);
 
 router.route('/admin/dumps').get(isAuthenticatedUser, authorizeRoles('administrator'), allDumps);
 router.route('/admin/dump/:id').put(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator', 'newUser'), updateDump).delete(isAuthenticatedUser, authorizeRoles('administrator', 'newUser'), deleteDump);

@@ -22,14 +22,17 @@ const LoadingPublicReportsView = () => {
                                     <Text style={RandomStyle.vText2}>Date Cleaned: </Text>
                                     <Skeleton style={{alignSelf: "center"}} width={100} animation="pulse"/>                    
                                 </HStack>
-                        </VStack>
-                            <Skeleton style={{alignSelf: "center"}} width={100} animation="pulse"/>                    
+                                <HStack>
+                                    <Text style={RandomStyle.vText2}>Date Reported: </Text>
+                                    <Skeleton style={{alignSelf: "center"}} width={100} animation="pulse"/>                    
+                                </HStack>
+                        </VStack>                  
                         
                     </HStack>
                 </View>
                 <HStack>
                     <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                    <Skeleton style={{alignSelf: "center"}} width={"50%"} animation="pulse"/>                    
+                    <Skeleton style={{alignSelf: "center"}} width={"27%"} animation="pulse"/>                    
                 </HStack>
                 <HStack>
                     <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>

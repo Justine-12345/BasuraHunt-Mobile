@@ -1,23 +1,31 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator } from "react-native";
 import { HStack, VStack } from "native-base";
 import Empty1 from "../../../stylesheets/empty1";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import { useSelector, useDispatch } from "react-redux";
 import { getSingleDump } from "../../../Redux/Actions/dumpActions";
-import { getNewsfeeds, clearErrors } from "../../../Redux/Actions/newsfeedActions";
+import { getNewsfeeds, getNewsfeedList, clearErrors } from "../../../Redux/Actions/newsfeedActions";
 import { getItemDetails } from "../../../Redux/Actions/itemActions";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import LoadingNewsfeed from "../../extras/loadingPages/loading-nf";
 import { ALL_NEWSFEEDS_RESET } from "../../../Redux/Constants/newsfeedConstants";
+import { RESET_PUSH_NOTIFICATION } from "../../../Redux/Constants/pushNotificationConstants";
 import { readNoficationMobile, loadUser } from "../../../Redux/Actions/userActions";
+import { getNewsfeedDetails } from "../../../Redux/Actions/newsfeedActions";
+import { NEWSFEED_PAGE_SET } from "../../../Redux/Constants/newsfeedConstants";
+import { Skeleton } from "@rneui/themed";
 const newsfeedData = require('../../../assets/sampleData/newsfeed.json')
 
 const Newsfeed = ({ navigation }) => {
     const dispatch = useDispatch()
     const { screen, object, message, code } = useSelector(state => state.pushNotification);
-    const { error, newsfeeds, loading } = useSelector(state => state.newsfeeds);
+    const { error, newsfeeds: allNewsFeeds, loading, newsfeedsCount, resPerPage } = useSelector(state => state.newsfeeds);
+    const { page } = useSelector(state => state.newsfeedPage);
+
+    const [currentPage, setCurrentPage] = useState(1)
+    const [newsfeeds, setNewsfeeds] = useState([])
 
     useFocusEffect(
         useCallback(() => {
@@ -27,17 +35,30 @@ const Newsfeed = ({ navigation }) => {
             //         console.log("res",res)
             //     })
             //     .catch((error) => console.log(error))
-
-            dispatch(getNewsfeeds())
-            return () => {
-                dispatch({ type: ALL_NEWSFEEDS_RESET })
+            // setNewsfeeds([])
+            if (newsfeeds && newsfeeds.length <= 0) {
+                dispatch(getNewsfeedList(1))
             }
-        }, [])
+
+
+            // return () => {
+            //     // setNewsfeeds([])
+
+            //     dispatch({ type: ALL_NEWSFEEDS_RESET })
+            // }
+        }, [page])
     )
 
+    useEffect(() => {
+        // if (allNewsFeeds.length <= 0) {
+
+        if (allNewsFeeds) {
+            setNewsfeeds(oldArray => oldArray.concat(allNewsFeeds && allNewsFeeds))
+        }
+        // }
+    }, [allNewsFeeds])
 
     useEffect(() => {
-        console.log("code", code)
         if (code) {
             const formData = new FormData();
             formData.append('notifCode', code);
@@ -84,14 +105,26 @@ const Newsfeed = ({ navigation }) => {
         }
 
         else if (screen === 'NewsfeedNav') {
-            dispatch({ type: ALL_NEWSFEEDS_RESET })
-            dispatch(getNewsfeeds())
-            navigation.navigate("NewsfeedNav", { screen: 'Newsfeed' })
+            dispatch(getNewsfeedDetails(object))
+            navigation.navigate("Home", { screen: 'NewsfeedNav', params:{screen:'NewsfeedView'} })
             // console.log("object",object)
         }
 
 
     }, [screen, object, message, code])
+
+    const fetchMoreData = () => {
+        if (newsfeeds.length <= newsfeedsCount - 1) {
+            // console.log("fetchMoreData")
+            dispatch({
+                type: NEWSFEED_PAGE_SET,
+                payload: currentPage + 1
+            })
+            setCurrentPage(currentPage + 1)
+            dispatch(getNewsfeedList(currentPage + 1))
+        }
+
+    }
 
     const newsfeedItem = ({ item, index }) => {
 
@@ -101,12 +134,14 @@ const Newsfeed = ({ navigation }) => {
         return (
             <>
                 {/* <TouchableOpacity onPress={() => {
-                    //  dispatch(getItemDetails('63c3fa0f6f109065156a169c'))
-                    //  navigation.navigate("User", { screen: 'Donation', params: { screen: 'PublicDonationsView', params: { item_id: '63c3fa0f6f109065156a169c' } } })
-                    navigation.navigate("Donation", {params:{screen:"PublicDonationsChat"}})
+
+                    navigation.navigate("Home", { screen: 'NewsfeedNav', params:{screen:'NewsfeedView'} })
                 }}><Text>Go</Text></TouchableOpacity> */}
                 {index == 0 ?
-                    <TouchableOpacity activeOpacity={.8} onPress={() => navigation.navigate("NewsfeedView", { item })}>
+                    <TouchableOpacity activeOpacity={.8} onPress={() => {
+                        navigation.navigate("NewsfeedView", { item })
+                        dispatch(getNewsfeedDetails(item._id))
+                    }}>
                         <View style={RandomStyle.lLatestContainer}>
                             <Image source={{ uri: img }} resizeMode="cover" style={RandomStyle.lLatestImg} />
                             <View style={{ flex: 1, justifyContent: "flex-start", marginVertical: 8 }}>
@@ -117,7 +152,10 @@ const Newsfeed = ({ navigation }) => {
                             <Text numberOfLines={5} style={RandomStyle.lLatestContent}>{item.content}</Text>
                         </View>
                     </TouchableOpacity> :
-                    <TouchableOpacity activeOpacity={.8} onPress={() => navigation.navigate("NewsfeedView", { item })}>
+                    <TouchableOpacity activeOpacity={.8} onPress={() => {
+                        navigation.navigate("NewsfeedView", { item })
+                        dispatch(getNewsfeedDetails(item._id))
+                    }}>
                         <View style={RandomStyle.lContainer}>
                             <HStack>
                                 <Image source={{ uri: img }} resizeMode="cover" style={RandomStyle.lImg} />
@@ -141,13 +179,44 @@ const Newsfeed = ({ navigation }) => {
     return (
 
         <>
-            {loading ? <LoadingNewsfeed /> : null}
-            {newsfeedData.length > 0 ?
-                <FlatList
-                    data={newsfeeds}
-                    renderItem={newsfeedItem}
-                    keyExtractor={item => item._id}
-                />
+            {newsfeeds&& newsfeeds.length <= 0? <LoadingNewsfeed /> : null}
+            {/* {console.log("newsfeeds", newsfeeds.length)} */}
+            {newsfeeds && newsfeeds.length > 0 ?
+                <>
+                    <FlatList
+                        data={newsfeeds}
+                        renderItem={newsfeedItem}
+                        keyExtractor={item => Math.random()}
+                        onEndReachedThreshold={0.2}
+                        onEndReached={fetchMoreData}
+                        ListFooterComponent={() =>
+                            <>
+                                {loading && currentPage >= 2 ?
+                                    <>
+                                        <View style={RandomStyle.lContainer}>
+                                            <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                        </View>
+                                        <View style={RandomStyle.lContainer}>
+                                            <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                        </View>
+                                        <View style={RandomStyle.lContainer}>
+                                            <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                        </View>
+                                        <View style={RandomStyle.lContainer}>
+                                            <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                        </View>
+                                    </>
+                                    : null}
+                            </>
+                        }
+                    />
+                    {/* {loading && currentPage >= 2 ?
+                        <View>
+                            <ActivityIndicator size="large" color="#1E5128" />
+                        </View>
+                        : null
+                    } */}
+                </>
                 :
                 <View style={Empty1.container}>
                     <Text style={Empty1.text1}>

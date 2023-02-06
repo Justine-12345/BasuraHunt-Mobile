@@ -7,7 +7,8 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const sendEmail = require('../utils/sendEmail');
 const { ObjectId } = require('mongodb');
 const cloudinary = require('cloudinary');
-
+const Dump = require('../models/dump')
+const APIFeatures = require('../utils/apiFeatures')
 
 // const fetch = require('node-fetch');
 // const {OAuth2Client} = require('google-auth-library');
@@ -115,7 +116,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 	// })
 
 	//Send Email OTP
-
 
 	// const html = `<body style=" background: rgb(255,255,255);background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(210,255,236,1) 53%, rgba(169,246,255,1) 100%);"><br/><br/><div style="width:350px; text-align: center; margin: auto;font-family: arial; line-height: 25px;background: white;padding: 24px;box-shadow: 2px 2px 7px #9e9e9e;"><img src="https://static.vecteezy.com/system/resources/thumbnails/001/312/428/small/monitor-with-password-and-shield-free-vector.jpg"/><p>${otp}</p><br/></div></body>`
 	// const message = `<body style=" background: rgb(255,255,255);background: linear-gradient(90deg, rgba(255,255,255,1) 0%, rgba(210,255,236,1) 53%, rgba(169,246,255,1) 100%);"><br/><br/><div style="width:350px; text-align: center; margin: auto;font-family: arial; line-height: 25px;background: white;padding: 24px;box-shadow: 2px 2px 7px #9e9e9e;"><img src="https://static.vecteezy.com/system/resources/thumbnails/001/312/428/small/monitor-with-password-and-shield-free-vector.jpg"/><p>${otp}</p><br/></div></body>`
@@ -368,7 +368,14 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 
 //******View User's Profile******
 exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
-	const user = await User.findById(req.user.id).populate('notifications');
+	let user
+	if (req.query.forNotification == true || req.query.forNotification == "true") {
+		user = await User.findById(req.user.id).populate('notifications').select('-reported_dumps -donated_items -received_items');
+	} else {
+		user = await User.findById(req.user.id).populate('notifications').select('-reported_dumps -donated_items -received_items');
+	}
+
+
 
 	let usersBrgyRank = await User.aggregate(
 		[
@@ -376,10 +383,6 @@ exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
 			{ $group: { _id: { id: "$_id", alias: "$alias", level: "$level", exp: "$exp" } } }
 		]
 	).sort({ "_id.level": -1, "_id.exp": -1, "_id.alias": 1 })
-
-
-
-
 	let usersCityRank = await User.aggregate(
 		[
 			{ $match: { "level": { $gte: 1 }, "role": "user" } },
@@ -423,13 +426,19 @@ exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
 	} else {
 		token = req.cookies.token
 	}
-
+	
+	const dumps = await Dump.find({"user_id":req.user.id});
+	const items = await Item.find({"user_id":req.user.id});
+	const reportedDumpCounts = dumps.length
+	const donatedItemsCount = items.length
 	res.status(200).json({
 		success: true,
 		user,
 		userBrgyRank,
 		userCityRank,
 		otp_status: user.otp_status,
+		reportedDumpCounts,
+		donatedItemsCount,
 		token
 	})
 
@@ -513,7 +522,7 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 
 //******Get User List (Admin)******
 exports.allUsers = catchAsyncErrors(async (req, res, next) => {
-	const users = await User.find().sort({ _id: -1 });
+	const users = await User.find().sort({ _id: -1 }).select('-avatar -suffix -birthday -alias -level -exp -otp -activeChat -otp_status -reported_dumps -donated_items -received_items -push_tokens -notifications -gender -phone_number');
 
 	res.status(200).json({
 		success: true,
@@ -524,7 +533,7 @@ exports.allUsers = catchAsyncErrors(async (req, res, next) => {
 
 //******Get User Details (Admin)******
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
-	const user = await User.findById(req.params.id);
+	const user = await User.findById(req.params.id).select('-valid_id -received_items -notifications -activeChat -push_tokens');
 
 	let usersBrgyRank = await User.aggregate(
 		[
@@ -831,30 +840,74 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
 //******Reported Dumps By User******
 exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
-	const userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate({
-		path: 'reported_dumps',
-		populate: {
-			path: 'dump',
+
+
+	const resPerPage = 5;
+	const currentPath = Number(req.query.page) || 1;
+	const skip = resPerPage * (currentPath - 1)
+
+	let userDumpsFind
+
+	if (req.query.ismobile == "true") {
+		userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate({
+			path: 'reported_dumps',
 			populate: {
-				path: 'chat_id'
+				path: 'dump',
+				populate: {
+					path: 'chat_id',
+					select: { 'room': 1 }
+				},
+				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1, 'createdAt': 1 },
 			}
-		}
-	})
+		})
+	}else{
+		userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate({
+			path: 'reported_dumps',
+			populate: {
+				path: 'dump',
+				populate: {
+					path: 'chat_id',
+					select: { 'room': 1 }
+				},
+				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1,'waste_type': 1, 'coordinates':1, 'createdAt': 1 },
+			}
+		})
+	}
+
 
 	if (!userDumpsFind) {
 		return next(new ErrorHandler('User Dumps not found', 404));
 	}
 
+	let userDumpsP = []
 	let userDumps = []
+	let dumpsCount
+	let filteredDumpCount
+	if (req.query.ismobile == "true") {
+		userDumpsFind.reported_dumps.reverse().forEach(dump => {
+			if (dump.dump !== null) {
+				userDumpsP.push(dump)
+			}
+		})
 
-	userDumpsFind.reported_dumps.reverse().forEach(dump => {
-		if (dump.dump !== null) {
-			userDumps.push(dump)
-		}
-	})
+		dumpsCount = userDumpsP.length
+		userDumps = userDumpsP.slice(skip, skip + resPerPage)
+		filteredDumpCount = userDumps.length
+	} else {
+		userDumpsFind.reported_dumps.reverse().forEach(dump => {
+			if (dump.dump !== null) {
+				userDumps.push(dump)
+			}
+		})
+	}
+
+
 
 	res.status(200).json({
 		success: true,
+		dumpsCount,
+		resPerPage,
+		filteredDumpCount,
 		userDumps
 	})
 })
@@ -864,31 +917,62 @@ exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 	// const userReceiveItems = await User.findById(req.user.id).populate('received_items.item').select('received_items');
 
-	const userReceiveItems = await User.findById(req.user.id).populate({
+	const resPerPage = 3;
+	const currentPath = Number(req.query.page) || 1;
+	const skip = resPerPage * (currentPath - 1)
+
+	const userReceiveItemsFind = await User.findById(req.user.id).populate({
 		path: 'received_items',
 		populate: {
 			path: 'item',
-			populate: [
-				{
-					path: 'chat_id',
-				},
-				{
-					path: 'user_id',
-				},
-				{
-					path: 'receiver_id',
-				}
-			]
+			// populate: [
+			// 	{
+			// 		path: 'chat_id',
+			// 	},
+			// 	{
+			// 		path: 'user_id',
+			// 	},
+			// 	{
+			// 		path: 'receiver_id',
+			// 	}
+			// ]
+			select: { 'images': 1, "createdAt": 1, "status": 1, "name": 1, "additional_description": 1, "item_type": 1, "date_recieved":1 }
 		}
 	}).select('received_items');
 
 
-	if (!userReceiveItems) {
+	if (!userReceiveItemsFind) {
 		return next(new ErrorHandler('User Receive Items not found', 404));
+	}
+
+	let userReceiveItemsP = []
+	let userReceiveItems = []
+	let itemsCount
+	let filteredItemCount
+
+	if (req.query.ismobile == "true") {
+		userReceiveItemsFind.received_items.reverse().forEach(item => {
+			if (item.item !== null) {
+				userReceiveItemsP.push(item)
+			}
+		})
+
+		itemsCount = userReceiveItemsP.length
+		userReceiveItems = userReceiveItemsP.slice(skip, skip + resPerPage)
+		filteredItemCount = userReceiveItems.length
+	} else {
+		userReceiveItemsFind.received_items.reverse().forEach(item => {
+			if (item.item !== null) {
+				userReceiveItems.push(item)
+			}
+		})
 	}
 
 	res.status(200).json({
 		success: true,
+		resPerPage,
+		itemsCount,
+		filteredItemCount,
 		userReceiveItems
 	})
 })
@@ -896,50 +980,86 @@ exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 //******Donated Items By User******
 exports.donatedItems = catchAsyncErrors(async (req, res, next) => {
 	// const userDonatedItems = await User.findById(req.user.id).populate('donated_items.item').select('donated_items');
+	const resPerPage = 5;
+	const currentPath = Number(req.query.page) || 1;
+	const skip = resPerPage * (currentPath - 1)
 
-
-
-	const userDonatedItems = await User.findById(req.user.id).populate({
+	const userDonatedItemsfind = await User.findById(req.user.id).populate({
 		path: 'donated_items',
 		populate: {
 			path: 'item',
-			populate: [
-				{
-					path: 'chat_id',
-				},
-				{
-					path: 'user_id',
-				},
-				{
-					path: 'receiver_id',
-				}
-			]
+			// populate: [
+			// 	{
+			// 		path: 'chat_id',
+			// 	},
+			// 	{
+			// 		path: 'user_id',
+			// 	},
+			// 	{
+			// 		path: 'receiver_id',
+			// 	}
+			// ],
+			select: { 'images': 1, "createdAt": 1, "status": 1, "name": 1, "additional_description": 1, "item_type": 1 }
+
 		}
+
 	})
 		.select('donated_items');
 
 
-	if (!userDonatedItems) {
+	if (!userDonatedItemsfind) {
 		return next(new ErrorHandler('User Donated Items not found', 404));
 	}
 
+	let userDonatedItemsP = []
+	let userDonatedItems = []
+	let itemsCount
+	let filteredItemCount
 
+	if (req.query.ismobile == "true") {
+		userDonatedItemsfind.donated_items.reverse().forEach(item => {
+			if (item.item !== null) {
+				userDonatedItemsP.push(item)
+			}
+		})
 
+		itemsCount = userDonatedItemsP.length
+		userDonatedItems = userDonatedItemsP.slice(skip, skip + resPerPage)
+		filteredItemCount = userDonatedItems.length
+	} else {
+		userDonatedItemsfind.donated_items.reverse().forEach(item => {
+			if (item.item !== null) {
+				userDonatedItems.push(item)
+			}
+		})
+	}
 	res.status(200).json({
 		success: true,
+		resPerPage,
+		itemsCount,
+		filteredItemCount,
 		userDonatedItems
 	})
 })
 
 
+
 //******Claimed Items By User******
 exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
-	'Confirmed'
-	const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).populate('chat_id').populate("receiver_id").populate("user_id").sort({ "date_claimed": -1 })
-		;
 
-	console.log(req.user.id)
 
+	// const userClaimedItems = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).populate('chat_id').populate("receiver_id").populate("user_id").sort({ "date_claimed": -1 });
+	const itemsCount = await Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).select("addional_desciption name images createdAt status item_type").sort({ "date_claimed": -1 }).countDocuments();
+	const resPerPage = 5;
+
+	let apiFeatures
+
+	apiFeatures = new APIFeatures(Item.find({ receiver_id: req.user.id, status: ["Claimed", "Confirmed"] }).select("addional_desciption name images createdAt status item_type date_claimed").sort({ "date_claimed": -1 }), req.query);
+
+	apiFeatures.pagination(resPerPage);
+
+	const userClaimedItems = await apiFeatures.query;
+	filteredItemCount = userClaimedItems.length
 	if (!userClaimedItems) {
 		return next(new ErrorHandler('User Donated Items not found', 404));
 	}
@@ -952,9 +1072,11 @@ exports.claimedItems = catchAsyncErrors(async (req, res, next) => {
 	// 	}
 	// })
 
-	console.log("userClaimedItems", userClaimedItems)
 	res.status(200).json({
 		success: true,
+		itemsCount,
+		resPerPage,
+		filteredItemCount,
 		userClaimedItems
 	})
 })

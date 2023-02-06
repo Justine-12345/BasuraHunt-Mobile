@@ -8,6 +8,12 @@ let baseURL = '';
 //     : baseURL = 'http://localhost:3000/api/v1/'
 // }
 
+// {
+//     Platform.OS == 'android'
+//     ? baseURL = 'https://prickly-sundress.cyclic.app/api/v1'
+//     : baseURL = 'http://localhost:3000/api/v1/'
+// }
+
 {
     Platform.OS == 'android'
     ? baseURL = 'http://192.168.100.60:4001/api/v1'

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
 import { Text, View, FlatList, TouchableOpacity, Image, TextInput } from "react-native";
 import { HStack, VStack } from "native-base";
@@ -6,6 +6,8 @@ import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
 import { useDispatch, useSelector } from "react-redux";
 import { receiveItems } from "../../../Redux/Actions/userActions";
+import LoadingList from "../../extras/loadingPages/loading-list";
+import { getItemDetails } from "../../../Redux/Actions/itemActions";
 const UserReceivedDonations = ({ navigation }) => {
     const dispatch = useDispatch()
     const sampleDonations = require("../../../assets/sampleData/items.json");
@@ -21,16 +23,20 @@ const UserReceivedDonations = ({ navigation }) => {
 
             if (searching === false || searching === undefined || !items) {
                 dispatch(receiveItems())
-                setItems(userReceiveItems)
             }
             // setDumpCount(reports && reports.length)
             return () => {
-                receiveItems();
+                setItems();
                 setSearching();
             }
-        }, [userReceiveItems])
+        }, [])
 
     )
+
+    useEffect(() => {
+        setItems(userReceiveItems && userReceiveItems)
+    }, [userReceiveItems])
+
 
 
 
@@ -55,7 +61,7 @@ const UserReceivedDonations = ({ navigation }) => {
     }
     const donationsItem = ({ item, index }) => {
         if (item.item !== null) {
-            let img =  item.item.images?item.item.images[0].url : "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png"
+            let img = item.item.images ? item.item.images[0].url : "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png"
             const date = new Date(item.item.createdAt).toLocaleDateString()
             // let itemForProps = item.item
             // itemForProps.user_id = { _id: item.item.user_id }
@@ -63,9 +69,10 @@ const UserReceivedDonations = ({ navigation }) => {
                 <>
                     {/* {console.log("item", item.item)} */}
                     <TouchableOpacity
-                        onPress={() =>
-                            navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item: item.item, category:"received" } } })
-                        }
+                        onPress={() =>{
+                            dispatch(getItemDetails(item.item._id))
+                            navigation.navigate("User", { screen: 'MyReceived', params: { screen: 'MyPublicReceivedDonationsView', params: { item_id: item.item._id, category: "received" } } })
+                        }}
                         activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
                             <HStack>
@@ -97,28 +104,33 @@ const UserReceivedDonations = ({ navigation }) => {
 
     return (
         <>
-    
+
             <View style={RandomStyle.lContainer3}>
-            <Text style={[RandomStyle.vText1, {marginVertical:8}]}>My Received Items</Text>
+                <Text style={[RandomStyle.vText1, { marginVertical: 8 }]}>My Received Items</Text>
                 <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => search(text)} />
                 </HStack>
-                <Text style={[RandomStyle.vText1,{fontSize:15}]}>Total: {items && items.length}</Text>
+                <Text style={[RandomStyle.vText1, { fontSize: 15 }]}>Total: {items && items.length}</Text>
 
             </View>
-           
-            {items && items.length > 0 ?
-                <FlatList
-                    data={items}
-                    renderItem={donationsItem}
-                    keyExtractor={item => item._id}
-                />
-                :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No received donations yet!
-                    </Text>
-                </View>
+            {loading ?
+                <LoadingList /> :
+
+                <>
+                    {items && items.length > 0 ?
+                        <FlatList
+                            data={items}
+                            renderItem={donationsItem}
+                            keyExtractor={item => item._id}
+                        />
+                        :
+                        <View style={Empty1.container}>
+                            <Text style={Empty1.text1}>
+                                No received donations yet!
+                            </Text>
+                        </View>
+                    }
+                </>
             }
         </>
     )

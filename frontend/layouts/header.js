@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useState } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, StyleSheet, Image, View, Dimensions, Modal, Pressable, BackHandler } from "react-native";
+import { Text, StyleSheet, Image, View, Dimensions, Modal, Pressable, BackHandler, FlatList, TouchableOpacity } from "react-native";
 import { FontAwesome } from "@expo/vector-icons";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useDispatch, useSelector } from "react-redux";
@@ -8,13 +8,15 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { loadUser } from "../Redux/Actions/userActions";
 import { useRoute } from "@react-navigation/native";
 import * as Notifications from 'expo-notifications';
-import { ScrollView } from "native-base";
+import { ScrollView, HStack, VStack } from "native-base";
 import { useNavigation } from '@react-navigation/native';
 import { readNoficationMobile } from "../Redux/Actions/userActions";
 import { getSingleDump } from "../Redux/Actions/dumpActions";
 import { getItemDetails } from "../Redux/Actions/itemActions";
 import { ALL_NEWSFEEDS_RESET } from "../Redux/Constants/newsfeedConstants";
 import { getNewsfeeds } from "../Redux/Actions/newsfeedActions";
+import RandomStyle from "../stylesheets/randomStyle";
+import moment from 'moment';
 var { width } = Dimensions.get("window");
 
 const Header = () => {
@@ -90,7 +92,8 @@ const Header = () => {
     }
 
     const viewNotification = (notification) => {
-        // console.log("category", notification.category)
+
+        console.log("category", notification)
         if (notification.category === "schedule") {
             setModalVisible(false)
             const formData = new FormData();
@@ -181,7 +184,46 @@ const Header = () => {
             navigation.navigate("User", { screen: 'MyReports', params: { screen: 'MyPublicReportsView', params: { item_id: obj_id } } })
 
         }
+    }
 
+
+    const notificationItem = ({ item, index }) => {
+
+        return (
+            <>
+            {item.status === "unread"?
+                <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
+                    <View style={[ { backgroundColor: "#1E5128", marginVertical: 8, padding: 8, marginHorizontal:8, borderRadius:5 }]} >
+                        <HStack>
+                        
+                            <VStack>
+                                <Text style={[{color:"white", fontWeight:"700"}]}>{item.title}</Text>
+                                {/* item.additional_desciption change to item.addition_description */}
+                                {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
+                                    <Text style={{ color:"white", fontStyle:"italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
+                                {/* </View> */}
+                            </VStack>
+                        </HStack>
+                    </View>
+                </TouchableOpacity>:
+                <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
+                    <View style={[ { backgroundColor: "#d3d3d3", marginVertical: 8, padding: 8, marginHorizontal:8, borderRadius:5 }]} >
+                        <HStack>
+                        
+                            <VStack>
+                                <Text style={[{color:"black", fontWeight:"700"}]}>{item.title}</Text>
+                                {/* item.additional_desciption change to item.addition_description */}
+                                {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
+                                    <Text style={{ color:"black", fontStyle:"italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
+                                {/* </View> */}
+                            </VStack>
+                        </HStack>
+                    </View>
+                </TouchableOpacity>
+
+            }
+            </>
+        )
     }
 
     return (
@@ -197,6 +239,7 @@ const Header = () => {
                 </View>
 
                 <Modal
+                    useNativeDriver={true}
                     animationType="slide"
                     transparent={false}
                     visible={modalVisible}
@@ -207,7 +250,15 @@ const Header = () => {
                 >
 
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <ScrollView>
+                        <Text style={{fontWeight:"700", fontSize:17}}>Notifications List</Text>
+
+                        <FlatList
+                            data={loading ? prevNotification.reverse() : notificationList.reverse()}
+                            renderItem={notificationItem}
+                            keyExtractor={item => item._id}
+                        />
+
+                        {/* <ScrollView>
                             {loading ?
                                 prevNotification.map(notification => {
                                     if (notification.status === "unread") {
@@ -261,28 +312,32 @@ const Header = () => {
                                         )
                                     }
                                 }).reverse()}
-
-
-                        </ScrollView>
+                        </ScrollView> */}
                     </View>
-
-
-
                 </Modal>
 
 
                 {isLogin ?
-                    <View style={styles.bellContainer}>
+                    <>
+                        <View style={styles.bellContainer}>
 
-                        <FontAwesome name="bell" onPress={() => setModalVisible(true)} size={25} style={[styles.notifBtn]} />
-                        {/* {console.log("notificationList", notificationList)} */}
-                        {notificationList.map((notification) => {
-                            if (notification.status === "unread") {
-                                unReadNotificationCounter += 1
-                            }
-                        })}
-                        <Text onPress={() => setModalVisible(true)} style={{ position: "absolute", backgroundColor: "red", color: "white", fontSize: 8, borderRadius: 4, fontWeight: "700", padding: 2, bottom: 12, left: 12, elevation: 2 }}>{abbreviateNumber(unReadNotificationCounter <= 0 ? prevCount : unReadNotificationCounter)}</Text>
-                    </View> :
+                            <FontAwesome name="bell" onPress={() => setModalVisible(true)} size={25} style={[styles.notifBtn]} />
+                            {/* {console.log("notificationList", notificationList)} */}
+
+
+
+                            {notificationList.map((notification) => {
+                                if (notification.status === "unread") {
+                                    unReadNotificationCounter += 1
+                                }
+                            })}
+
+
+                            <Text onPress={() => setModalVisible(true)} style={{ position: "absolute", backgroundColor: "red", color: "white", fontSize: 8, borderRadius: 4, fontWeight: "700", padding: 2, bottom: 12, left: 12, elevation: 2 }}>{abbreviateNumber(unReadNotificationCounter <= 0 ? prevCount : unReadNotificationCounter)}</Text>
+                        </View>
+                    </>
+
+                    :
                     null}
             </View>
         </SafeAreaView>

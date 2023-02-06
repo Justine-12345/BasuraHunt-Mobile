@@ -14,9 +14,14 @@ exports.getItemList = catchAsyncErrors(async (req, res, next) => {
 	const itemsCount = await Item.find({ status: "Unclaimed" }).count();
 
 	// const items = await Item.find({status: {$ne: "Received"}}).sort({_id:-1}).populate("user_id");
-	const apiFeatures2 = new APIFeatures2(Item.find({ status: "Unclaimed" }).sort({ _id: -1 }).populate("user_id").populate('chat_id'), req.query).search().filter();
-
-	if (req.query.ismobile === undefined) {
+	let apiFeatures2
+	if (req.query.ismobile == "true") {
+		apiFeatures2 = new APIFeatures2(Item.find({ status: "Unclaimed" }).sort({ _id: -1 }).select("addional_desciption name images createdAt status item_type"), req.query).search().filter();
+		if (!req.query.keyword) {
+			apiFeatures2.pagination(resPerPage);
+		}
+	} else {
+		apiFeatures2 = new APIFeatures2(Item.find({ status: "Unclaimed" }).sort({ _id: -1 }).select("images name addional_desciption createdAt"), req.query).search().filter();
 		apiFeatures2.pagination(resPerPage);
 	}
 
@@ -38,8 +43,8 @@ exports.getItemList = catchAsyncErrors(async (req, res, next) => {
 })
 
 exports.getSingleItem = catchAsyncErrors(async (req, res, next) => {
-	const item = await Item.findById(req.params.id).populate("user_id").populate("receiver_id").populate("chat_id");
-	const receiver = await User.findById(item.receiver_id);
+	const item = await Item.findById(req.params.id).populate("user_id", "first_name last_name alias barangay").populate("receiver_id", "first_name last_name alias barangay").populate("chat_id", "room");
+	const receiver = await User.findById(item.receiver_id).select('first_name last_name level barangay');
 
 	res.status(200).json({
 		success: true,
@@ -407,7 +412,7 @@ exports.receiveItem = catchAsyncErrors(async (req, res, next) => {
 // Donation Items CRUD--------------------------------------------
 exports.getItems = catchAsyncErrors(async (req, res, next) => {
 
-	const items = await Item.find().populate("user_id").sort({ _id: -1 });
+	const items = await Item.find().populate("user_id", "first_name last_name").select('-images -district -item_type -item_desc -addional_desciption -donate_using -receiver_id').sort({ _id: -1 });
 	const itemsCount = await Item.countDocuments();
 
 	res.status(200).json({
@@ -499,7 +504,7 @@ exports.newItem = catchAsyncErrors(async (req, res, next) => {
 	}
 
 	const { barangay_hall, name, addional_desciption, donate_using, item_desc, status, date_recieved } = req.body;
-	console.log(addional_desciption)
+
 	const item = await Item.create({
 		images: imagesLinks,
 		barangay_hall,

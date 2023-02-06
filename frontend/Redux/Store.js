@@ -22,7 +22,8 @@ import {
     dumpDetailsReducer,
     dumpReducer,
     rankingReducer,
-    dumpCommentReducer
+    dumpCommentReducer,
+    dumpPageReducer
 } from './Reducers/dumpReducers'
 
 import {
@@ -48,6 +49,7 @@ import {
     newsfeedReducer,
     newsfeedDetailsReducer,
     newNewsfeedReducer,
+    newsfeedPageReducer
 } from './Reducers/newsfeedReducers';
 
 import { pushNotificationReducer } from './Reducers/pushNotificationReducer';
@@ -59,6 +61,7 @@ import {
     itemReducer,
     itemDetailsReducer,
     newItemReducer,
+    itemPageReducer
 } from './Reducers/itemReducers';
 
 
@@ -82,6 +85,7 @@ const reducers = combineReducers({
     dump: dumpReducer,
     ranking: rankingReducer,
     dumpComment: dumpCommentReducer,
+    dumpPage:dumpPageReducer,
 
     collectionPointsUpcoming: collectionPointsUpcomingReducer,
     collectionPointsToday: collectionPointsTodayReducer,
@@ -96,6 +100,7 @@ const reducers = combineReducers({
     newsfeed: newsfeedReducer,
     newsfeedDetails: newsfeedDetailsReducer,
     newNewsfeed: newNewsfeedReducer,
+    newsfeedPage:newsfeedPageReducer,
 
     newChat: newChatReducer,
     chatDetails: chatDetailsReducer,
@@ -106,6 +111,7 @@ const reducers = combineReducers({
     item: itemReducer,
     itemDetails: itemDetailsReducer,
     newItem: newItemReducer,
+    itemPage:itemPageReducer,
 
     coordinate: coordinateReducer,
     pushNotification: pushNotificationReducer

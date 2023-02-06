@@ -203,7 +203,7 @@ const ChatDonation = (props) => {
                 {!item ?
                     <View>
                         {/* <ChatBubble admin style={styles.chatBubbles}> */}
-                        {chatLoading ? <ActivityIndicator size="large" color="#00ff00" /> :
+                        {chatLoading ? <ActivityIndicator size="large" color="#1E5128" /> :
                             <Text style={[styles.chatText, { color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}>*** No chat yet ***</Text>
                         }
                         {/* </ChatBubble> */}

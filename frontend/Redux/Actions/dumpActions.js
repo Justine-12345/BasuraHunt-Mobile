@@ -86,7 +86,7 @@ export const newDump = (dumpData) => async (dispatch) => {
 }
 
 // Get Dumps for User
-export const getDumps = (keyword = '', currentPage = 1, district = '', barangay = '', waste_size = '', waste_type = '', ismobile = false) => async (dispatch) => {
+export const getDumps = (keyword = '', currentPage = 1, district = '', barangay = '', waste_size = '', waste_type = '', ismobile = 'false') => async (dispatch) => {
     try {
 
         dispatch({ type: DUMPS_REQUEST })
@@ -195,8 +195,23 @@ export const allDumps = () => async (dispatch) => {
 
         dispatch({ type: ALL_DUMP_REQUEST })
 
+        let token
+        AsyncStorage.getItem("jwt")
+            .then((res) => {
+                token = res
 
-        const { data } = await axios.get('/api/v1/admin/dumps')
+            })
+            .catch((error) => console.log(error))
+
+        const config = {
+            headers: {
+                "Content-Type": "multipart/form-data",
+                Authorization: `Bearer ${token}`
+            }
+        }
+
+
+        const { data } = await axios.get(`${baseURL}/admin/dumps`, config)
 
         dispatch({
             type: ALL_DUMP_SUCCESS,

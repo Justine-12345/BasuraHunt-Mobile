@@ -108,7 +108,7 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 			}
 		});
 
-		const userForPushNotification = await User.find({ _id: req.body.receiver })
+		const userForPushNotification = await User.find({ _id: req.body.receiver }).select('push_tokens activeChat')
 		expoSendNotification(userForPushNotification, NotifTitle, 'PublicDonationsChat', obj, req.body.notifCode)
 
 
@@ -180,7 +180,7 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 			});
 
 
-			const userForPushNotification = await User.find({ _id: req.body.receiver })
+			const userForPushNotification = await User.find({ _id: req.body.receiver }).select('push_tokens activeChat')
 			expoSendNotification(userForPushNotification, NotifTitle, 'PublicReportsChat', obj, req.body.notifCode)
 
 		}

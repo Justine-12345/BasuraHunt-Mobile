@@ -43,7 +43,7 @@ const CScheduleToday = ({ navigation }) => {
 
 
     useEffect(() => {
-        
+
         if (screen === 'SchedNotifView') {
             navigation.navigate('GarbageCollectorSchedNav', { screen: 'TodayNav', params: { screen: 'SchedNotifView', params: { title: message } } })
         }
@@ -164,16 +164,33 @@ const CScheduleToday = ({ navigation }) => {
 
         return date;
     }
+   
+    const collectionPointsList = (collectionPoints) => {
+        let collectionPointsList = "";
 
+        for (let i = 0; i < collectionPoints.length; i++) {
+
+            if (i !== collectionPoints.length - 1) {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint + ", "
+            }
+            else {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint
+            }
+        }
+
+        return collectionPointsList;
+    }
     const schedulesList = ({ item }) => {
         // const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
                 {
                     item.collectors.map((cp) => {
-                        if (String(cp && cp.collector && cp.collector._id) === String(userID && userID._id)) {
+                        if (String(cp && cp.collector && cp.collector).trim() === String(userID && userID._id).trim()) {
+
                             return (
                                 <View key={item._id} style={RandomStyle.lContainer4}>
+
                                     <HStack>
                                         {/* <Text style={RandomStyle.vBadgeGrey}>FINISHED</Text> */}
                                         {/* <Text style={RandomStyle.vBadge}>ONGOING</Text> */}
@@ -191,8 +208,8 @@ const CScheduleToday = ({ navigation }) => {
                                             </HStack>
                                             <VStack>
                                                 <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
-                                                <Text numberOfLines={1} style={[RandomStyle.lItem2, {fontWeight:"700"}]}>{item.barangay}</Text>
-                                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{item.collectionPoint}</Text>
+                                                <Text numberOfLines={1} style={[RandomStyle.lItem2, { fontWeight: "700" }]}>{item.barangay}</Text>
+                                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{collectionPointsList(item.collectionPoints)}</Text>
                                             </VStack>
                                             {getWatchBtn(item)}
                                             {/* <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}

@@ -8,14 +8,16 @@ import { Ionicons } from "@expo/vector-icons";
 
 import { useDispatch, useSelector } from 'react-redux'
 import { getItemList } from "../../../Redux/Actions/itemActions";
-
+import LoadingList from "../../extras/loadingPages/loading-list";
+import { ITEM_PAGE_SET } from "../../../Redux/Constants/itemConstants";
+import { Skeleton } from "@rneui/themed";
+import { getItemDetails } from "../../../Redux/Actions/itemActions";
 const PublicDonationsList = ({ navigation }) => {
 
     const dispatch = useDispatch();
-    const { error, items } = useSelector(state => state.items);
-
-    const [donations, setDonations] = useState();
-
+    const { error, items, loading, itemsCount, filteredItemCount, resPerPage } = useSelector(state => state.items);
+    const { page } = useSelector(state => state.itemPage);
+    const [donations, setDonations] = useState([]);
     const [filter, setFilter] = useState(false);
     const [currentPage, setCurrentPage] = useState(1)
     const [district, setDistrict] = useState("");
@@ -73,13 +75,45 @@ const PublicDonationsList = ({ navigation }) => {
                 });
             }
 
-            dispatch(getItemList(keyword, currentPage, district, barangay, type, true));
 
-            return () => {
 
+            if (keyword === '') {
+                if (donations && donations.length <= 0) {
+                    dispatch(getItemList(keyword, 1, district, barangay, type, "true"));
+                }
+            } else {
+                dispatch(getItemList(keyword, 1, district, barangay, type, "true"));
             }
-        }, [dispatch, error, keyword, currentPage, district, barangay, type])
+
+            // return () => {
+
+            // }
+        }, [error, keyword, page, district, barangay, type])
     )
+
+
+    useEffect(() => {
+        if (keyword === '') {
+            if (currentPage <= 1) {
+                setDonations([])
+            }
+            if (items) {
+                setDonations(oldArray => oldArray.concat(items && items))
+            }
+        }
+    }, [items])
+
+    useEffect(() => {
+        if (!loading) {
+            if (keyword !== '') {
+                if (items) {
+                    setDonations(items && items)
+                }
+            }
+        }
+    }, [items])
+
+
 
     useEffect(() => {
         if (filter === false) {
@@ -88,6 +122,19 @@ const PublicDonationsList = ({ navigation }) => {
             setType("")
         }
     });
+
+    const fetchMoreData = () => {
+        if (keyword === '') {
+            if (donations.length <= itemsCount - 1) {
+                dispatch({
+                    type: ITEM_PAGE_SET,
+                    payload: currentPage + 1
+                })
+                setCurrentPage(currentPage + 1)
+                dispatch(getItemList(keyword, currentPage + 1, district, barangay, type, "true"));
+            }
+        }
+    }
 
     const FilterOptions = () => {
         return (
@@ -126,12 +173,15 @@ const PublicDonationsList = ({ navigation }) => {
         return (
             <>
                 {item.status === "Unclaimed" && (
-                    <TouchableOpacity onPress={() => navigation.navigate("PublicDonationsView", { item })} activeOpacity={.8}>
+                    <TouchableOpacity onPress={() => {
+                         dispatch(getItemDetails(item._id))
+                        navigation.navigate("PublicDonationsView", { item_id:item._id })
+                    }} activeOpacity={.8}>
                         <View style={RandomStyle.lContainer2}>
                             <HStack>
                                 <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                                 <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.name} <Text style={{fontWeight:"400", fontSize:10, fontStyle:"italic", color:"gray"}}>({date})</Text></Text>
+                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.name} <Text style={{ fontWeight: "400", fontSize: 10, fontStyle: "italic", color: "gray" }}>({date})</Text></Text>
                                     <Text numberOfLines={2} style={RandomStyle.lContent}>{item.addional_desciption}</Text>
                                     <Text numberOfLines={3} style={RandomStyle.lType}>
                                         {item.item_type.map((i, index) =>
@@ -153,23 +203,77 @@ const PublicDonationsList = ({ navigation }) => {
         )
     }
     return (
+
         <>
             <View style={RandomStyle.lContainer3}>
                 <HStack style={RandomStyle.searchContainer}>
-                    <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
+                    <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => {
+                        if (text) {
+                            setKeyword(text)
+                        } else {
+                            setFilter(false)
+                            setKeyword(text)
+                            setCurrentPage(1)
+                            dispatch(getItemList(text, 1, "", "", "", "true"));
+                        }
 
-                    <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
-                        <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
-                    </TouchableOpacity>
+
+                    }} />
+
+                    {keyword ?
+                        <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
+                            <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
+                        </TouchableOpacity>
+                        : null
+                    }
                 </HStack>
                 {filter == false ? null : <FilterOptions />}
             </View>
-            {items && items.length > 0 ?
-                <FlatList
-                    data={items}
-                    renderItem={donationsItem}
-                    keyExtractor={item => item._id}
-                />
+            {loading && currentPage === 1 ? <LoadingList /> : null}
+            {donations && donations.length > 0 ?
+
+                <>
+                    {!keyword ?
+                        <FlatList
+                            data={donations}
+                            renderItem={donationsItem}
+                            keyExtractor={item =>Math.random()}
+                            onEndReachedThreshold={0.2}
+                            onEndReached={fetchMoreData}
+                            ListFooterComponent={() =>
+                                <>
+                                    {loading && currentPage >= 2 ?
+                                        <>
+
+                                            <View style={RandomStyle.lContainer}>
+                                                <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                            </View>
+                                            <View style={RandomStyle.lContainer}>
+                                                <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                            </View>
+                                            <View style={RandomStyle.lContainer}>
+                                                <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                            </View>
+                                            <View style={RandomStyle.lContainer}>
+                                                <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                            </View>
+                                            <View style={RandomStyle.lContainer}>
+                                                <Skeleton animation="pulse" height={100} borderRadius={10} />
+                                            </View>
+
+                                        </>
+                                        : null}
+                                </>
+                            }
+                        /> :
+                        <FlatList
+                            data={donations}
+                            renderItem={donationsItem}
+                            keyExtractor={item => Math.random()}
+                        />
+                    }
+                </>
+
                 :
                 <View style={Empty1.container}>
                     <Text style={Empty1.text1}>
@@ -177,6 +281,7 @@ const PublicDonationsList = ({ navigation }) => {
                     </Text>
                 </View>
             }
+
         </>
     )
 }
