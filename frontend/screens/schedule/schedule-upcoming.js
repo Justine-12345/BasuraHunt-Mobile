@@ -229,7 +229,12 @@ const ScheduleUpcoming = () => {
                                 return null;
                             }
                         })
-                        : <Text>{noSched}</Text>
+                        : 
+                        <View style={Empty1.container}>
+                            <Text style={Empty1.text1}>
+                                No upcoming collection yet!
+                            </Text>
+                        </View>
                     }
                 </View>  
             </>
