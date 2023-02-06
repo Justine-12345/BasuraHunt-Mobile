@@ -1,8 +1,6 @@
-import React, { useState } from "react";
-import { FlatList, Text, View, Image, TouchableOpacity, StyleSheet,ScrollView } from "react-native";
+import React from "react";
+import { Text, View, Image, StyleSheet,ScrollView } from "react-native";
 import { HStack, VStack } from "native-base";
-import RandomStyle from "../../../stylesheets/randomStyle";
-import { FontAwesome } from "@expo/vector-icons";
 const About= () => {
 
         return(
@@ -15,28 +13,28 @@ const About= () => {
                     <VStack style={{width: "100%"}}>
                             <Text style={styles.headerTitle}>ABOUT US</Text>
                              {/*<Text style={styles.line}/> */}
-                            <Text style={styles.text}>BasuraHunt is a web application that lets a user report illegal dumps and donate usable items. 
+                            <Text style={styles.text}>BasuraHunt is an application that lets users report illegal dumps and donate reusable items. 
                             This application aims to reduce and improve the environmental status, particularly in managing illegal dumps and providing self-awareness to the residents of Taguig City.
                            
                             </Text>  
                              <Text style={styles.headerMeet}>MEET THE TEAM</Text>
-                             <Image style={styles.image} source= {require('../../../assets/haicel.jpg')}/>
+                             <Image style={styles.image} source={{uri:"https://res.cloudinary.com/basurahunt/image/upload/v1673798105/BasuraHunt/Developers/bh2_fuicli.heic"}}/>
                              <Text style={styles.name}>Haicel Marie E. Carlos</Text>
                              <Text style={styles.desc}>Web and Mobile Developer</Text>
                               <Text style={styles.line}/>
-                             <Image style={styles.image} source= {require('../../../assets/justine.jpg')}/>
+                             <Image style={styles.image} source={{uri:"https://res.cloudinary.com/basurahunt/image/upload/v1673797158/BasuraHunt/Developers/bh2_r9ujih.heic"}}/>
                              <Text style={styles.name}>Justine S. Castaneda</Text>
                              <Text style={styles.desc}>Web and Mobile Developer</Text>
                               <Text style={styles.line}/>
-                             <Image style={styles.image} source= {require('../../../assets/erin.jpg')}/>
+                             <Image style={styles.image} source={{uri:"https://res.cloudinary.com/basurahunt/image/upload/v1673797104/BasuraHunt/Developers/bh2_ah7csh.heic"}}/>
                              <Text style={styles.name}>Erin Jean V. Elpedes</Text>
                              <Text style={styles.desc}>Mobile Developer and Tester</Text>
                               <Text style={styles.line}/>
-                             <Image style={styles.image} source= {require('../../../assets/denise.jpg')}/>
+                             <Image style={styles.image} source={{uri:"https://res.cloudinary.com/basurahunt/image/upload/v1673797133/BasuraHunt/Developers/bh2_l8dgge.heic"}}/>
                              <Text style={styles.name}>Denise R. Fajardo</Text>
                              <Text style={styles.desc}>Mobile Developer and Tester</Text>
                               <Text style={styles.line}/>
-                             <Image style={styles.image} source= {require('../../../assets/harris.jpg')}/>
+                             <Image style={styles.image} source={{uri:"https://res.cloudinary.com/basurahunt/image/upload/v1673797146/BasuraHunt/Developers/bh2_vryfom.heic"}}/>
                              <Text style={styles.name}>Harris A. Gurion</Text>
                              <Text style={styles.desc}>Web and Mobile Developer</Text>
                               <Text style={styles.line}/>

@@ -145,7 +145,7 @@ const Newsfeed = ({ navigation }) => {
                         <View style={RandomStyle.lLatestContainer}>
                             <Image source={{ uri: img }} resizeMode="cover" style={RandomStyle.lLatestImg} />
                             <View style={{ flex: 1, justifyContent: "flex-start", marginVertical: 8 }}>
-                                <Text style={{ position: "absolute", color: "white", marginHorizontal: 5, backgroundColor: "#1E5128", color: "white", borderRadius: 10, padding: 5, fontWeight: "700" }}>Most Latest</Text>
+                                <Text style={{ position: "absolute", color: "white", marginHorizontal: 5, backgroundColor: "#1E5128", color: "white", borderRadius: 10, padding: 5, fontWeight: "700" }}>Latest</Text>
                                 <Text style={{ alignSelf: "flex-end", color: "white", marginHorizontal: 5 }}>{date}</Text>
                             </View>
                             <Text numberOfLines={3} style={RandomStyle.lLatestTitle}>{item.title} </Text>
