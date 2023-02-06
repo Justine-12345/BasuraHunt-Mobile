@@ -464,6 +464,63 @@ const RandomStyle = StyleSheet.create({
         marginVertical: 10,
         padding: 2,
         elevation: 5
+    },
+
+    usContainer: {
+        flexWrap: "wrap",
+        flexDirection: "row",
+        justifyContent: "space-evenly",
+        flexGrow: 1,
+        flexBasis: "auto",
+        flexShrink: 0,
+        alignContent: "stretch",
+        marginVertical: 10,
+        position: "relative"
+    },
+    usSched: {
+        padding: 10,
+        margin: 5,
+        backgroundColor: "#1E5128",
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        maxWidth: width/2.33,
+        minHeight: height/4.5,
+        elevation: 5
+    },
+    usInfo: {
+        fontWeight: "bold",
+        color: "white",
+        fontSize: 15,
+        textAlign: "center",
+    },
+    usAlt: {
+        backgroundColor: "#1E9000",
+    },
+    usModal: {
+        maxHeight: height,
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    usPoints: {
+        backgroundColor: "white",
+        padding: 20,
+        borderRadius: 10,
+        margin: 10,
+        width: width-100,
+        elevation: 10
+    },
+    usClosec: {
+        backgroundColor: "dimgrey",
+        borderRadius: 5,
+        marginTop: 10,
+        padding: 5
+    },
+    usClose: {
+        textAlign: "center",
+        fontSize: 20,
+        color: "white"
     }
 })
 
