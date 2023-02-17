@@ -17,6 +17,8 @@ import { ALL_NEWSFEEDS_RESET } from "../Redux/Constants/newsfeedConstants";
 import { getNewsfeeds } from "../Redux/Actions/newsfeedActions";
 import RandomStyle from "../stylesheets/randomStyle";
 import moment from 'moment';
+import { Skeleton } from "native-base";
+import { getNewsfeedDetails } from "../Redux/Actions/newsfeedActions";
 var { width } = Dimensions.get("window");
 
 const Header = () => {
@@ -65,9 +67,11 @@ const Header = () => {
         setPrevCount(unReadNotificationCounter)
         setPrevNotification(notificationList)
         setNotificationList([])
-        user && user.notifications && user.notifications.forEach(data => {
-            setNotificationList((list) => [...list, data]);
-        })
+
+        if (user && user.notifications) {
+            setNotificationList(user.notifications.reverse());
+        }
+
     }, [user, screen, object, message, loading])
 
     const SI_SYMBOL = ["", "k", "M", "G", "T", "P", "E"];
@@ -93,7 +97,7 @@ const Header = () => {
 
     const viewNotification = (notification) => {
 
-        console.log("category", notification)
+        // console.log("category", notification)
         if (notification.category === "schedule") {
             setModalVisible(false)
             const formData = new FormData();
@@ -169,9 +173,12 @@ const Header = () => {
             const formData = new FormData();
             formData.append('notifCode', notification.notifCode);
             dispatch(readNoficationMobile(formData))
-            dispatch({ type: ALL_NEWSFEEDS_RESET })
-            dispatch(getNewsfeeds())
-            navigation.navigate("NewsfeedNav", { screen: 'Newsfeed' })
+            
+            const obj_id = notification.link.split("/")[2];
+
+            
+            dispatch(getNewsfeedDetails(obj_id))
+            navigation.navigate("Home", { screen: 'NewsfeedNav', params:{screen:'NewsfeedView'} })
 
         }
         if (notification.category === "user-verified") {
@@ -191,37 +198,37 @@ const Header = () => {
 
         return (
             <>
-            {item.status === "unread"?
-                <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
-                    <View style={[ { backgroundColor: "#1E5128", marginVertical: 8, padding: 8, marginHorizontal:8, borderRadius:5 }]} >
-                        <HStack>
-                        
-                            <VStack>
-                                <Text style={[{color:"white", fontWeight:"700"}]}>{item.title}</Text>
-                                {/* item.additional_desciption change to item.addition_description */}
-                                {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
-                                    <Text style={{ color:"white", fontStyle:"italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
-                                {/* </View> */}
-                            </VStack>
-                        </HStack>
-                    </View>
-                </TouchableOpacity>:
-                <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
-                    <View style={[ { backgroundColor: "#d3d3d3", marginVertical: 8, padding: 8, marginHorizontal:8, borderRadius:5 }]} >
-                        <HStack>
-                        
-                            <VStack>
-                                <Text style={[{color:"black", fontWeight:"700"}]}>{item.title}</Text>
-                                {/* item.additional_desciption change to item.addition_description */}
-                                {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
-                                    <Text style={{ color:"black", fontStyle:"italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
-                                {/* </View> */}
-                            </VStack>
-                        </HStack>
-                    </View>
-                </TouchableOpacity>
+                {item.status === "unread" ?
+                    <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
+                        <View style={[{ backgroundColor: "#1E5128", marginVertical: 8, padding: 8, marginHorizontal: 8, borderRadius: 5 }]} >
+                            <HStack>
 
-            }
+                                <VStack>
+                                    <Text style={[{ color: "white", fontWeight: "700" }]}>{item.title}</Text>
+                                    {/* item.additional_desciption change to item.addition_description */}
+                                    {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
+                                    <Text style={{ color: "white", fontStyle: "italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
+                                    {/* </View> */}
+                                </VStack>
+                            </HStack>
+                        </View>
+                    </TouchableOpacity> :
+                    <TouchableOpacity key={item._id} onPress={() => viewNotification(item)} activeOpacity={.8}>
+                        <View style={[{ backgroundColor: "#d3d3d3", marginVertical: 8, padding: 8, marginHorizontal: 8, borderRadius: 5 }]} >
+                            <HStack>
+
+                                <VStack>
+                                    <Text style={[{ color: "black", fontWeight: "700" }]}>{item.title}</Text>
+                                    {/* item.additional_desciption change to item.addition_description */}
+                                    {/* <View style={{ flex: 1, justifyContent: "flex-end", }}> */}
+                                    <Text style={{ color: "black", fontStyle: "italic" }}>{moment(new Date(item.time)).fromNow()}</Text>
+                                    {/* </View> */}
+                                </VStack>
+                            </HStack>
+                        </View>
+                    </TouchableOpacity>
+
+                }
             </>
         )
     }
@@ -250,69 +257,34 @@ const Header = () => {
                 >
 
                     <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                        <Text style={{fontWeight:"700", fontSize:17}}>Notifications List</Text>
+                        <Text style={{ fontWeight: "700", fontSize: 17 }}>Notifications List</Text>
 
-                        <FlatList
-                            data={loading ? prevNotification.reverse() : notificationList.reverse()}
-                            renderItem={notificationItem}
-                            keyExtractor={item => item._id}
-                        />
+                        {notificationList.map((notification) => {
+                            if (notification.status === "unread") {
+                                unReadNotificationCounter += 1
+                            }
+                        })}
 
-                        {/* <ScrollView>
-                            {loading ?
-                                prevNotification.map(notification => {
-                                    if (notification.status === "unread") {
-                                        return (
+                        {notificationList && notificationList.length >= 1 || prevNotification && prevNotification.length >= 1 ?
+                            < FlatList
+                                data={loading ? prevNotification.reverse() : notificationList}
+                                renderItem={notificationItem}
+                                keyExtractor={item => item._id}
+                            /> :
 
-                                            <Pressable key={notification._id} onPress={() => viewNotification(notification)}>
-                                                <View style={{ backgroundColor: "#1E5128", marginVertical: 8 }} >
-                                                    <Text style={{ color: "white" }}>
-                                                        {notification.time}
-                                                        {notification.title}
-                                                    </Text>
-                                                </View>
-                                            </Pressable>
-                                        )
-                                    } else {
-                                        return (
-                                            <Pressable key={notification._id} onPress={() => viewNotification(notification)}>
-                                                <View style={{ backgroundColor: "#d3d3d3", marginVertical: 8 }} >
-                                                    <Text style={{ color: "black" }}>
-                                                        {notification.time}
-                                                        {notification.title}
-                                                    </Text>
-                                                </View>
-                                            </Pressable>
-                                        )
-                                    }
+                            <>
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
+                                <Skeleton style={{ marginVertical: 5, elevation: 0, marginVertical: 8, padding: 8, marginHorizontal: 8 }} height={140} animation="pulse" borderRadius={10} />
 
-                                }).reverse()
-                                : notificationList.map(notification => {
-                                    if (notification.status === "unread") {
-                                        return (
-                                            <Pressable key={notification._id} onPress={() => viewNotification(notification)}>
-                                                <View style={{ backgroundColor: "#1E5128", marginVertical: 8 }} >
-                                                    <Text style={{ color: "white" }}>
-                                                        {notification.time}
-                                                        {notification.title}
-                                                    </Text>
-                                                </View>
-                                            </Pressable>
-                                        )
-                                    } else {
-                                        return (
-                                            <Pressable key={notification._id} onPress={() => viewNotification(notification)}>
-                                                <View style={{ backgroundColor: "#d3d3d3", marginVertical: 8 }} >
-                                                    <Text style={{ color: "black" }}>
-                                                        {notification.time}
-                                                        {notification.title}
-                                                    </Text>
-                                                </View>
-                                            </Pressable>
-                                        )
-                                    }
-                                }).reverse()}
-                        </ScrollView> */}
+                            </>
+                        }
+
                     </View>
                 </Modal>
 
@@ -326,14 +298,12 @@ const Header = () => {
 
 
 
-                            {notificationList.map((notification) => {
-                                if (notification.status === "unread") {
-                                    unReadNotificationCounter += 1
-                                }
-                            })}
 
 
-                            <Text onPress={() => setModalVisible(true)} style={{ position: "absolute", backgroundColor: "red", color: "white", fontSize: 8, borderRadius: 4, fontWeight: "700", padding: 2, bottom: 12, left: 12, elevation: 2 }}>{abbreviateNumber(unReadNotificationCounter <= 0 ? prevCount : unReadNotificationCounter)}</Text>
+                            {unReadNotificationCounter >= 1 || prevCount >= 1 ?
+                                <Text onPress={() => setModalVisible(true)} style={{ position: "absolute", backgroundColor: "red", color: "white", fontSize: 8, borderRadius: 4, fontWeight: "700", padding: 2, bottom: 12, left: 12, elevation: 2 }}>{abbreviateNumber(unReadNotificationCounter <= 0 ? prevCount : unReadNotificationCounter)}</Text> : null
+                            }
+
                         </View>
                     </>
 

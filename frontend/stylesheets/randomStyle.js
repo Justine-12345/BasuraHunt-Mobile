@@ -488,6 +488,15 @@ const RandomStyle = StyleSheet.create({
         minHeight: height/4.5,
         elevation: 5
     },
+    usSchedLoading: {
+        margin: 5,
+        borderRadius: 10,
+        justifyContent: "center",
+        alignItems: "center",
+        maxWidth: width/2.33,
+        minHeight: height/4.5,
+        elevation: 5
+    },
     usInfo: {
         fontWeight: "bold",
         color: "white",

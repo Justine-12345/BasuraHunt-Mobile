@@ -13,6 +13,16 @@ const dumpSchema = new mongoose.Schema({
             },
         }    
     ],
+    accomplished_images: [
+        {
+            public_id: {
+                type: String
+            },
+            url: {
+                type: String
+            },
+        }    
+    ],
     coordinates:{
 
             latitude: {

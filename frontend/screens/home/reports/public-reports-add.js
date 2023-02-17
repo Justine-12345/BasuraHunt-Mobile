@@ -17,12 +17,17 @@ import { NEW_DUMP_RESET } from "../../../Redux/Constants/dumpConstants";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import NotificationSender from "../../extras/notificationSender";
+import { reportedDumps } from "../../../Redux/Actions/userActions";
+import { USER_DUMP_PAGE_RESET } from "../../../Redux/Constants/userConstants";
+import { Skeleton } from "native-base";
 const windowHeight = Dimensions.get('window').height;
+
+
 const PublicReportsAdd = ({ navigation }) => {
     const dispatch = useDispatch()
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
     const { loading, success, dump, error } = useSelector(state => state.newDump)
-
+    const { initializing } = useSelector(state => state.mapLoading)
     let longitude = 0
     let latitude = 0
     const [openImages, setOpenImages] = useState(false);
@@ -41,20 +46,6 @@ const PublicReportsAdd = ({ navigation }) => {
     const [additional_desciption, setAdditional_desciption] = useState('')
     const [reportUsing, setReportUsing] = useState('')
     const [reportAnonymously, setReportAnonymously] = useState(false)
-    const [typeAC, setTypeAC] = useState(false);
-    const [typeAU, setTypeAU] = useState(false);
-    const [typeBU, setTypeBU] = useState(false);
-    const [typeCO, setTypeCO] = useState(false);
-    const [typeEL, setTypeEL] = useState(false);
-    const [typeHZ, setTypeHZ] = useState(false);
-    const [typeHH, setTypeHH] = useState(false);
-    const [typeLW, setTypeLW] = useState(false);
-    const [typeMC, setTypeMC] = useState(false);
-    const [typePP, setTypePP] = useState(false);
-    const [typePL, setTypePL] = useState(false);
-    const [typeGB, setTypeGB] = useState(false);
-    const [typeOF, setTypeOF] = useState(false);
-    const [typeOther, setTypeOther] = useState(false);
     const [mapHeight, setMapHeight] = useState(0);
     const [mapWidth, setMapWidth] = useState(0);
     const [btnAdd, setBtnAdd] = useState(false);
@@ -108,7 +99,6 @@ const PublicReportsAdd = ({ navigation }) => {
     ]
 
     useEffect(() => {
-
         AsyncStorage.getItem("user")
             .then((res) => {
                 setUser(JSON.parse(res))
@@ -142,8 +132,9 @@ const PublicReportsAdd = ({ navigation }) => {
             setReportAnonymously(false)
             dispatch({ type: RESET_COORDINATE })
             dispatch({ type: NEW_DUMP_RESET })
-            console.log("success")
-            navigation.navigate('User', { screen: 'MyReports', params:{screen:'UserReportsList'} });
+            dispatch({ type: USER_DUMP_PAGE_RESET })
+            dispatch(reportedDumps(1))
+            navigation.navigate('User', { screen: 'MyReports', params: { screen: 'UserReportsList' } });
         }
         if (error) {
             Toast.show({
@@ -160,38 +151,40 @@ const PublicReportsAdd = ({ navigation }) => {
     const pickImage = async () => {
 
         // **** ___5 images
+        if (images.length <= 4) {
+            let result = await ImagePicker.launchImageLibraryAsync({
+                base64: true,
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: true,
+                quality: 0.1
+            });
 
-        let result = await ImagePicker.launchImageLibraryAsync({
-            base64: true,
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: true,
-            quality: 0.1
-        });
-
-        if (!result.canceled) {
-            console.log("base64", result.assets[0].base64)
-            console.log("uri", result.assets[0].uri)
-            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
-            setImages(oldArray => [...oldArray, imageUri])
-            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
+            if (!result.canceled) {
+                console.log("base64", result.assets[0].base64)
+                console.log("uri", result.assets[0].uri)
+                let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
+                setImages(oldArray => [...oldArray, imageUri])
+                setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
+            }
         }
     }
 
     const capImage = async () => {
 
         // **** ___5 images
+        if (images.length <= 4) {
+            let result = await ImagePicker.launchCameraAsync({
+                base64: true,
+                mediaTypes: ImagePicker.MediaTypeOptions.All,
+                allowsEditing: false,
+                quality: 0.1
+            });
 
-        let result = await ImagePicker.launchCameraAsync({
-            base64: true,
-            mediaTypes: ImagePicker.MediaTypeOptions.All,
-            allowsEditing: false,
-            quality: 0.1
-        });
-
-        if (!result.canceled) {
-            let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
-            setImages(oldArray => [...oldArray, imageUri])
-            setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
+            if (!result.canceled) {
+                let imageUri = result ? `data:image/jpg;base64,${result.assets[0].base64}` : null;
+                setImages(oldArray => [...oldArray, imageUri])
+                setImagesPreview(items => [...items, { uri: result.assets[0].uri, base64: imageUri }])
+            }
         }
     }
 
@@ -267,6 +260,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
     return (
         <>
+
             {loading ?
                 <View style={{ position: "relative", top: windowHeight / 3 }}>
                     <ActivityIndicator size="large" color="#1E5128" />
@@ -282,173 +276,226 @@ const PublicReportsAdd = ({ navigation }) => {
                         <View style={RandomStyle.vHeader}>
                             <Text style={RandomStyle.vText1}>Report an Illegal Dump</Text>
                         </View>
+                        {/* ========== */}
+                        {initializing === true ? <>
 
-                        <HStack justifyContent={"space-between"}>
-                            <BhButton medium onPress={pickImage}>
-                                <Text style={{ color: "white" }}>Upload Image</Text>
-                            </BhButton>
-                            <BhButton medium onPress={capImage}>
-                                <Text style={{ color: "white" }}>Capture Image</Text>
-                            </BhButton>
-                        </HStack>
+                            <HStack justifyContent={"space-between"}>
+                                <Skeleton style={[[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }], { paddingBottom: 0 }]} height={35} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0 }]} height={35} width={"40%"} animation="pulse" />
 
-                        <View style={RandomStyle.vImages}>
-                            {imagesPreview.length > 0 ?
-                                imagesPreview.map((img, index) =>
-                                    <View key={index}>
-                                        <TouchableOpacity style={{ zIndex: 999 }} onPress={() => { setImagesPreview(imagesPreview.filter(image => image.uri !== img.uri)); setImages(images.filter(image => image !== img.base64)) }}>
-                                            <MaterialCommunityIcons size={20} style={RandomStyle.vBadge} name="close" />
-                                        </TouchableOpacity>
-                                        <TouchableOpacity onPress={() => showImages(index)}>
-                                            <Image style={RandomStyle.vImage} source={{ uri: img.uri }} resizeMode="cover" />
-                                        </TouchableOpacity>
-                                    </View>
-                                ) : null
-                            }
-                            <ImageView
-                                images={imagesPreview}
-                                imageIndex={imgIndex}
-                                visible={openImages}
-                                onRequestClose={() => setOpenImages(false)}
-                            />
+                            </HStack>
 
-                        </View>
+                            <VStack>
+                                <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
+                                <Skeleton style={{ alignSelf: "center" }} height={25} animation="pulse" />
+                            </VStack>
+                            <VStack>
+                                <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
+                                <Skeleton style={{ alignSelf: "center" }} height={25} animation="pulse" />
+                            </VStack>
+                            <Text style={RandomStyle.vText2}>Barangay</Text>
+                            <Skeleton style={{ alignSelf: "center" }} height={25} animation="pulse" />
 
-                        <VStack>
-                            <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                            <TextInput value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
-                        </VStack>
-                        <VStack>
-                            <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
-                            <TextInput value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
-                        </VStack>
 
-                        <Text style={RandomStyle.vText2}>Barangay</Text>
-                        <Select
-                            selectedValue={barangay}
-                            onValueChange={(barangay_value) => setBarangay(barangay_value)}>
-                            {barangays.map((barangay) =>
-                                <Select.Item key={barangay} value={barangay} label={barangay} />
-                            )
+                        </> :
+                            <>
+                                <HStack justifyContent={"space-between"}>
+                                    <BhButton medium onPress={pickImage}>
+                                        <Text style={{ color: "white" }}>Upload Image</Text>
+                                    </BhButton>
+                                    <BhButton medium onPress={capImage}>
+                                        <Text style={{ color: "white" }}>Capture Image</Text>
+                                    </BhButton>
+                                </HStack>
 
-                            }
+                                <View style={RandomStyle.vImages}>
+                                    {imagesPreview.length > 0 ?
+                                        imagesPreview.map((img, index) =>
+                                            <View key={index}>
+                                                <TouchableOpacity style={{ zIndex: 999 }} onPress={() => { setImagesPreview(imagesPreview.filter(image => image.uri !== img.uri)); setImages(images.filter(image => image !== img.base64)) }}>
+                                                    <MaterialCommunityIcons size={20} style={RandomStyle.vBadge} name="close" />
+                                                </TouchableOpacity>
+                                                <TouchableOpacity onPress={() => showImages(index)}>
+                                                    <Image style={RandomStyle.vImage} source={{ uri: img.uri }} resizeMode="cover" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        ) : null
+                                    }
+                                    <ImageView
+                                        images={imagesPreview}
+                                        imageIndex={imgIndex}
+                                        visible={openImages}
+                                        onRequestClose={() => setOpenImages(false)}
+                                    />
 
-                        </Select>
+                                </View>
 
-                        <View style={{ width: 50, justifyContent: 'center', borderWidth: 0, alignItems: 'center', position: "relative", left: (mapWidth / 2) - 25, top: (mapHeight / 2) + 2, zIndex: 5 }}>
-                            <Image style={{ height: 50, width: 50, zIndex: 1 }} source={{ uri: "https://img.icons8.com/glyph-neue/100/26ff00/marker.png" }} resizeMode="stretch" />
-                        </View>
+                                <VStack>
+                                    <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
+                                    <TextInput value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
+                                </VStack>
+                                <VStack>
+                                    <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
+                                    <TextInput value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
+                                </VStack>
 
+                                <Text style={RandomStyle.vText2}>Barangay</Text>
+                                <Select
+                                    selectedValue={barangay}
+                                    onValueChange={(barangay_value) => setBarangay(barangay_value)}>
+                                    {barangays.map((barangay) =>
+                                        <Select.Item key={barangay} value={barangay} label={barangay} />
+                                    )
+
+                                    }
+
+                                </Select>
+
+
+                                <View style={{ width: 50, justifyContent: 'center', borderWidth: 0, alignItems: 'center', position: "relative", left: (mapWidth / 2) - 25, top: (mapHeight / 2) + 2, zIndex: 5 }}>
+                                    <Image style={{ height: 50, width: 50, zIndex: 1 }} source={{ uri: "https://img.icons8.com/glyph-neue/100/26ff00/marker.png" }} resizeMode="stretch" />
+                                </View>
+                            </>
+                        }
+                        {/* ========= */}
 
                         <View onLayout={onLayout} style={RandomStyle.vMapContainer}>
                             <MapFinder />
                         </View>
 
+                        {/* === */}
+                        {initializing === true ? <>
+                            <Text style={RandomStyle.vText2}>Type of Waste</Text>
+                            <View style={RandomStyle.vContainer2}>
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                                <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0, marginHorizontal: 5 }]} height={25} width={"40%"} animation="pulse" />
+                            </View>
 
-                        <Text style={RandomStyle.vText2}>Type of Waste</Text>
-                        <View style={RandomStyle.vContainer2}>
-                            <CheckboxBtn isChecked={waste_type.includes("Animal Corpse")} /*onPress={()=>setTypeAC(!typeAC)}*/ onPress={(e) => { !waste_type.includes("Animal Corpse") ? setWaste_type(oldArray => [...oldArray, "Animal Corpse"]) : setWaste_type(waste_type.filter(type => type !== "Animal Corpse")) }} >
-                                <Text style={{ color: "white" }}>Animal Corpse</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Automotive")} /*onPress={()=>setTypeAU(!typeAU)}*/ onPress={(e) => { !waste_type.includes("Automotive") ? setWaste_type(oldArray => [...oldArray, "Automotive"]) : setWaste_type(waste_type.filter(type => type !== "Automotive")) }}>
-                                <Text style={{ color: "white" }}>Automotive</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Burned")} /*onPress={()=>setTypeBU(!typeBU)}*/ onPress={(e) => { !waste_type.includes("Burned") ? setWaste_type(oldArray => [...oldArray, "Burned"]) : setWaste_type(waste_type.filter(type => type !== "Burned")) }}>
-                                <Text style={{ color: "white" }}>Burned</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Construction")} /*onPress={()=>setTypeCO(!typeCO)}*/ onPress={(e) => { !waste_type.includes("Construction") ? setWaste_type(oldArray => [...oldArray, "Construction"]) : setWaste_type(waste_type.filter(type => type !== "Construction")) }}>
-                                <Text style={{ color: "white" }}>Construction</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Electronics")} /*onPress={()=>setTypeEL(!typeEL)}*/ onPress={(e) => { !waste_type.includes("Electronics") ? setWaste_type(oldArray => [...oldArray, "Electronics"]) : setWaste_type(waste_type.filter(type => type !== "Electronics")) }}>
-                                <Text style={{ color: "white" }}>Electronics</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Hazardous")} /*onPress={()=>setTypeHZ(!typeHZ)}*/ onPress={(e) => { !waste_type.includes("Hazardous") ? setWaste_type(oldArray => [...oldArray, "Hazardous"]) : setWaste_type(waste_type.filter(type => type !== "Hazardous")) }}>
-                                <Text style={{ color: "white" }}>Hazardous</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Household")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Household") ? setWaste_type(oldArray => [...oldArray, "Household"]) : setWaste_type(waste_type.filter(type => type !== "Household")) }}>
-                                <Text style={{ color: "white" }}>Household</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Liquid Waste")} /*onPress={()=>setTypeLW(!typeLW)}*/ onPress={(e) => { !waste_type.includes("Liquid Waste") ? setWaste_type(oldArray => [...oldArray, "Liquid Waste"]) : setWaste_type(waste_type.filter(type => type !== "Liquid Waste")) }}>
-                                <Text style={{ color: "white" }}>Liquid Waste</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Metal/Can")} /*onPress={()=>setTypeMC(!typeMC)}*/ onPress={(e) => { !waste_type.includes("Metal/Can") ? setWaste_type(oldArray => [...oldArray, "Metal/Can"]) : setWaste_type(waste_type.filter(type => type !== "Metal/Can")) }}>
-                                <Text style={{ color: "white" }}>Metal/Can</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Paper")} /*onPress={()=>setTypePP(!typePP)}*/ onPress={(e) => { !waste_type.includes("Paper") ? setWaste_type(oldArray => [...oldArray, "Paper"]) : setWaste_type(waste_type.filter(type => type !== "Paper")) }}>
-                                <Text style={{ color: "white" }}>Paper</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Plastic")} /*onPress={()=>setTypePL(!typePL)}*/ onPress={(e) => { !waste_type.includes("Plastic") ? setWaste_type(oldArray => [...oldArray, "Plastic"]) : setWaste_type(waste_type.filter(type => type !== "Plastic")) }}>
-                                <Text style={{ color: "white" }}>Plastic</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Glass Bottle")} /*onPress={()=>setTypeGB(!typeGB)}*/ onPress={(e) => { !waste_type.includes("Glass Bottle") ? setWaste_type(oldArray => [...oldArray, "Glass Bottle"]) : setWaste_type(waste_type.filter(type => type !== "Glass Bottle")) }}>
-                                <Text style={{ color: "white" }}>Glass Bottle</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Organic/Food")} /*onPress={()=>setTypeOF(!typeOF)}*/ onPress={(e) => { !waste_type.includes("Organic/Food") ? setWaste_type(oldArray => [...oldArray, "Organic/Food"]) : setWaste_type(waste_type.filter(type => type !== "Organic/Food")) }}>
-                                <Text style={{ color: "white" }}>Organic/Food</Text>
-                            </CheckboxBtn>
-                            <CheckboxBtn isChecked={waste_type.includes("Other")} /*onPress={()=>setTypeOther(!typeOther)}*/ onPress={(e) => { !waste_type.includes("Other") ? setWaste_type(oldArray => [...oldArray, "Other"]) : setWaste_type(waste_type.filter(type => type !== "Other")) }}>
-                                <Text style={{ color: "white" }}>Other</Text>
-                            </CheckboxBtn>
+                            <Text style={RandomStyle.vText2}>Additional Details</Text>
+                            <Skeleton style={[RandomStyle.vContainer2, { paddingBottom: 0 }]} height={20} animation="pulse" />
+
+                            <Skeleton style={[RandomStyle.vContainer3, { alignSelf: "center", paddingBottom: 0 }]} height={35} width={150} animation="pulse" />
+
+                        </> :
+                            <>
+                                <Text style={RandomStyle.vText2}>Type of Waste</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <CheckboxBtn isChecked={waste_type.includes("Animal Corpse")} /*onPress={()=>setTypeAC(!typeAC)}*/ onPress={(e) => { !waste_type.includes("Animal Corpse") ? setWaste_type(oldArray => [...oldArray, "Animal Corpse"]) : setWaste_type(waste_type.filter(type => type !== "Animal Corpse")) }} >
+                                        <Text style={{ color: "white" }}>Animal Corpse</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Automotive")} /*onPress={()=>setTypeAU(!typeAU)}*/ onPress={(e) => { !waste_type.includes("Automotive") ? setWaste_type(oldArray => [...oldArray, "Automotive"]) : setWaste_type(waste_type.filter(type => type !== "Automotive")) }}>
+                                        <Text style={{ color: "white" }}>Automotive</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Burned")} /*onPress={()=>setTypeBU(!typeBU)}*/ onPress={(e) => { !waste_type.includes("Burned") ? setWaste_type(oldArray => [...oldArray, "Burned"]) : setWaste_type(waste_type.filter(type => type !== "Burned")) }}>
+                                        <Text style={{ color: "white" }}>Burned</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Construction")} /*onPress={()=>setTypeCO(!typeCO)}*/ onPress={(e) => { !waste_type.includes("Construction") ? setWaste_type(oldArray => [...oldArray, "Construction"]) : setWaste_type(waste_type.filter(type => type !== "Construction")) }}>
+                                        <Text style={{ color: "white" }}>Construction</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Electronics")} /*onPress={()=>setTypeEL(!typeEL)}*/ onPress={(e) => { !waste_type.includes("Electronics") ? setWaste_type(oldArray => [...oldArray, "Electronics"]) : setWaste_type(waste_type.filter(type => type !== "Electronics")) }}>
+                                        <Text style={{ color: "white" }}>Electronics</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Hazardous")} /*onPress={()=>setTypeHZ(!typeHZ)}*/ onPress={(e) => { !waste_type.includes("Hazardous") ? setWaste_type(oldArray => [...oldArray, "Hazardous"]) : setWaste_type(waste_type.filter(type => type !== "Hazardous")) }}>
+                                        <Text style={{ color: "white" }}>Hazardous</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Household")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Household") ? setWaste_type(oldArray => [...oldArray, "Household"]) : setWaste_type(waste_type.filter(type => type !== "Household")) }}>
+                                        <Text style={{ color: "white" }}>Household</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Liquid Waste")} /*onPress={()=>setTypeLW(!typeLW)}*/ onPress={(e) => { !waste_type.includes("Liquid Waste") ? setWaste_type(oldArray => [...oldArray, "Liquid Waste"]) : setWaste_type(waste_type.filter(type => type !== "Liquid Waste")) }}>
+                                        <Text style={{ color: "white" }}>Liquid Waste</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Metal/Can")} /*onPress={()=>setTypeMC(!typeMC)}*/ onPress={(e) => { !waste_type.includes("Metal/Can") ? setWaste_type(oldArray => [...oldArray, "Metal/Can"]) : setWaste_type(waste_type.filter(type => type !== "Metal/Can")) }}>
+                                        <Text style={{ color: "white" }}>Metal/Can</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Paper")} /*onPress={()=>setTypePP(!typePP)}*/ onPress={(e) => { !waste_type.includes("Paper") ? setWaste_type(oldArray => [...oldArray, "Paper"]) : setWaste_type(waste_type.filter(type => type !== "Paper")) }}>
+                                        <Text style={{ color: "white" }}>Paper</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Plastic")} /*onPress={()=>setTypePL(!typePL)}*/ onPress={(e) => { !waste_type.includes("Plastic") ? setWaste_type(oldArray => [...oldArray, "Plastic"]) : setWaste_type(waste_type.filter(type => type !== "Plastic")) }}>
+                                        <Text style={{ color: "white" }}>Plastic</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Glass Bottle")} /*onPress={()=>setTypeGB(!typeGB)}*/ onPress={(e) => { !waste_type.includes("Glass Bottle") ? setWaste_type(oldArray => [...oldArray, "Glass Bottle"]) : setWaste_type(waste_type.filter(type => type !== "Glass Bottle")) }}>
+                                        <Text style={{ color: "white" }}>Glass Bottle</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Organic/Food")} /*onPress={()=>setTypeOF(!typeOF)}*/ onPress={(e) => { !waste_type.includes("Organic/Food") ? setWaste_type(oldArray => [...oldArray, "Organic/Food"]) : setWaste_type(waste_type.filter(type => type !== "Organic/Food")) }}>
+                                        <Text style={{ color: "white" }}>Organic/Food</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Other")} /*onPress={()=>setTypeOther(!typeOther)}*/ onPress={(e) => { !waste_type.includes("Other") ? setWaste_type(oldArray => [...oldArray, "Other"]) : setWaste_type(waste_type.filter(type => type !== "Other")) }}>
+                                        <Text style={{ color: "white" }}>Other</Text>
+                                    </CheckboxBtn>
 
 
-                            {waste_type.includes("Other") ?
-                                <TextInput onChangeText={(waste_desc_value) => { setWaste_desc(waste_desc_value) }} style={Form1.textInput2} placeholder="If other, please specify here" />
-                                : null
-                            }
-                        </View>
+                                    {waste_type.includes("Other") ?
+                                        <TextInput onChangeText={(waste_desc_value) => { setWaste_desc(waste_desc_value) }} style={Form1.textInput2} placeholder="If other, please specify here" />
+                                        : null
+                                    }
+                                </View>
 
-                        <HStack alignItems="center" space={1}>
-                            <Text style={RandomStyle.vText2} fontSize="lg">Report Anonymously</Text>
-                            <Switch
-                                trackColor={{ false: "#767577", true: "#2B822E" }}
-                                thumbColor={reportAnonymously ? "#09DE10" : "#f4f3f4"}
-                                ios_backgroundColor="#3e3e3e"
-                                onValueChange={(report_anonymously_value) => setReportAnonymously(report_anonymously_value)}
-                                value={reportAnonymously}
-                            />
-                        </HStack>
+                                <HStack alignItems="center" space={1}>
+                                    <Text style={RandomStyle.vText2} fontSize="lg">Report Anonymously</Text>
+                                    <Switch
+                                        trackColor={{ false: "#767577", true: "#2B822E" }}
+                                        thumbColor={reportAnonymously ? "#09DE10" : "#f4f3f4"}
+                                        ios_backgroundColor="#3e3e3e"
+                                        onValueChange={(report_anonymously_value) => setReportAnonymously(report_anonymously_value)}
+                                        value={reportAnonymously}
+                                    />
+                                </HStack>
 
-                        <Text style={RandomStyle.vText2}>Additional Details</Text>
-                        <View style={RandomStyle.vContainer2}>
-                            <TextInput value={additional_desciption} onChangeText={(additional_desciption_value) => { setAdditional_desciption(additional_desciption_value) }} textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} />
-                        </View>
+                                <Text style={RandomStyle.vText2}>Additional Details</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <TextInput value={additional_desciption} onChangeText={(additional_desciption_value) => { setAdditional_desciption(additional_desciption_value) }} textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} />
+                                </View>
 
-                        <View style={RandomStyle.vContainer3}>
-                            <BhButton gray={!btnAdd} center large onPress={() => setBtnAdd(!btnAdd)}>
-                                <Text style={{ color: "white" }}>Add more info (Optional)</Text>
-                            </BhButton>
+                                <View style={RandomStyle.vContainer3}>
+                                    <BhButton gray={!btnAdd} center large onPress={() => setBtnAdd(!btnAdd)}>
+                                        <Text style={{ color: "white" }}>Add more info (Optional)</Text>
+                                    </BhButton>
 
-                            {btnAdd === true ?
-                                <VStack>
-                                    <Text style={RandomStyle.vText2}>Size of Waste</Text>
-                                    <Select
-                                        selectedValue={waste_size} onValueChange={(waste_size_value) => setWaste_size(waste_size_value)}
-                                    >
-                                        <Select.Item value="Trash Bin" label="Trash Bin" />
-                                        <Select.Item value="Dump Truck" label="Dump Truck" />
-                                    </Select>
+                                    {btnAdd === true ?
+                                        <VStack>
+                                            <Text style={RandomStyle.vText2}>Size of Waste</Text>
+                                            <Select
+                                                selectedValue={waste_size} onValueChange={(waste_size_value) => setWaste_size(waste_size_value)}
+                                            >
+                                                <Select.Item value="Trash Bin" label="Trash Bin" />
+                                                <Select.Item value="Dump Truck" label="Dump Truck" />
+                                            </Select>
 
-                                    <Text style={RandomStyle.vText2}>Accessible by</Text>
-                                    <Select
-                                        selectedValue={accessible_by} onValueChange={(accessible_by_value) => setAccessible_by(accessible_by_value)}>
-                                        <Select.Item value="People Only" label="People Only" />
-                                        <Select.Item value="Tricycle" label="Tricycle" />
-                                        <Select.Item value="Motorcycle" label="Motorcycle" />
-                                        <Select.Item value="Truck/Car" label="Truck/Car" />
-                                        <Select.Item value="Boat" label="Boat" />
-                                    </Select>
-                                </VStack> : null
-                            }
-                        </View>
-                        {loading ?
-                            <BhButton center medium disabled>
-                                <ActivityIndicator size="small" color="#00ff00" />
-                            </BhButton> :
-                            <BhButton center medium onPress={submitHandle}>
-                                <Text style={{ color: "white" }}>Submit</Text>
-                            </BhButton>
+                                            <Text style={RandomStyle.vText2}>Accessible by</Text>
+                                            <Select
+                                                selectedValue={accessible_by} onValueChange={(accessible_by_value) => setAccessible_by(accessible_by_value)}>
+                                                <Select.Item value="People Only" label="People Only" />
+                                                <Select.Item value="Tricycle" label="Tricycle" />
+                                                <Select.Item value="Motorcycle" label="Motorcycle" />
+                                                <Select.Item value="Truck/Car" label="Truck/Car" />
+                                                <Select.Item value="Boat" label="Boat" />
+                                            </Select>
+                                        </VStack> : null
+                                    }
+                                </View>
+                                {loading ?
+                                    <BhButton center medium disabled>
+                                        <ActivityIndicator size="small" color="#00ff00" />
+                                    </BhButton> :
+                                    <BhButton center medium onPress={submitHandle}>
+                                        <Text style={{ color: "white" }}>Submit</Text>
+                                    </BhButton>
+                                }
+
+                            </>
                         }
-
+                        {/* ===== */}
 
                     </View>
                 </ScrollView>

@@ -16,7 +16,7 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 const Profile = ({ navigation }) => {
     const dispatch = useDispatch()
-    const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
+    const { loading: authLoading, isAuthenticated, error: authError, user: authUser, isLogout } = useSelector(state => state.auth);
     const [expoPushToken, setExpoPushToken] = useState('');
 
     useFocusEffect(
@@ -40,7 +40,7 @@ const Profile = ({ navigation }) => {
             return () => {
 
             }
-        }, [isAuthenticated]))
+        }, [isAuthenticated, isLogout]))
 
     useFocusEffect(
         useCallback(() => {

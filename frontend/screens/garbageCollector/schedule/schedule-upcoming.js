@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { FlatList, Text, View, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, Modal } from "react-native";
 import { HStack, VStack } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -13,7 +13,8 @@ const GScheduleUpcoming = () => {
     const dispatch = useDispatch();
     const { isRefreshed, collectionPointsUpcoming } = useSelector(state => state.collectionPointsUpcoming);
     const [userID, setUserID] = useState("");
-
+    const [points, setPoints] = useState("");
+    const [modalVisible, setModalVisible] = useState(false);
     useFocusEffect(
         useCallback(() => {
             let user;
@@ -188,6 +189,7 @@ const GScheduleUpcoming = () => {
             </>
         )
     }
+
 
     return (
         <>

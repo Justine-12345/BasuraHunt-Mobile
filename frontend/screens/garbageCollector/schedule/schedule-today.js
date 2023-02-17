@@ -13,9 +13,10 @@ import RandomStringGenerator from "../../extras/randomStringGenerator";
 import NotificationSender from "../../extras/notificationSender";
 import { getSingleDump } from "../../../Redux/Actions/dumpActions";
 import { DUMP_DETAILS_RESET } from "../../../Redux/Constants/dumpConstants";
+import LoadingSchedule from "../../extras/loadingPages/loading-schedule";
 const CScheduleToday = ({ navigation }) => {
     const [userID, setUserID] = useState("");
-    const { isRefreshed, collectionPointsToday } = useSelector(state => state.collectionPointsToday);
+    const { isRefreshed, collectionPointsToday, loading } = useSelector(state => state.collectionPointsToday);
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
     const { screen, object, message } = useSelector(state => state.pushNotification);
@@ -30,15 +31,16 @@ const CScheduleToday = ({ navigation }) => {
                 })
                 .catch((error) => console.log(error))
 
-
-            dispatch({ type: TODAY_COLLECTION_POINT_LIST_RESET })
-            dispatch(getTodayCollectionPointList())
-
+                console.log("collectionPointsToday",collectionPointsToday.length<=0)
+            // dispatch({ type: TODAY_COLLECTION_POINT_LIST_RESET })
+            if (collectionPointsToday.length<=0) {
+                dispatch(getTodayCollectionPointList())
+            }
 
             return () => {
 
             }
-        }, [])
+        }, [collectionPointsToday])
     )
 
 
@@ -133,8 +135,6 @@ const CScheduleToday = ({ navigation }) => {
         timeNow = hourNow + "" + minuteNow;
         let checkTime = timeNow >= startTimeArray[0] + "" + startTimeArray[1] && timeNow <= endTimeArray[0] + "" + endTimeArray[1];
 
-        console.log(checkTime)
-
         if (checkTime) {
             return (
                 <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
@@ -164,7 +164,7 @@ const CScheduleToday = ({ navigation }) => {
 
         return date;
     }
-   
+
     const collectionPointsList = (collectionPoints) => {
         let collectionPointsList = "";
 
@@ -235,20 +235,25 @@ const CScheduleToday = ({ navigation }) => {
                 {/* <Text onPress={()=>{ navigation.navigate('GarbageCollectorSchedNav', { screen: 'TodayNav', params: { screen: 'SchedNotifView', params: { title: "zxczxcxz|ZXczxC|XZCXZ|CZXczx|ZXCzxczx|ZXc" } } })}}>Go</Text> */}
                 {/* <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text> */}
             </View>
-            {collectionPointsToday && collectionPointsToday.length > 0 ?
-                <FlatList
-                    data={collectionPointsToday}
-                    renderItem={schedulesList}
-                    keyExtractor={item => item._id}
-                />
-                :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No collection for today!
-                    </Text>
-                </View>
+            {loading ? <LoadingSchedule /> :
+                <>
+                    {collectionPointsToday && collectionPointsToday.length > 0 ?
+                        <FlatList
+                            data={collectionPointsToday}
+                            renderItem={schedulesList}
+                            keyExtractor={item => item._id}
+                        />
+                        :
+                        <View style={Empty1.container}>
+                            <Text style={Empty1.text1}>
+                                No collection for today!
+                            </Text>
+                        </View>
+                    }
+                </>
             }
         </>
+
     )
 
 

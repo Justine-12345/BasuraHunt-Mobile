@@ -76,20 +76,21 @@ const Personal = ({ navigation }) => {
                 text2: 'Please enter a valid value for birthday'
             });
         }
-        else if (!phone_number) {
-            Toast.show({
-                type: 'error',
-                text1: 'Invalid Phone number',
-                text2: 'Please enter a valid value for phone number'
-            });
-        }
-        else if (!gender) {
-            Toast.show({
-                type: 'error',
-                text1: 'Invalid Gender',
-                text2: 'Please enter a valid value for gender'
-            });
-        }else{
+        // else if (!phone_number) {
+        //     Toast.show({
+        //         type: 'error',
+        //         text1: 'Invalid Phone number',
+        //         text2: 'Please enter a valid value for phone number'
+        //     });
+        // }
+        // else if (!gender) {
+        //     Toast.show({
+        //         type: 'error',
+        //         text1: 'Invalid Gender',
+        //         text2: 'Please enter a valid value for gender'
+        //     });
+        // }
+        else{
             dispatch(setRegPersonalData(user))
             navigation.navigate('Address')
         }
@@ -135,12 +136,12 @@ const Personal = ({ navigation }) => {
                 )}
 
                 {/* phone number */}
-                <Text style={Form1.label}>Phone Number</Text>
-                <TextInput onChangeText={(phone_number_value) => setUser({ ...user, ["phone_number"]: phone_number_value })} keyboardType="numeric" style={Form1.textInput} />
+                {/* <Text style={Form1.label}>Phone Number</Text>
+                <TextInput onChangeText={(phone_number_value) => setUser({ ...user, ["phone_number"]: phone_number_value })} keyboardType="numeric" style={Form1.textInput} /> */}
 
                 {/* gender */}
-                <Text style={Form1.label}>Gender</Text>
-                <SelectList search={false} setSelected={setGenderSelect} data={genderList} onSelect={() => setUser({ ...user, ["gender"]: genderSelect })} />
+                {/* <Text style={Form1.label}>Gender</Text>
+                <SelectList search={false} setSelected={setGenderSelect} data={genderList} onSelect={() => setUser({ ...user, ["gender"]: genderSelect })} /> */}
 
             </VStack>
 

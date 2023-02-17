@@ -15,6 +15,7 @@ import {
     CHECK_OTP_REQUEST,
     CHECK_OTP_SUCCESS,
     CHECK_OTP_FAIL,
+    LOGOUT_REQUEST,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
     LOAD_USER_REQUEST,
@@ -403,6 +404,8 @@ export const resetPassword = (code, passwords) => async (dispatch) => {
 export const logout = (user_id = '', pushToken = '', ismobile = '') => async (dispatch) => {
     try {
 
+        dispatch({ type: LOGOUT_REQUEST })
+
         let token
         AsyncStorage.getItem("jwt")
             .then((res) => {
@@ -435,7 +438,7 @@ export const logout = (user_id = '', pushToken = '', ismobile = '') => async (di
 }
 
 
-export const reportedDumps = () => async (dispatch) => {
+export const reportedDumps = (currentPage = 1) => async (dispatch) => {
     try {
         dispatch({ type: USER_DUMPS_REQUEST })
 
@@ -453,7 +456,7 @@ export const reportedDumps = () => async (dispatch) => {
             }
         }
 
-        const { data } = await axios.get(`${baseURL}/me/reported-dumps`, config)
+        const { data } = await axios.get(`${baseURL}/me/reported-dumps?page=${currentPage}&ismobile=true`, config)
 
         // axios.get(`${baseURL}/me/reported-dumps`, config)
         //     .then(res => console.log(res))

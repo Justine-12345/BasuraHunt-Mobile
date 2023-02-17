@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Text, View, ScrollView, Image, ActivityIndicator } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Text, View, ScrollView, Image, ActivityIndicator, RefreshControl } from "react-native";
 import { HStack, VStack } from 'native-base';
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -8,11 +8,13 @@ import { rankings } from "../../../Redux/Actions/dumpActions";
 import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux'
 import Styles from "../../../stylesheets/styles";
+import { DUMP_RANKING_RESET } from "../../../Redux/Constants/dumpConstants";
 
 const Ranking3 = () => {
     const dispatch = useDispatch();
 
     const { loading, error, mostReportedBrgyDone, mostReportedBrgyUndone, topBrgyUser, topCityUser, userBarangay } = useSelector(state => state.ranking)
+    const [refreshing, setRefreshing] = useState(false);
 
     useFocusEffect(
         useCallback(() => {
@@ -20,8 +22,20 @@ const Ranking3 = () => {
         }, [])
     )
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch({ type: DUMP_RANKING_RESET })
+        dispatch(rankings())
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+         refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
             {/* barangay top 10 */}
             <View style={RandomStyle.rContainer}>
                 <View style={RandomStyle.rText2Cont}>

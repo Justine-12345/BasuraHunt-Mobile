@@ -97,7 +97,7 @@ const AssignedFinished = ({ navigation }) => {
             return () => {
 
             }
-        }, [dispatch, dumps, error, keyword, currentPage, district, barangay, size, type])
+        }, [dumps, error, keyword, currentPage, district, barangay, size, type])
     )
 
     useEffect(() => {
@@ -204,7 +204,6 @@ const AssignedFinished = ({ navigation }) => {
                 </HStack>
                 {filter == false ? null : <FilterOptions />}
             </View>
-            {console.log("dumps",dumps)}
             {dumps && dumps.length > 0 ?
                 <FlatList
                     data={dumps}

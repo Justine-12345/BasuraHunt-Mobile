@@ -20,7 +20,7 @@ import { setRegAccountData } from
     "../../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
 import DatePicker from 'react-native-modern-datepicker';
-import { updateProfile } from "../../../Redux/Actions/userActions";
+import { updateProfile, loadUser } from "../../../Redux/Actions/userActions";
 import { UPDATE_PROFILE_RESET } from "../../../Redux/Constants/userConstants";
 const ProfileUpdate = (props) => {
     const dispatch = useDispatch()
@@ -168,6 +168,7 @@ const ProfileUpdate = (props) => {
                 text1: 'Profile Has Been Updated',
             });
             dispatch({type:UPDATE_PROFILE_RESET})
+            dispatch(loadUser())
             props.navigation.navigate('User',{screen:'ProfileNav', params:{screen:'Profile'}})
         }
         setUser({ ...user, ["birthday"]: birthdate })

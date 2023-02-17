@@ -4,6 +4,37 @@ const catchAsyncErrors = require('../middlewares/catchAsyncErrors');
 const APIFeatures = require('../utils/apiFeatures');
 const expoSendNotification = require('../utils/expoSendNotification')
 // Collection Point Today Page--------------------------------------------
+
+
+const collectionPointTime = (collectionPoint) => {
+	const startTimeArray = collectionPoint.startTime.split(":");
+	const endTimeArray = collectionPoint.endTime.split(":");
+	var ampmStartTime = startTimeArray[0] >= 12 ? 'PM' : 'AM';
+	var ampmEndTime = endTimeArray[0] >= 12 ? 'PM' : 'AM';
+	const hoursStartTime = (startTimeArray[0] % 12) == 0 ? 12 : startTimeArray[0] % 12;
+	const minutesStartTime = startTimeArray[1];
+	const hoursEndTime = (endTimeArray[0] % 12) == 0 ? 12 : endTimeArray[0] % 12;
+	const minutesEndTime = endTimeArray[1];
+
+	return hoursStartTime + ":" + minutesStartTime + " " + ampmStartTime + " - " + hoursEndTime + ":" + minutesEndTime + " " + ampmEndTime;
+}
+
+const scheduleCollectionPointsList = (collectionPoints) => {
+	let collectionPointsList = "";
+
+	for (let i = 0; i < collectionPoints.length; i++) {
+
+		if (i != collectionPoints.length - 1) {
+			collectionPointsList = collectionPointsList + collectionPoints[i] + ", "
+		}
+		else {
+			collectionPointsList = collectionPointsList + collectionPoints[i]
+		}
+	}
+
+	return collectionPointsList;
+}
+
 exports.getTodayCollectionPointList = catchAsyncErrors(async (req, res, next) => {
 
 	let dateToday = new Date(Date.now());
@@ -57,7 +88,7 @@ exports.getUpcomingCollectionPointList = catchAsyncErrors(async (req, res, next)
 
 
 exports.getSingleCollectionPoint = catchAsyncErrors(async (req, res, next) => {
-	const collectionPoint = await CollectionPoint.findById(req.params.id).populate("collectors.collector");
+	const collectionPoint = await CollectionPoint.findById(req.params.id).populate("collectors.collector", "first_name last_name" );
 
 	res.status(200).json({
 		success: true,
@@ -265,8 +296,11 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 
 	await collectionPoints.save();
 
-	const NotifTitle = `New Trash Collection Schedule Has Added To Your Barangay | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPointsList} | Type: ${type}`
-	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assign To You | Time: ${startTime}-${endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${collectionPointsList} | Type: ${type}`
+	
+
+
+	const NotifTitle = `New Trash Collection Schedule Has Added To Your Barangay | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
+	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assign To You | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
 
 
 	const bulk = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).updateMany({
@@ -507,8 +541,8 @@ exports.updateCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		useFindandModify: false
 	})
 
-	const NotifTitle = `Collection Schedule Has Been Updated To Your Barangay | Time: ${req.body.startTime}-${req.body.endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${req.body.collectionPoint} | Type: ${req.body.type}`
-	const NotifTitleForCollector = `The Assigned Trash Collection Schedule To You Has Been Updated | Time: ${req.body.startTime}-${req.body.endTime} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${req.body.collectionPoint} | Type: ${req.body.type}`
+	const NotifTitle = `Collection Schedule Has Been Updated To Your Barangay | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${req.body.type}`
+	const NotifTitleForCollector = `The Assigned Trash Collection Schedule To You Has Been Updated | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${req.body.type}`
 
 
 	const bulk = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).updateMany({

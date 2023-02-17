@@ -16,12 +16,13 @@ import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 import * as Print from 'expo-print';
+import { LOGOUT_RESET } from "../../../Redux/Constants/userConstants";
 
 const Profile = ({ navigation }) => {
     const dispatch = useDispatch()
-    const { loading: authLoading, isAuthenticated, error: authError, user: authUser, userBrgyRank, userCityRank, reportedDumpCounts, donatedItemsCount } = useSelector(state => state.auth);
+    const { loading: authLoading, isAuthenticated, isLogout, error: authError, user: authUser, userBrgyRank, userCityRank, reportedDumpCounts, donatedItemsCount } = useSelector(state => state.auth);
     const { levelExp } = useSelector(state => state.levelExp)
-    const [user, setUser] = useState()
+    const [hasUser, setHasUser] = useState()
     const [expoPushToken, setExpoPushToken] = useState('');
 
     useFocusEffect(
@@ -42,25 +43,28 @@ const Profile = ({ navigation }) => {
                     }
                 })
                 .catch((error) => console.log(error))
-            return () => {
-                setUser()
-            }
+            // return () => {
+            //     setUser()
+            // }
 
+            // if (isAuthenticated) {
+            //     setHasUser(true)
+            // }
 
-
-        }, [isAuthenticated]))
+        }, [isAuthenticated, isLogout]))
 
     useFocusEffect(
         useCallback(() => {
             registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
             AsyncStorage.getItem("jwt")
-            .then((res) => {
-                if (res) {
-                    dispatch(loadUser())
-                }
-            })
-            .catch((error) => console.log(error))
-           
+                .then((res) => {
+                    if (res) {
+                            dispatch(loadUser())
+                    }
+                })
+                .catch((error) => console.log(error))
+
             // console.log("authUser", authUser)
         }, []))
 
@@ -69,20 +73,23 @@ const Profile = ({ navigation }) => {
             // if(isAuthenticated){
             // dispatch(getLevelExp())
             // }
+
             AsyncStorage.getItem("jwt")
                 .then((res) => {
                     if (res) {
+
                         dispatch(getLevelExp())
+
                     }
                 })
                 .catch((error) => console.log(error))
             // console.log(levelExp)
-        }, [ prog]))
+        }, [prog]))
 
     const logoutHandle = () => {
-     
-                dispatch(logout(authUser && authUser._id, expoPushToken, true))
-      
+
+        dispatch(logout(authUser && authUser._id, expoPushToken, true))
+
 
     }
 
@@ -326,14 +333,14 @@ const Profile = ({ navigation }) => {
                         <Text style={RandomStyle.pText4}>Statistics</Text>
                         <View style={[RandomStyle.pContainer2, { borderBottomColor: "lightgrey", borderBottomWidth: 0.5, paddingBottom: 10 }]}>
                             <VStack style={RandomStyle.pContainer3}>
-                                <LinearGradient  colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
-                                    <Text onPress={()=>{ navigation.navigate('MyReports', {screen:'UserReportsList'})}} style={RandomStyle.pText6}>{reportedDumpCounts && reportedDumpCounts}</Text>
+                                <LinearGradient colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
+                                    <Text onPress={() => { navigation.navigate('MyReports', { screen: 'UserReportsList' }) }} style={RandomStyle.pText6}>{reportedDumpCounts && reportedDumpCounts}</Text>
                                 </LinearGradient>
                                 <Text style={RandomStyle.pInfo}>Reported Dumps</Text>
                             </VStack>
                             <VStack style={RandomStyle.pContainer3}>
                                 <LinearGradient colors={["mediumseagreen", "#1E9000"]} style={RandomStyle.pStatistic}>
-                                    <Text onPress={()=>{ navigation.navigate('MyDonations', {screen:'UserDonationsList'})}} style={RandomStyle.pText6}>{donatedItemsCount && donatedItemsCount}</Text>
+                                    <Text onPress={() => { navigation.navigate('MyDonations', { screen: 'UserDonationsList' }) }} style={RandomStyle.pText6}>{donatedItemsCount && donatedItemsCount}</Text>
                                 </LinearGradient>
                                 <Text style={RandomStyle.pInfo}>Donated Items</Text>
                             </VStack>
@@ -350,9 +357,11 @@ const Profile = ({ navigation }) => {
                                 <Text style={RandomStyle.pInfo}>Overall Ranking</Text>
                             </VStack>
                         </View>
-                        <TouchableOpacity onPress={()=>printPDF(authUser && authUser.first_name, authUser && authUser.last_name, 6)} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
-                            <Text style={RandomStyle.pButton2}>Download E-Certificate</Text>
-                        </TouchableOpacity>
+                        {levelExp && levelExp.level && levelExp.level >= 6 && levelExp && levelExp.level && levelExp.level <= 10 ?
+                            <TouchableOpacity onPress={() => printPDF(authUser && authUser.first_name, authUser && authUser.last_name, 6)} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
+                                <Text style={RandomStyle.pButton2}>Download E-Certificate</Text>
+                            </TouchableOpacity> : null
+                        }
                     </View>
                 </ScrollView>
             }

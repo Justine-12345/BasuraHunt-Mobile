@@ -1,5 +1,5 @@
-import React, { useCallback } from "react";
-import { Text, View, FlatList, ScrollView, ActivityIndicator } from "react-native";
+import React, { useCallback, useState } from "react";
+import { Text, View, FlatList, ScrollView, ActivityIndicator, RefreshControl } from "react-native";
 import { HStack, VStack } from 'native-base';
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -9,22 +9,34 @@ import { useFocusEffect } from "@react-navigation/native";
 import { useDispatch, useSelector } from 'react-redux'
 import Kapitan from '../../../assets/kapitan'
 import Styles from "../../../stylesheets/styles";
-
+import { DUMP_RANKING_RESET } from "../../../Redux/Constants/dumpConstants";
 
 const Ranking2 = () => {
     const dispatch = useDispatch();
 
     const { loading, error, mostReportedBrgyDone, mostReportedBrgyUndone, topBrgyUser, topCityUser } = useSelector(state => state.ranking)
-
+    const [refreshing, setRefreshing] = useState(false);
+    
     useFocusEffect(
         useCallback(() => {
             dispatch(rankings())
         }, [])
     )
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch({ type: DUMP_RANKING_RESET })
+        dispatch(rankings())
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
 
     return (
-        <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <ScrollView contentContainerStyle={{ flexGrow: 1 }}
+            refreshControl={
+                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+        >
             {/* most cleaned */}
             <View style={RandomStyle.rContainer}>
                 <Text style={RandomStyle.rText1}>Barangays with Most Cleaned Illegal Dumps</Text>

@@ -6,9 +6,10 @@ import { StyleSheet, Text, View, Dimensions, Image } from 'react-native';
 import * as Location from 'expo-location';
 import { SET_COORDINATE } from '../../Redux/Constants/mapConstants';
 import { useDispatch, useSelector } from 'react-redux';
+import { SET_MAP_INITIALIZING, RESET_MAP_INITIALIZING } from '../../Redux/Constants/mapConstants';
 
 const MapFinder = () => {
-
+    
     // (async () => {
     //     if (Platform.OS !== "web") {
 
@@ -21,25 +22,29 @@ const MapFinder = () => {
     //     // setLatUser(location.coords.latitude)
     //     // setLngUser(location.coords.longitude)
     // })();
-
+    const { initializing } = useSelector(state => state.mapLoading)
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
 
     let lat = 0;
     let lng = 0
-    
+
     useFocusEffect(
         useCallback(() => {
             if (mapLatitude === null) {
                 setLatMarker(0)
                 setLngMarker(0)
             }
-            
+
         }, [mapLatitude, mapLongtitude])
     )
 
-    useEffect(()=>{
+    useEffect(() => {
+        dispatch({
+            type: SET_MAP_INITIALIZING,
+            payload: { initializing: true }
+        })
         getUserLocation()
-    },[])
+    }, [])
     const dispatch = useDispatch()
 
     const [latUser, setLatUser] = useState(0)
@@ -50,9 +55,9 @@ const MapFinder = () => {
 
     const [latMarker, setLatMarker] = useState(0)
     const [lngMarker, setLngMarker] = useState(0)
-    
 
-   
+
+
 
     const getUserLocation = async () => {
 
@@ -61,7 +66,7 @@ const MapFinder = () => {
             alert('Permission to access location was denied');
         }
 
-      
+
 
         let location = await Location.getCurrentPositionAsync({});
         // // console.log("i",location.coords.latitude);
@@ -70,10 +75,10 @@ const MapFinder = () => {
         setLngUser(location.coords.longitude)
         setLatInit(location.coords.latitude)
         setLngInit(location.coords.longitude)
-     
+
 
         const data = { latitude: location.coords.latitude, longitude: location.coords.longitude }
-        console.log("init",data);
+        console.log("init", data);
         dispatch({
             type: SET_COORDINATE,
             payload: data
@@ -81,14 +86,14 @@ const MapFinder = () => {
     }
 
     const onRegionChange = (region) => {
-      
+
         lat = region.latitude
         lng = region.longitude
         setLatMarker(region.latitude)
         setLngMarker(region.longitude)
-        
+
         const data = { latitude: region.latitude, longitude: region.longitude }
-        console.log("change",data);
+        console.log("change", data);
         dispatch({
             type: SET_COORDINATE,
             payload: data
@@ -100,26 +105,32 @@ const MapFinder = () => {
     return (
         <>
             <View style={styles.container}>
-                {latInit !== 0 && lngInit !== 0? 
-                    <MapView style={styles.map}
-                    provider={PROVIDER_GOOGLE}
-                    initialRegion={{
-                        latitude: latInit,
-                        longitude: lngInit,
-                        latitudeDelta: 0.00056,
-                        longitudeDelta: 0.00011,
-                    }}
-                    onMapReady={getUserLocation}
-                    onRegionChangeComplete={onRegionChange}
-                >
-                    {/* <MapView.Marker
+                {latInit !== 0 && lngInit !== 0 ?
+                    <MapView style={[styles.map]}
+                        provider={PROVIDER_GOOGLE}
+                        initialRegion={{
+                            latitude: latInit,
+                            longitude: lngInit,
+                            latitudeDelta: 0.00056,
+                            longitudeDelta: 0.00011,
+                        }}
+                        loadingEnabled={true}
+                        onMapReady={getUserLocation}
+                        onMapLoaded={()=>{
+                            dispatch({
+                            type: RESET_MAP_INITIALIZING
+                        })
+                        }}
+                        onRegionChangeComplete={onRegionChange}
+                    >
+                        {/* <MapView.Marker
                         coordinate={{
                             latitude: latMarker,
                             longitude: lngMarker,
                         }}
                     /> */}
-                </MapView>
-                :
+                    </MapView>
+                    :
                     ""
                 }
             </View>

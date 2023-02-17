@@ -213,8 +213,8 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
 	let dumps
 	if (req.user.role == 'garbageCollector') {
-		
-		findDumps = await Dump.find().sort({ _id: -1 });
+
+		findDumps = await Dump.find().populate("user_id", "first_name last_name role barangay").sort({ _id: -1 }).sort({ _id: -1 });
 
 		let dumpsArry = []
 
@@ -226,8 +226,8 @@ exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
 			});
 		});
 		dumps = dumpsArry
-	
-		
+
+
 
 
 	} else {
@@ -252,7 +252,7 @@ exports.allDumps = catchAsyncErrors(async (req, res, next) => {
 
 //******View Dump******
 exports.getSingleDump = catchAsyncErrors(async (req, res, next) => {
-	const dump = await Dump.findById(req.params.id).populate('user_id', 'role first_name last_name alias barangay').populate('chat_id', 'room').populate('collectors.collector', 'first_name').populate('chat_id.chat.chats');
+	const dump = await Dump.findById(req.params.id).populate('user_id', 'role first_name last_name alias barangay').populate('chat_id', 'room').populate('collectors.collector', 'first_name last_name jobDesc barangay').populate('chat_id.chat.chats');
 
 
 	if (!dump) {
@@ -382,9 +382,9 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 	// if (req.user.id == dump.user_id._id) {
 	// 	req.body.report_using = req.user.alias;
 	// }else{
-		req.body.report_using = dump.report_using
+	req.body.report_using = dump.report_using
 	// }
-	
+
 	let district
 
 	const district1 = ["Bagumbayan",
@@ -570,16 +570,11 @@ exports.deleteDump = catchAsyncErrors(async (req, res, next) => {
 
 //****** Update Dump Status******
 exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
-
 	let dump = await Dump.findById(req.params.id);
-
-
 
 	if (!dump) {
 		return next(new ErrorHandler('Dump not found', 404));
 	}
-
-	console.log(req.body.old_status !== "Cleaned")
 
 	let user
 	let addedExp
@@ -590,34 +585,77 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 			addedExp = AddExp(user.exp, req.body.rate);
 			user.exp = addedExp[0];
 			user.level = addedExp[1];
-			req.body.score = addedExp[2];
-			req.body.date_cleaned = Date();
+			dump.score = addedExp[2];
+			dump.date_cleaned = Date();
+
+			let images = []
+
+			if (typeof req.body.accomplished_images === 'string') {
+				images.push(req.body.accomplished_images)
+			} else {
+				images = req.body.accomplished_images
+			}
+
+			let imagesLinks = [];
+
+			if (req.body.accomplished_images) {
+				for (let i = 0; i < images.length; i++) {
+					const result = await cloudinary.v2.uploader.upload(images[i], {
+						folder: 'BasuraHunt/Dump'
+					});
+
+					imagesLinks.push({
+						public_id: result.public_id,
+						url: result.secure_url
+					})
+				}
+			}
+
+			dump.accomplished_images = imagesLinks
 
 			await user.save();
+		
 		} else {
 
-			req.body.date_cleaned = null;
+			dump.date_cleaned = null;
+		
 		}
 	} else {
-		user = await User.findById(dump.user_id);
-		minusExp = MinusExp(user.exp, dump.score);
-		user.exp = minusExp[0];
-		user.level = minusExp[1];
-		req.body.score = 0;
-		console.log(dump.score)
-		await user.save();
-		if (req.body.new_status !== "Cleaned") {
 
-			req.body.date_cleaned = null;
+		if (req.body.new_status != "Cleaned") {
+
+			user = await User.findById(dump.user_id);
+			minusExp = MinusExp(user.exp, dump.score);
+			user.exp = minusExp[0];
+			user.level = minusExp[1];
+			dump.score = 0;
+		
+			for (let i = 0; i < dump.accomplished_images.length; i++) {
+				const result = await cloudinary.v2.uploader.destroy(dump.accomplished_images[i].public_id)
+			}
+			
+			dump.accomplished_images = []
+
+			await user.save();
+		
+
+		}
+
+		if (req.body.new_status !== "Cleaned") {
+			dump.date_cleaned = null;
+		
 		}
 	}
 
-	req.body.status = req.body.new_status
-	dump = await Dump.findByIdAndUpdate(req.params.id, req.body, {
-		new: true,
-		runValidators: true,
-		useFindModify: false
-	})
+	dump.status = req.body.new_status
+	await dump.save();
+
+	// dump = await Dump.findByIdAndUpdate(req.params.id, req.body, {
+	// 	new: true,
+	// 	runValidators: true,
+	// 	useFindModify: false
+	// })
+
 
 	let updatedDump = await Dump.findById(req.params.id).populate('user_id');
 
@@ -985,7 +1023,7 @@ exports.deleteComment = catchAsyncErrors(async (req, res, next) => {
 exports.getDumpsCoordinates = catchAsyncErrors(async (req, res, next) => {
 
 	let dumpsCoordinates = await Dump.find().select('coordinates status').sort({ _id: -1 });
-	
+
 	res.status(200).json({
 		success: true,
 		dumpsCoordinates

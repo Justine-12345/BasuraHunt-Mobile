@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from "react-native";
 import { HStack, VStack } from "native-base";
 import Empty1 from "../../../stylesheets/empty1";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -26,6 +26,17 @@ const Newsfeed = ({ navigation }) => {
 
     const [currentPage, setCurrentPage] = useState(1)
     const [newsfeeds, setNewsfeeds] = useState([])
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setNewsfeeds([])
+        setCurrentPage(1)
+        dispatch(getNewsfeedList(1))
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
@@ -106,9 +117,13 @@ const Newsfeed = ({ navigation }) => {
 
         else if (screen === 'NewsfeedNav') {
             dispatch(getNewsfeedDetails(object))
-            navigation.navigate("Home", { screen: 'NewsfeedNav', params:{screen:'NewsfeedView'} })
+            navigation.navigate("Home", { screen: 'NewsfeedNav', params: { screen: 'NewsfeedView' } })
             // console.log("object",object)
+        }else{
+            navigation.navigate("Report")
         }
+
+       
 
 
     }, [screen, object, message, code])
@@ -179,11 +194,13 @@ const Newsfeed = ({ navigation }) => {
     return (
 
         <>
-            {newsfeeds&& newsfeeds.length <= 0? <LoadingNewsfeed /> : null}
+            {newsfeeds && newsfeeds.length <= 0 ? <LoadingNewsfeed /> : null}
             {/* {console.log("newsfeeds", newsfeeds.length)} */}
             {newsfeeds && newsfeeds.length > 0 ?
                 <>
                     <FlatList
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                         data={newsfeeds}
                         renderItem={newsfeedItem}
                         keyExtractor={item => Math.random()}

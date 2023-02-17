@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Text, View, Image, Dimensions, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { HStack } from 'native-base';
-import { SimpleLineIcons  } from "@expo/vector-icons";
+import { SimpleLineIcons } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { findEmail } from "../../Redux/Actions/userActions";
@@ -15,6 +15,7 @@ import * as Device from 'expo-device';
 import { Platform } from 'react-native';
 
 
+
 const Login = ({ navigation }) => {
     const dispatch = useDispatch()
     const [email, setEmail] = useState('')
@@ -26,37 +27,39 @@ const Login = ({ navigation }) => {
     async function registerForPushNotificationsAsync() {
         let token;
         if (Device.isDevice) {
-          const { status: existingStatus } = await Notifications.getPermissionsAsync();
-          let finalStatus = existingStatus;
-          if (existingStatus !== 'granted') {
-            const { status } = await Notifications.requestPermissionsAsync();
-            finalStatus = status;
-          }
-          if (finalStatus !== 'granted') {
-            alert('Failed to get push token for push notification!');
-            return;
-          }
-          token = (await Notifications.getExpoPushTokenAsync()).data;
-          console.log("Token", token);
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            token = (await Notifications.getExpoPushTokenAsync()).data;
+            console.log("TokenLogin", token);
         } else {
-          alert('Must use physical device for Push Notifications');
+            alert('Must use physical device for Push Notifications');
         }
-      
+
         if (Platform.OS === 'android') {
-          Notifications.setNotificationChannelAsync('default', {
-            name: 'default',
-            importance: Notifications.AndroidImportance.MAX,
-            vibrationPattern: [0, 250, 250, 250],
-            lightColor: '#FF231F7C',
-          });
+            Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
         }
-      
+
         return token;
-      }
-      
-      useEffect(()=>{
-        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-      },[])
+    }
+
+    useFocusEffect(
+        useCallback(() => {
+            registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+        }, [])
+    )
 
     useFocusEffect(
         useCallback(() => {
@@ -151,9 +154,9 @@ const Login = ({ navigation }) => {
     return (
         <>
             <View style={Styles.container}>
-            <TouchableOpacity onPress={()=> navigation.navigate('About')} style={{position:"relative", top:-15}}>
-            <SimpleLineIcons name="info" size={24} color="#757575" style={{marginHorizontal:8, alignSelf: "flex-end"}} />
-            </TouchableOpacity>
+                <TouchableOpacity onPress={() => navigation.navigate('About')} style={{ position: "relative", top: -15 }}>
+                    <SimpleLineIcons name="info" size={24} color="#757575" style={{ marginHorizontal: 8, alignSelf: "flex-end" }} />
+                </TouchableOpacity>
                 <Image
 
                     source={require("../../assets/BasuraHunt-logo.png")}

@@ -11,7 +11,7 @@ const Tab = createMaterialTopTabNavigator();
 function MyTabs() {
     return (
         <Tab.Navigator
-            backBehavior="none"
+            backBehavior="initialRoute"
             screenOptions={{
                 tabBarActiveTintColor: "black",
                 tabBarLabelStyle: {
@@ -32,11 +32,21 @@ function MyTabs() {
                     tabPress: (e) => {
                         // Prevent default action
                         e.preventDefault();
-                        console.log('route', route)
+                        console.log('e', e)
                         // Do something with the `navigation` object
                         navigation.navigate('AssignedList');
 
                     },
+                    focus:(e)=>{
+                        // e.preventDefault();
+                        // console.log('e', e)
+                        // Do something with the `navigation` object
+                        console.log("blur")
+                        navigation.navigate('AssignedList');
+
+                    }
+                    
+                
                 })}
             />
             <Tab.Screen

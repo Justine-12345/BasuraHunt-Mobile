@@ -29,9 +29,9 @@ PR = (used)
  PR = ()
  cant chat if not their report
  Schedule notif view time AM and PM
- ---cant donated new user
- ---cant access donation ranking when new user
- --- token after registration
+ cant donated new user
+ cant access donation ranking when new user
+ token after registration
 
  
 ******NOTIFICATION***
@@ -39,9 +39,9 @@ PR = (used)
 schedule
 live 
 Dont send notification if in chat or dumpview
- Dont send if no token
+Dont send if no token
 
-PR = ()
+PR = (used)
 illegalDump-new 
 illegalDump-update  
 illegalDump-update-status 
@@ -71,15 +71,29 @@ collector update dump
 web: not require collector when confirmed dump
 
  web and mobile: collector collection today, even if his not barangay
---- web users record
---- hide e-cert Button
+web users record
+hide e-cert Button
 mobile: seperate header for auth and visitor
---- refresh
---- donation code
----load map before report
----report dump firt page 
---- edit capture button
----logout loading
----profile loading : mobile
---- infinite loading of level in profile, revise
+refresh
+    newsfeed
+    PublicReportsList
+    Ranking1
+    Ranking2
+    Ranking3
+    Ranking4
+    UserReportList
+//--- donation code
+load map before report
+report dump firt page with i understand
+--- edit capture button (pagawa kay cel)
+ infinite loading of level in profile, revise web
+ put click to searches
+ admin crud loading 
+ fix status select
+ cleaned label
+--- loading accomplish
+--- confirm socket
+--- collectpoint chart (Harris)
+ submit image after report
+--- public report after
 *** tinangal sa backend socket.io

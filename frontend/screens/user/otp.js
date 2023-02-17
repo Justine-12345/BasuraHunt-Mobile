@@ -8,13 +8,57 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import { checkOtp, clearErrors } from "../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
+import * as Notifications from 'expo-notifications';
+import * as Device from 'expo-device';
+import { Platform } from 'react-native';
+
 
 const OTP = ({ navigation }) => {
     const dispatch = useDispatch()
     const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
+    const [expoPushToken, setExpoPushToken] = useState('');
     const [user, setUser] = useState()
     const [otp, setOtp] = useState('')
-    
+
+
+    async function registerForPushNotificationsAsync() {
+        let token;
+        if (Device.isDevice) {
+            const { status: existingStatus } = await Notifications.getPermissionsAsync();
+            let finalStatus = existingStatus;
+            if (existingStatus !== 'granted') {
+                const { status } = await Notifications.requestPermissionsAsync();
+                finalStatus = status;
+            }
+            if (finalStatus !== 'granted') {
+                alert('Failed to get push token for push notification!');
+                return;
+            }
+            token = (await Notifications.getExpoPushTokenAsync()).data;
+            console.log("TokenOtp", token);
+        } else {
+            alert('Must use physical device for Push Notifications');
+        }
+
+        if (Platform.OS === 'android') {
+            Notifications.setNotificationChannelAsync('default', {
+                name: 'default',
+                importance: Notifications.AndroidImportance.MAX,
+                vibrationPattern: [0, 250, 250, 250],
+                lightColor: '#FF231F7C',
+            });
+        }
+
+        return token;
+    }
+
+
+    useFocusEffect(useCallback(() => {
+        registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+    }, []))
+
+
+
     useFocusEffect(
         useCallback(() => {
 
@@ -111,7 +155,7 @@ const OTP = ({ navigation }) => {
                 }
 
             });
-            
+
             return () => {
                 setUser();
             }
@@ -129,30 +173,31 @@ const OTP = ({ navigation }) => {
         } else {
             const formData = new FormData();
             formData.append('otp', otp);
+            formData.append('pushToken', expoPushToken);
             dispatch(checkOtp(formData))
         }
     }
-    
-    return ( 
+
+    return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
-            
+
             <VStack style={Form1.formContainer}>
                 <Text style={Form1.title}>Enter 6-digit code</Text>
-                <Text style={[Form1.sub, {marginVertical: 20}]}>Your code was sent to {user && user.email}</Text>
-                <View style={Form1.otpContainer}>   
+                <Text style={[Form1.sub, { marginVertical: 20 }]}>Your code was sent to {authUser && authUser.email}</Text>
+                <View style={Form1.otpContainer}>
                     <OtpInput
                         numberOfInput={6}
                         setOtpCode={setOtp}
                     />
                 </View>
-                    {/* refresh OTP */}
-                    <TouchableOpacity style={{alignSelf: "flex-end"}}>
-                        <Text>Resend Code</Text>
-                    </TouchableOpacity>
+                {/* refresh OTP */}
+                <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+                    <Text>Resend Code</Text>
+                </TouchableOpacity>
             </VStack>
 
             <View style={Form1.bottom}>
-                <TouchableOpacity onPress={submitHandle}  style={Form1.formBtn} activeOpacity={0.8}
+                <TouchableOpacity onPress={submitHandle} style={Form1.formBtn} activeOpacity={0.8}
                 >
                     <Text style={Form1.btnLabel}>Submit</Text>
                 </TouchableOpacity>

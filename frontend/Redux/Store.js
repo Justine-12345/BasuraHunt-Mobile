@@ -12,7 +12,8 @@ import {
     userDetailsReducer,
     userReportsAndItemsReducer,
     notificationReducer,
-    levelExpReducer
+    levelExpReducer,
+    userDumpPageReducer
 } from './Reducers/userReducers'
 
 import {
@@ -54,7 +55,7 @@ import {
 
 import { pushNotificationReducer } from './Reducers/pushNotificationReducer';
 
-import { coordinateReducer } from './Reducers/mapReducers';
+import { coordinateReducer, mapLoadingReducer } from './Reducers/mapReducers';
 
 import {
     itemsReducer,
@@ -77,6 +78,7 @@ const reducers = combineReducers({
     userReportsAndItems: userReportsAndItemsReducer,
     notification: notificationReducer,
     levelExp: levelExpReducer,
+    userDumpPage:userDumpPageReducer,
 
     dumps: dumpsReducer,
     newDump: newDumpReducer,
@@ -114,6 +116,7 @@ const reducers = combineReducers({
     itemPage:itemPageReducer,
 
     coordinate: coordinateReducer,
+    mapLoading:mapLoadingReducer,
     pushNotification: pushNotificationReducer
 })
 

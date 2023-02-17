@@ -15,8 +15,6 @@ exports.getNewsfeedList = catchAsyncErrors(async(req,res,next) => {
 	apiFeatures.pagination(resPerPage);
 	const newsfeeds = await apiFeatures.query;
 
-	console.log("meron")
-
 
     res.status(200).json({
         success: true,

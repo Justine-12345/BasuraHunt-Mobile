@@ -257,7 +257,7 @@ exports.refreshOtp = catchAsyncErrors(async (req, res, next) => {
 exports.checkOtp = catchAsyncErrors(async (req, res, next) => {
 	const { otp } = req.body;
 
-	const findUser = await User.findById(req.user.id).select('otp');
+	const findUser = await User.findById(req.user.id).select('otp push_tokens');
 
 
 	if (findUser.otp !== otp) {
@@ -268,6 +268,27 @@ exports.checkOtp = catchAsyncErrors(async (req, res, next) => {
 
 		findUser.otp = "";
 		findUser.otp_status = "Verified";
+
+
+		const allUserTokens = findUser.push_tokens
+		const newPushToken = req.body.pushToken
+		let newSetsOfTokens = []
+		let sameTokenCounter = 0
+
+
+
+		allUserTokens.forEach(userToken => {
+			if (userToken.push_token === newPushToken) {
+				sameTokenCounter += 1
+			}
+		})
+
+
+		if (sameTokenCounter <= 0) {
+			newSetsOfTokens = [...allUserTokens, { push_token: newPushToken }]
+			findUser.push_tokens = newSetsOfTokens
+		}
+
 		await findUser.save();
 
 		const user = await User.findById(req.user.id);
@@ -426,9 +447,9 @@ exports.getUserProfile = catchAsyncErrors(async (req, res, next) => {
 	} else {
 		token = req.cookies.token
 	}
-	
-	const dumps = await Dump.find({"user_id":req.user.id});
-	const items = await Item.find({"user_id":req.user.id});
+
+	const dumps = await Dump.find({ "user_id": req.user.id });
+	const items = await Item.find({ "user_id": req.user.id });
 	const reportedDumpCounts = dumps.length
 	const donatedItemsCount = items.length
 	res.status(200).json({
@@ -860,7 +881,7 @@ exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1, 'createdAt': 1 },
 			}
 		})
-	}else{
+	} else {
 		userDumpsFind = await User.findById(req.user.id).select('reported_dumps').populate({
 			path: 'reported_dumps',
 			populate: {
@@ -869,7 +890,7 @@ exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 					path: 'chat_id',
 					select: { 'room': 1 }
 				},
-				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1,'waste_type': 1, 'coordinates':1, 'createdAt': 1 },
+				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1, 'waste_type': 1, 'coordinates': 1, 'createdAt': 1 },
 			}
 		})
 	}
@@ -936,7 +957,7 @@ exports.receiveItems = catchAsyncErrors(async (req, res, next) => {
 			// 		path: 'receiver_id',
 			// 	}
 			// ]
-			select: { 'images': 1, "createdAt": 1, "status": 1, "name": 1, "additional_description": 1, "item_type": 1, "date_recieved":1 }
+			select: { 'images': 1, "createdAt": 1, "status": 1, "name": 1, "additional_description": 1, "item_type": 1, "date_recieved": 1 }
 		}
 	}).select('received_items');
 

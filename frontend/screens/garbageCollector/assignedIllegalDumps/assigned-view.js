@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect } from "react";
+import React, { useState, useCallback, useEffect, Fragment } from "react";
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { HStack, InputGroup, Select, VStack } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -52,7 +52,9 @@ const AssignedView = (props) => {
     const [notifCode, setNotifCode] = useState(RandomStringGenerator(40))
     const [notifCode1, setNotifCode1] = useState(RandomStringGenerator(40))
     const [imagesPreview, setImagesPreview] = useState([])
-
+    const [imagesPreviewCleaned, setImagesPreviewCleaned] = useState([])
+    const [imgIndexCleaned, setImgIndexCleaned] = useState(0);
+    const [openImagesCleaned, setOpenImagesCleaned] = useState(false);
     useFocusEffect(
         useCallback(() => {
             socket.disconnect()
@@ -90,9 +92,8 @@ const AssignedView = (props) => {
                     text2: 'Comment: Something went wrong, please try again later'
                 });
             }
-
             if (isUpdatedStatus) {
-
+                setModalVisible(false)
                 const messageData = {
                     room: dump && dump.chat_id && dump.chat_id.room,
                     author: user && user._id,
@@ -117,12 +118,12 @@ const AssignedView = (props) => {
                     notifTitle = "Your reported illegal dump is rejected"
                 }
 
-                NotificationSender(notifTitle, user._id, dump && dump.user_id && dump.user_id._id, dump && dump.barangay, 'illegalDump-update-status', notifCode, dump && dump)
+                NotificationSender(notifTitle, user && user._id, dump && dump.user_id && dump.user_id._id, dump && dump.barangay, 'illegalDump-update-status', notifCode, dump && dump)
 
                 if (dump.user_id.role === "newUser" && messageStatus === "Cleaned") {
                     const notifTitle1 = "Congratulation you are now a verified user."
                     console.log("notifcode1", notifCode1)
-                    NotificationSender(notifTitle1, user._id, dump.user_id._id, dump.barangay, 'user-verified', notifCode1, dump && dump)
+                    NotificationSender(notifTitle1, user && user._id, dump.user_id._id, dump.barangay, 'user-verified', notifCode1, dump && dump)
                 }
                 dispatch({ type: UPDATE_DUMP_STATUS_RESET })
 
@@ -141,6 +142,11 @@ const AssignedView = (props) => {
                 setImagesPreview(items => [...items, { uri: i.url }])
             })
 
+            setImagesPreviewCleaned([])
+            dump && dump.accomplished_images && dump.accomplished_images.forEach(i => {
+                setImagesPreviewCleaned(items => [...items, { uri: i.url }])
+            })
+
             socket.connect()
             socket.emit("join_room", [dump && dump.chat_id && dump.chat_id.room, 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31'])
 
@@ -148,12 +154,17 @@ const AssignedView = (props) => {
         }, [isDeleted, upDelError, commentError, isUpdatedStatus, dump, item])
     )
 
-   
+
 
     const showImages = (index) => {
 
         setOpenImages(true);
         setImgIndex(index);
+    }
+    const showImagesCleaned = (index) => {
+
+        setOpenImagesCleaned(true);
+        setImgIndexCleaned(index);
     }
 
 
@@ -246,10 +257,15 @@ const AssignedView = (props) => {
     }
 
     const updateDumpStatusHandler = (new_status) => {
-        setNewStatus(new_status)
-        if (status !== new_status) {
-            setModalVisible(true)
+        if (new_status === "Cleaned") {
+            props.navigation.navigate('AssignedAccomplished', { status: status, id: dump && dump._id, room: dump && dump.chat_id && dump.chat_id.room, role: dump && dump.user_id && dump.user_id.role, user_id: dump && dump.user_id && dump.user_id._id, barangay: dump && dump.barangay, long: dump && dump.coordinates && dump.coordinates.longtitude, lati: dump && dump.coordinates && dump.coordinates.latitude });
+        } else {
+            setNewStatus(new_status)
+            if (status !== new_status) {
+                setModalVisible(true)
+            }
         }
+
 
         // console.log(new_status)
     }
@@ -258,7 +274,7 @@ const AssignedView = (props) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={RandomStyle.vContainer}>
                 <View style={RandomStyle.vHeader}>
-                {console.log("compleaddr", dump&&dump.complete_address)}
+                    {/* {console.log("user", user && user._id)} */}
                     <Text style={RandomStyle.vText1}>Illegal Dump No. {dump && dump._id}</Text>
                     <HStack justifyContent={"space-between"}>
                         <VStack>
@@ -381,15 +397,21 @@ const AssignedView = (props) => {
 
 
                                 <Text style={[RandomStyle.vText2, { marginVertical: 10 }]}>Status: </Text>
+                                {status === "Cleaned" ?
+                                    <Text style={{ marginTop: 10 }}>{status}</Text>
+                                    :
+                                    <Select
+                                        minWidth="200"
+                                        selectedValue={status === "Confirmed" ? "Unfinish" : status}
+                                        onValueChange={updateDumpStatusHandler}
+                                    >
+                                        <Select.Item key={"Unfinish"} value={"Unfinish"} label={"Unfinish"} style={status === "Unfinish" ? { display: "none" } : null} />
+                                        <Select.Item key={"Cleaned"} value={"Cleaned"} label={"Cleaned"} style={status === "Cleaned" ? { display: "none" } : null} />
+                                    </Select>
+                                }
 
-                                <Select
-                                    minWidth="200"
-                                    selectedValue={status === "Confirmed" ? "Unfinish" : status}
-                                    onValueChange={updateDumpStatusHandler}
-                                >
-                                    <Select.Item key={"Unfinish"} value={"Unfinish"} label={"Unfinish"} />
-                                    <Select.Item key={"Cleaned"} value={"Cleaned"} label={"Cleaned"} />
-                                </Select>
+
+
                                 {/* <Text>{status === "newReport" ? "New Report" : status}</Text> */}
                             </HStack>
                             {dump && dump.date_cleaned != null ?
@@ -423,7 +445,10 @@ const AssignedView = (props) => {
                         <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
                     </View> : null
                 }
-                <View style={RandomStyle.vImages}>
+                {dump && dump.accomplished_images && dump.accomplished_images.length >= 1 ?
+                    <Text style={RandomStyle.vText2}>Before</Text> : null
+                }
+                <View style={[RandomStyle.vImages, { marginBottom: 24 }]}>
                     {dump && dump.images && dump.images.map((img, index) =>
                         <TouchableOpacity key={index} onPress={() => showImages(index)}>
                             <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
@@ -436,6 +461,25 @@ const AssignedView = (props) => {
                         onRequestClose={() => setOpenImages(false)}
                     />
                 </View>
+
+                {dump && dump.accomplished_images && dump.accomplished_images.length >= 1 ?
+                    <>
+                        <Text style={RandomStyle.vText2}>After</Text>
+                        <View style={RandomStyle.vImages}>
+                            {dump && dump.accomplished_images && dump.accomplished_images.map((img, index) =>
+                                <TouchableOpacity key={index} onPress={() => showImagesCleaned(index)}>
+                                    <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
+                                </TouchableOpacity>
+                            )}
+                            <ImageView
+                                images={imagesPreviewCleaned}
+                                imageIndex={imgIndexCleaned}
+                                visible={openImagesCleaned}
+                                onRequestClose={() => setOpenImagesCleaned(false)}
+                            />
+                        </View>
+                    </> : null
+                }
 
                 <Text style={RandomStyle.vText2}>Type of Waste</Text>
                 <View style={RandomStyle.vContainer2}>

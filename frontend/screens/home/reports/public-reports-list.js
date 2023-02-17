@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator, RefreshControl } from "react-native";
 import { HStack, VStack, Select } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -32,6 +32,17 @@ const PublicReportsList = ({ navigation }) => {
     const [type, setType] = useState("");
     const [searching, setSearching] = useState(false)
     const [keyword, setKeyword] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        setReports([])
+        setCurrentPage(1)
+        dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
 
     useFocusEffect(
         useCallback(() => {
@@ -47,24 +58,13 @@ const PublicReportsList = ({ navigation }) => {
                 if (reports && reports.length <= 0) {
                     dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
                 }
-            } else {
-                dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
-            }
-
-
+            } 
+            // else {
+            //     dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
             // }
 
 
-            // if (!searchText) {
-            //     return () => {
-            //         setSearchText("")
-            //         setSearching(false)
-            //         setReports([]);
-            //     };
-            // }
-
-
-        }, [error, keyword, page, district, barangay, size, type]
+        }, [error, keyword]
         ))
 
 
@@ -142,15 +142,12 @@ const PublicReportsList = ({ navigation }) => {
 
 
 
-    const search = (text, dist, brgy, siz, typ) => {
-
-        if (text == "") {
-            setSearching(false)
-        } else {
-            setSearching(true)
+    const search = () => {
+        if (keyword !== "") {
+            setCurrentPage(1)
+            setReports([])
+            dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
         }
-
-
     }
 
 
@@ -284,6 +281,8 @@ const PublicReportsList = ({ navigation }) => {
                         // }
 
                     }} />
+
+
                     {keyword ?
                         <>
                             <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
@@ -294,19 +293,24 @@ const PublicReportsList = ({ navigation }) => {
                         : null
 
                     }
+                    <TouchableOpacity onPress={search} style={[RandomStyle.searchFilterContainer, { backgroundColor: "#1E5128" }]}>
+                        <Text style={RandomStyle.searchFilter}><Ionicons name="search" size={20} color="#ffffff" /></Text>
+                    </TouchableOpacity>
 
 
                 </HStack>
                 {filter == false ? null : <FilterOptions />}
             </View>
-            {loading && currentPage === 1 ? <LoadingList /> : null}
+            {loading && currentPage === 1  ? <LoadingList /> : null}
             {reports && reports.length > 0 ?
 
                 <>
 
-                    {!keyword ?
+                    {!keyword?
                         <FlatList
                             data={reports}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                             renderItem={reportsItem}
                             keyExtractor={item => Math.random()}
                             onEndReachedThreshold={0.2}
@@ -341,33 +345,6 @@ const PublicReportsList = ({ navigation }) => {
                             data={reports}
                             renderItem={reportsItem}
                             keyExtractor={item => Math.random()}
-                        // onEndReachedThreshold={0.2}
-                        // onEndReached={fetchMoreDataFiltered}
-                        // ListFooterComponent={() =>
-                        //     <>
-                        //         {loading && currentPageFilter >= 2 ?
-                        //             <>
-
-                        //                 <View style={RandomStyle.lContainer}>
-                        //                     <Skeleton animation="pulse" height={100} borderRadius={10} />
-                        //                 </View>
-                        //                 <View style={RandomStyle.lContainer}>
-                        //                     <Skeleton animation="pulse" height={100} borderRadius={10} />
-                        //                 </View>
-                        //                 <View style={RandomStyle.lContainer}>
-                        //                     <Skeleton animation="pulse" height={100} borderRadius={10} />
-                        //                 </View>
-                        //                 <View style={RandomStyle.lContainer}>
-                        //                     <Skeleton animation="pulse" height={100} borderRadius={10} />
-                        //                 </View>
-                        //                 <View style={RandomStyle.lContainer}>
-                        //                     <Skeleton animation="pulse" height={100} borderRadius={10} />
-                        //                 </View>
-
-                        //             </>
-                        //             : null}
-                        //     </>
-                        // }
                         />
                     }
                 </>

@@ -147,7 +147,8 @@ export const collectionPointsUpcomingReducer = (state = { collectionPointsUpcomi
         case UPCOMING_COLLECTION_POINT_LIST_RESET:
             return {
                 ...state,
-                isRefreshed: false
+                isRefreshed: false,
+                collectionPointsUpcoming: undefined
             }
         case CLEAR_ERRORS:
             return {

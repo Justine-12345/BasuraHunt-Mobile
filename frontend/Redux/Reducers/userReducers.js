@@ -15,8 +15,10 @@ import {
     CHECK_OTP_REQUEST,
     CHECK_OTP_SUCCESS,
     CHECK_OTP_FAIL,
+    LOGOUT_REQUEST,
     LOGOUT_SUCCESS,
     LOGOUT_FAIL,
+    LOGOUT_RESET,
     LOAD_USER_REQUEST,
     LOAD_USER_SUCCESS,
     LOAD_USER_FAIL,
@@ -78,6 +80,9 @@ import {
     REGISTER_DATA_RESET,
     REGISTER_DATA_FAIL,
 
+    USER_DUMP_PAGE_SET,
+    USER_DUMP_PAGE_RESET,
+
     CLEAR_ERRORS
 } from "../Constants/userConstants"
 import AsyncStorage from "@react-native-async-storage/async-storage"
@@ -89,6 +94,7 @@ export const authReducer = (state = { user: {} }, action) => {
         case REGISTER_USER_REQUEST:
         case LOAD_USER_REQUEST:
         case CHECK_OTP_REQUEST:
+        case LOGOUT_REQUEST:
             return {
                 loading: true,
                 isAuthenticated: false,
@@ -97,8 +103,8 @@ export const authReducer = (state = { user: {} }, action) => {
         case LOGIN_SUCCESS:
         case REGISTER_USER_SUCCESS:
         case LOAD_USER_SUCCESS:
-        case CHECK_OTP_SUCCESS:  
-            
+        case CHECK_OTP_SUCCESS:
+
             AsyncStorage.setItem("isAuthenticated", "true");
             AsyncStorage.setItem("user", JSON.stringify(action.payload.user));
             AsyncStorage.setItem("jwt", action.payload.token);
@@ -110,7 +116,7 @@ export const authReducer = (state = { user: {} }, action) => {
                 userBrgyRank: action.payload.userBrgyRank,
                 userCityRank: action.payload.userCityRank,
                 reportedDumpCounts: action.payload.reportedDumpCounts,
-				donatedItemsCount: action.payload.donatedItemsCount,
+                donatedItemsCount: action.payload.donatedItemsCount,
                 otp_status: action.payload.otp_status
             }
 
@@ -120,6 +126,16 @@ export const authReducer = (state = { user: {} }, action) => {
                 ...state,
                 loading: false,
                 isAuthenticated: false,
+                isLogout:true,
+                user: null
+            }
+        
+        case LOGOUT_RESET:
+            return {
+                ...state,
+                loading: false,
+                isAuthenticated: false,
+                isLogout:false,
                 user: null
             }
 
@@ -417,7 +433,10 @@ export const userReportsAndItemsReducer = (state = {}, action) => {
             return {
                 ...state,
                 loading: false,
-                userDumps: action.payload.userDumps
+                userDumps: action.payload.userDumps,
+                dumpsCount: action.payload.dumpsCount,
+                resPerPage: action.payload.resPerPage,
+                filteredDumpCount: action.payload.filteredDumpCount
             }
 
         case USER_DONATED_SUCCESS:
@@ -578,5 +597,32 @@ export const registerDataReducer = (state = {}, action) => {
 
         default:
             return state;
+    }
+}
+
+
+export const userDumpPageReducer = (state = {}, action) => {
+    switch (action.type) {
+
+        case USER_DUMP_PAGE_SET:
+            return {
+                ...state,
+                page: action.payload
+            }
+
+        case USER_DUMP_PAGE_RESET:
+            return {
+                ...state,
+                page: 1
+            }
+
+        case CLEAR_ERRORS:
+            return {
+                ...state,
+                error: null
+            }
+
+        default:
+            return state
     }
 }

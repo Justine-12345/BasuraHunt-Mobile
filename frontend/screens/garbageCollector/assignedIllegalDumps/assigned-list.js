@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux'
 import { getDumps, getDumpList } from '../../../Redux/Actions/dumpActions'
-
+import LoadingList from "../../extras/loadingPages/loading-list";
 const AssignedList = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
@@ -93,12 +93,12 @@ const AssignedList = ({ navigation }) => {
             // dispatch(getDumps(keyword, currentPage, district, barangay, size, type, true));
             dispatch(getDumpList());
             return () => {
-                
+
             }
-        }, [dispatch, error, keyword, currentPage, district, barangay, size, type])
+        }, [ error, keyword, currentPage, district, barangay, size, type])
     )
 
- 
+
 
     useEffect(() => {
         if (filter === false) {
@@ -147,7 +147,6 @@ const AssignedList = ({ navigation }) => {
 
         if (userID) {
             dump && dump.collectors && dump.collectors.forEach((collector) => {
-                console.log(dump.status)
                 if (collector.collector === userID._id) {
                     isTrue = true;
                 }
@@ -163,32 +162,32 @@ const AssignedList = ({ navigation }) => {
 
         if (item.user_id !== null) {
             let img = item.images.map(img => img.url)[0]
-            const date = new Date(item.createdAt).toLocaleDateString()   
-          
+            const date = new Date(item.createdAt).toLocaleDateString()
+
             return (
                 <>
-                    { item.status === "Confirmed" || item.status === "Unfinish"?
+                    {item.status === "Confirmed" || item.status === "Unfinish" ?
 
 
                         <>
-                                <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
-                                    <View style={RandomStyle.lContainer2}>
-                                        <HStack>
-                                            <Text style={RandomStyle.vBadge}> {item.status} </Text>
+                            <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
+                                <View style={RandomStyle.lContainer2}>
+                                    <HStack>
+                                        <Text style={RandomStyle.vBadge}> {item.status} </Text>
 
-                                            <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
-                                            <VStack>
-                                                <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
-                                                {/* item.additional_desciption change to item.addition_description */}
-                                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
-                                                <View style={{ flex: 1, justifyContent: "flex-end", }}>
-                                                    <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
-                                                </View>
-                                            </VStack>
-                                        </HStack>
-                                    </View>
-                                </TouchableOpacity>
-                                
+                                        <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
+                                        <VStack>
+                                            <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                            {/* item.additional_desciption change to item.addition_description */}
+                                            <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                            <View style={{ flex: 1, justifyContent: "flex-end", }}>
+                                                <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
+                                            </View>
+                                        </VStack>
+                                    </HStack>
+                                </View>
+                            </TouchableOpacity>
+
                         </>
 
 
@@ -203,30 +202,34 @@ const AssignedList = ({ navigation }) => {
         <>
 
             <View style={RandomStyle.lContainer3}>
-                <HStack style={RandomStyle.searchContainer}>
+                {/* <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
 
                     <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
                         <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
                     </TouchableOpacity>
-                </HStack>
+                </HStack> */}
                 {filter == false ? null : <FilterOptions />}
             </View>
-            {dumps && dumps.length > 0 ?
-                <FlatList
-                    data={dumps}
-                    renderItem={reportsItem}
-                    keyExtractor={item => item._id}
-                />
-                :
-                <View style={Empty1.container}>
-                    {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
-                        <Text style={Empty1.text1}>
-                            No assined reports yet!
-                        </Text>
-                    }
-                </View>
-            }
+            <>
+                {dumps && dumps.length > 0 ?
+                    <FlatList
+                        data={dumps}
+                        renderItem={reportsItem}
+                        keyExtractor={item => item._id}
+                    />
+                    :
+                    <View style={Empty1.container}>
+                        {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
+                            <Text style={Empty1.text1}>
+                                No assined reports yet!
+                            </Text>
+                        }
+                    </View>
+                }
+            </>
+
+
         </>
     )
 }

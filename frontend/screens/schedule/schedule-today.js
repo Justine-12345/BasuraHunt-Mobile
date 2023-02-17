@@ -1,7 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useFocusEffect } from "@react-navigation/native";
-import { FlatList, Text, View, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, RefreshControl } from "react-native";
 import { HStack, VStack } from "native-base";
 import RandomStyle from "../../stylesheets/randomStyle";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -14,6 +14,7 @@ const ScheduleToday = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
     const { isRefreshed, collectionPointsToday, loading } = useSelector(state => state.collectionPointsToday);
+    const [refreshing, setRefreshing] = useState(false);
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
 
@@ -37,6 +38,16 @@ const ScheduleToday = ({ navigation }) => {
             }
         }, [])
     )
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch({ type: TODAY_COLLECTION_POINT_LIST_RESET })
+        dispatch(getTodayCollectionPointList())
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
 
     const collectionPointTime = (collectionPoint) => {
         const startTimeArray = collectionPoint.startTime.split(":");
@@ -101,8 +112,6 @@ const ScheduleToday = ({ navigation }) => {
         }
         timeNow = hourNow + "" + minuteNow;
         let checkTime = timeNow >= startTimeArray[0] + "" + startTimeArray[1] && timeNow <= endTimeArray[0] + "" + endTimeArray[1];
-
-        console.log(checkTime)
 
         if (checkTime) {
             return <TouchableOpacity onPress={() => navigation.navigate("ScheduleView", { collectionPoint: collectionPoint })} activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}>
@@ -197,6 +206,8 @@ const ScheduleToday = ({ navigation }) => {
                             data={collectionPointsToday}
                             renderItem={schedulesList}
                             keyExtractor={item => item._id}
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                         />
                         :
                         <View style={Empty1.container}>
