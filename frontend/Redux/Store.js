@@ -65,6 +65,12 @@ import {
     itemPageReducer
 } from './Reducers/itemReducers';
 
+import {
+    newFeedbackReducer,
+    feedbackDetailsReducer,
+    allFeedBacksReducer
+} from './Reducers/feedbackReducers';
+
 
 const reducers = combineReducers({
     registerData: registerDataReducer,
@@ -78,7 +84,7 @@ const reducers = combineReducers({
     userReportsAndItems: userReportsAndItemsReducer,
     notification: notificationReducer,
     levelExp: levelExpReducer,
-    userDumpPage:userDumpPageReducer,
+    userDumpPage: userDumpPageReducer,
 
     dumps: dumpsReducer,
     newDump: newDumpReducer,
@@ -87,7 +93,7 @@ const reducers = combineReducers({
     dump: dumpReducer,
     ranking: rankingReducer,
     dumpComment: dumpCommentReducer,
-    dumpPage:dumpPageReducer,
+    dumpPage: dumpPageReducer,
 
     collectionPointsUpcoming: collectionPointsUpcomingReducer,
     collectionPointsToday: collectionPointsTodayReducer,
@@ -102,7 +108,7 @@ const reducers = combineReducers({
     newsfeed: newsfeedReducer,
     newsfeedDetails: newsfeedDetailsReducer,
     newNewsfeed: newNewsfeedReducer,
-    newsfeedPage:newsfeedPageReducer,
+    newsfeedPage: newsfeedPageReducer,
 
     newChat: newChatReducer,
     chatDetails: chatDetailsReducer,
@@ -113,10 +119,14 @@ const reducers = combineReducers({
     item: itemReducer,
     itemDetails: itemDetailsReducer,
     newItem: newItemReducer,
-    itemPage:itemPageReducer,
+    itemPage: itemPageReducer,
+
+    newFeedback: newFeedbackReducer,
+    feedbackDetails: feedbackDetailsReducer,
+    allFeedBacks: allFeedBacksReducer,
 
     coordinate: coordinateReducer,
-    mapLoading:mapLoadingReducer,
+    mapLoading: mapLoadingReducer,
     pushNotification: pushNotificationReducer
 })
 

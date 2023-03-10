@@ -48,7 +48,7 @@ illegalDump-update-status
 illegalDump-new-message
 illegalDump-new-comment
 
-PR = ()
+PR = (used)
 donation-new
 donation-update-claim
 donation-update-cancel
@@ -56,21 +56,24 @@ donation-update-confirm
 donation-update-receive (Rate)
 donation-new-message
 
-PR = ()
-collection-mass-add collector M to admin W
+PR = (Used)
+//collection-mass-add collector M to admin W
 newsfeeds-add
-user-verified (try nalang)
-user donated
+user-verified
+//user donated
 user claimed
 
+PR = (Used)
 update dumps status for collector
 add recieve item tab in profile
 fix image preview
----feedback-new (pagawan ng desing feedback)
+
+PR = ()
+//---feedback-new (pagawan ng desing feedback)
 collector update dump
 web: not require collector when confirmed dump
+web and mobile: collector collection today, even if his not barangay
 
- web and mobile: collector collection today, even if his not barangay
 web users record
 hide e-cert Button
 mobile: seperate header for auth and visitor
@@ -91,9 +94,28 @@ report dump firt page with i understand
  admin crud loading 
  fix status select
  cleaned label
---- loading accomplish
---- confirm socket
---- collectpoint chart (Harris)
+ loading accomplish
+ confirm socket
+ collectpoint chart 
  submit image after report
---- public report after
+ public report after (|web: |mobile)
+ date clened approx and actual (|web: |mobile)
+ Additional Details Suggestions
 *** tinangal sa backend socket.io
+
+ cel sent file
+ cenro interview to functional req
+ purok ng mga magrereport (optional) At yung garbage collector (required)
+ profile info (|web: |mobile)
+ modals in add report (|web: |mobile)
+--- metting about landing page
+ socket feedback
+ feedback submit loading
+ feedback feaching loading
+ display rating (|web: |mobile)
+ donation Additional detail profinity (|web: |mobile)
+ donation chat notif
+ chart illegal dump violation
+ dump chat timestamp (|web: |mobile)
+ harris sent mobile cleaning material
+ proof of recieved items 

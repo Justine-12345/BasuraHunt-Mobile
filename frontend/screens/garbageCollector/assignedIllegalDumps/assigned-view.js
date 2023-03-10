@@ -258,7 +258,7 @@ const AssignedView = (props) => {
 
     const updateDumpStatusHandler = (new_status) => {
         if (new_status === "Cleaned") {
-            props.navigation.navigate('AssignedAccomplished', { status: status, id: dump && dump._id, room: dump && dump.chat_id && dump.chat_id.room, role: dump && dump.user_id && dump.user_id.role, user_id: dump && dump.user_id && dump.user_id._id, barangay: dump && dump.barangay, long: dump && dump.coordinates && dump.coordinates.longtitude, lati: dump && dump.coordinates && dump.coordinates.latitude });
+            props.navigation.navigate('AssignedAccomplished', { purok: dump && dump.purok, status: status, id: dump && dump._id, room: dump && dump.chat_id && dump.chat_id.room, role: dump && dump.user_id && dump.user_id.role, user_id: dump && dump.user_id && dump.user_id._id, barangay: dump && dump.barangay, long: dump && dump.coordinates && dump.coordinates.longtitude, lati: dump && dump.coordinates && dump.coordinates.latitude });
         } else {
             setNewStatus(new_status)
             if (status !== new_status) {
@@ -439,6 +439,14 @@ const AssignedView = (props) => {
                 <HStack>
                     <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
                     <Text>{dump && dump.landmark}</Text>
+                </HStack>
+                <HStack>
+                    <Text style={RandomStyle.vText2}>Barangay: </Text>
+                    <Text>{dump && dump.barangay}</Text>
+                </HStack>
+                <HStack>
+                    <Text style={RandomStyle.vText2}>Purok: </Text>
+                    <Text>{dump && dump.purok}</Text>
                 </HStack>
                 {dump && dump.coordinates && dump.coordinates.longtitude ?
                     <View style={RandomStyle.vMapContainer}>

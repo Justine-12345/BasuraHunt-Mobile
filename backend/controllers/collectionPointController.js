@@ -35,6 +35,28 @@ const scheduleCollectionPointsList = (collectionPoints) => {
 	return collectionPointsList;
 }
 
+exports.getLandingPageTodayCollectionPointList = catchAsyncErrors(async (req, res, next) => {
+
+	let dateToday = new Date(Date.now());
+
+	const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
+		"Saturday"];
+
+	const day = days[dateToday.getDay()];
+
+	let collectionPointsCount
+	let collectionPoints
+
+	collectionPointsCount = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).countDocuments();
+	collectionPoints = await CollectionPoint.find({ "repeats.repeat": ["Every " + day, day, "Once"] }).sort({ startTime: 1 }).select("-collectionPerTruck");
+
+	res.status(200).json({
+		success: true,
+		collectionPointsCount,
+		collectionPoints
+	})
+})
+
 exports.getTodayCollectionPointList = catchAsyncErrors(async (req, res, next) => {
 
 	let dateToday = new Date(Date.now());

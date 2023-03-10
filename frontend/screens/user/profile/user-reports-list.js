@@ -38,8 +38,9 @@ const UserReportsList = (props) => {
             // if (searching === false || searching === undefined || !reports) {
             //     dispatch(reportedDumps(1))
             // }
-
-            if (reports && reports.length <= 0 && page <= 0 || page === undefined) {
+            console.log("page",page)
+            if (reports && reports.length <= 0 && page <= 0 || page === 1 || page === undefined) {
+                setReports([])
                 dispatch(reportedDumps(1))
             }
 
@@ -128,9 +129,7 @@ const UserReportsList = (props) => {
                         <View style={RandomStyle.lContainer2}>
                             <HStack>
                                 {/* hide if not cleaned??? */}
-                                {item.dump.status === "Cleaned" ?
-                                    <Text style={RandomStyle.vBadge}>{item.dump.status}</Text> : ""
-                                }
+                                <Text style={RandomStyle.vBadge}>{item.dump.status === "newReport" ? "New Report" : item.dump.status}</Text>
                                 {item.dump.images[0] ?
                                     <Image source={{ uri: item.dump.images[0].url.toString() }} resizeMode="cover" style={RandomStyle.lImg} /> :
                                     <Image source={{ uri: "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png" }} resizeMode="stretch" style={RandomStyle.lImg} />}

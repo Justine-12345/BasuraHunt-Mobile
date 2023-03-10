@@ -15,6 +15,7 @@ import { activeChat } from "../../Redux/Actions/chatActions";
 import { getSingleDump } from "../../Redux/Actions/dumpActions";
 import NotificationSender from "../extras/notificationSender";
 import RandomStringGenerator from "../extras/randomStringGenerator";
+import BhButton from "../../stylesheets/button";
 const socket = io.connect(SOCKET_PORT);
 let deviceWidth = Dimensions.get('window').width
 const Chat = (props) => {
@@ -41,7 +42,7 @@ const Chat = (props) => {
 
     useFocusEffect(
         useCallback(() => {
-            console.log("dumpObj",dumpObj)
+            console.log("dumpObj", dumpObj)
             const formDataActive = new FormData();
             formDataActive.append("activeChat", "true");
             dispatch(activeChat(formDataActive))
@@ -66,7 +67,7 @@ const Chat = (props) => {
                     dispatch(activeChat(formDataDeactive))
                 }
             });
-         
+
             socket.connect()
             socket.emit("join_room", [chatDetail.room])
             return () => {
@@ -116,11 +117,23 @@ const Chat = (props) => {
         // }
     }, [chats])
 
+    function formatAMPM(time) {
+        const timeArray = time.split(":");
+        var hours = timeArray[0];
+        var minutes = timeArray[1];
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
     const sendHandler = () => {
         // console.log("meron")
         // console.log(data)
         if (message !== "") {
-            const chatTime = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+            const chatTime = new Date().toLocaleDateString("en-US") + " " + formatAMPM(new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes())
             const messageData = {
                 room: chatDetail.room,
                 author: user,
@@ -150,7 +163,7 @@ const Chat = (props) => {
             setMessage("")
 
             socket.emit("send_message", messageData);
-           
+
             NotificationSender(`New Message From ${userDetail.first_name}: ${message}`, user, null, dumpObj && dumpObj.barangay, 'illegalDump-new-message', notifCodeForChat, dumpObj && dumpObj)
 
         }
@@ -324,6 +337,12 @@ const Chat = (props) => {
             </View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
                 <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Location: {dumpLocation}</Text>
+                <BhButton onPress={() => {
+                    dispatch(getSingleDump(dumpId))
+                    props.navigation.navigate("User", { screen: 'MyReports', params: { screen: 'MyPublicReportsView', params: { item_id: dumpId } } })
+                }} style={{ borderColor: "white", borderWidth: 2 }} fullwidth>
+                    <Text style={{ color: "white" }}>View Details</Text>
+                </BhButton>
             </View>
             {/* {console.log("messageList", messageList === undefined || messageList.length <= 0)} */}
             <FlatList

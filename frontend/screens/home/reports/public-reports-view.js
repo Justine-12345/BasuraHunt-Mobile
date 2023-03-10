@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { HStack, Select, VStack } from "native-base";
+import Star from "../extras/Star";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -33,7 +34,9 @@ const PublicReportsView = (props) => {
     const { dump: dumpDetail, loading: dumpDetailLoading } = useSelector(state => state.dumpDetails)
 
     const [openImages, setOpenImages] = useState(false);
+    const [openImagesCleaned, setOpenImagesCleaned] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
+    const [imgIndexCleaned, setImgIndexCleaned] = useState(0);
     const [author, setAuthor] = useState('Alias')
     const [comment, setComment] = useState('')
     const [allComments, setAllComments] = useState(item ? item.comments : [])
@@ -44,6 +47,7 @@ const PublicReportsView = (props) => {
     const [user, setUser] = useState()
     const [messageList, setMessageList] = useState([])
     const [imagesPreview, setImagesPreview] = useState([])
+    const [imagesPreviewCleaned, setImagesPreviewCleaned] = useState([])
 
     useFocusEffect(
         useCallback(() => {
@@ -83,6 +87,11 @@ const PublicReportsView = (props) => {
             setImagesPreview([])
             dump && dump.images && dump.images.forEach(i => {
                 setImagesPreview(items => [...items, { uri: i.url }])
+            })
+
+            setImagesPreviewCleaned([])
+            dump && dump.images && dump.accomplished_images.forEach(i => {
+                setImagesPreviewCleaned(items => [...items, { uri: i.url }])
             })
 
             socket.connect()
@@ -139,6 +148,12 @@ const PublicReportsView = (props) => {
         setOpenImages(true);
         setImgIndex(index);
     }
+
+    const showImagesCleaned = (index) => {
+        setOpenImagesCleaned(true);
+        setImgIndexCleaned(index);
+    }
+
     let uniqueWt = []
 
     const commentSubmit = () => {
@@ -194,6 +209,17 @@ const PublicReportsView = (props) => {
         }
     }
 
+
+    const getCleanedDuration = () => {
+        const date_created = new Date(dump && dump.createdAt)
+        const date_cleaned = new Date(dump && dump.date_cleaned)
+
+        const dif = Math.abs(date_cleaned - date_created);
+        const d = dif / (1000 * 3600 * 24)
+        return Math.ceil(d)
+    }
+
+
     return (
         <>
             {dumpDetailLoading ?
@@ -207,9 +233,15 @@ const PublicReportsView = (props) => {
                             <Text style={RandomStyle.vText1}>Illegal Dump No. {dump && dump._id}</Text>
                             <HStack justifyContent={"space-between"}>
                                 <VStack>
-                                    <HStack>
+                                    <HStack style={{ flexWrap: 'wrap', alignItems: "flex-start" }}>
                                         <Text style={RandomStyle.vText2}>Status: </Text>
-                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status}</Text>
+
+                                        {dump && dump.date_cleaned ?
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} {getCleanedDuration() <= 1 ? " day" : " days"} <Star rate={dump&&dump.score/10}/></Text> :
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "":`approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "":dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "":"to clean"}</Text>
+                                        }
+
+
                                     </HStack>
                                     {dump && dump.date_cleaned != null ?
                                         <HStack>
@@ -222,15 +254,18 @@ const PublicReportsView = (props) => {
                                         <Text style={RandomStyle.vText2}>Date Reported: </Text>
                                         <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
                                     </HStack>
+                                    <HStack>
+                                        {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) ?
+                                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj: { _id: dump && dump._id, coordinates: { longtitude: dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude }, barangay: dump && dump.barangay } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                                <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                                            </TouchableOpacity>
+                                            : null
+                                        }
+                                    </HStack>
                                 </VStack>
                                 <HStack>
-                               
-                                    {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) ?
-                                        <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj: { _id: dump && dump._id, coordinates: { longtitude: dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude }, barangay: dump && dump.barangay } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                            <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                                        </TouchableOpacity> 
-                                        : null
-                                    }
+
+
                                     {/* <TouchableOpacity
                                 onPress={() => {
                                     props.navigation.navigate("TheAbout")
@@ -306,6 +341,18 @@ const PublicReportsView = (props) => {
                             <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
                             <Text>{dump && dump.landmark}</Text>
                         </HStack>
+                        <HStack>
+                            <Text style={RandomStyle.vText2}>Barangay: </Text>
+                            <Text>{dump && dump.barangay}</Text>
+                        </HStack>
+                        {
+                            dump && dump.purok && (
+                                <HStack>
+                                    <Text style={RandomStyle.vText2}>Purok: </Text>
+                                    <Text>{dump && dump.purok}</Text>
+                                </HStack>
+                            )
+                        }
                         {dump && dump.coordinates && dump.coordinates.longtitude ?
                             <View style={RandomStyle.vMapContainer}>
                                 <MapViewer long={dump.coordinates.longtitude} lati={dump.coordinates.latitude} />
@@ -324,6 +371,37 @@ const PublicReportsView = (props) => {
                                 onRequestClose={() => setOpenImages(false)}
                             />
                         </View>
+
+
+                        {dump && dump.accomplished_images && dump.accomplished_images.length >= 1 ?
+                            <>
+                                <Text style={RandomStyle.vText2}>After</Text>
+                                <View style={RandomStyle.vImages}>
+                                    {dump && dump.accomplished_images && dump.accomplished_images.map((img, index) =>
+                                        <TouchableOpacity key={index} onPress={() => showImagesCleaned(index)}>
+                                            <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
+                                        </TouchableOpacity>
+                                    )}
+                                    <ImageView
+                                        images={imagesPreviewCleaned}
+                                        imageIndex={imgIndexCleaned}
+                                        visible={openImagesCleaned}
+                                        onRequestClose={() => setOpenImagesCleaned(false)}
+                                    />
+                                </View>
+                            </> : null
+                        }
+
+
+
+
+
+
+
+
+
+
+
 
                         <Text style={RandomStyle.vText2}>Type of Waste</Text>
                         <View style={RandomStyle.vContainer2}>

@@ -466,10 +466,19 @@ exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
 				}
 			},
 			{
+				$addFields:
+				{
+					"collectionPointsSize": {
+						$size: "$collectionPoints"
+
+					}
+				}
+			},
+			{
 				$group:
 				{
 					_id: cluster,
-					total: { $sum: 1 }
+					total: { $sum: "$collectionPointsSize" }
 				}
 			},
 			{
@@ -493,13 +502,21 @@ exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
 				}
 			},
 			{
+				$addFields:
+				{
+					"collectionPointsSize": {
+						$size: "$collectionPoints"
+
+					}
+				}
+			},
+			{
 				$group:
 				{
 					_id: {
-						month: { $month: "$createdAt" },
-						year: { $year: "$createdAt" }
+						name: "$name"
 					},
-					total: { $sum: 1 }
+					total: { $sum: "$collectionPointsSize" }
 				}
 			},
 			{

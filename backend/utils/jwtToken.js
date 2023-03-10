@@ -4,7 +4,7 @@ const sendToken = (user, statusCode, res) => {
 
     // Options for cookie
     const options = {
-		httpOnly: true
+		httpOnly: true,
 		    
 		}
 

@@ -530,6 +530,65 @@ const RandomStyle = StyleSheet.create({
         textAlign: "center",
         fontSize: 20,
         color: "white"
+    },
+    nfAddInfoContainer: {
+        borderRadius: 10,
+        margin: 10,
+        marginBottom: 0,
+        display: "flex",
+        flexDirection: "row",
+        flexWrap: "wrap",
+        justifyContent: "space-evenly",
+        alignContent: "space-between",
+    },
+    nfAddInfo: {
+        width: width/2.2,
+        backgroundColor: "darkgreen",
+        padding: 5,
+        margin: 2,
+        borderRadius: 5,
+        flexGrow: 1
+    },
+    nfAddInfo1: {
+        backgroundColor: "darkgreen",
+    },
+    nfAddInfo2: {
+        backgroundColor: "darkred",
+    },
+    nfAddInfo3: {
+        backgroundColor: "green",
+    },
+    nfAddInfo4: {
+        backgroundColor: "goldenrod",
+    },
+    nfAddInfoSmall: {
+        fontStyle: "italic",
+        fontSize: 13,
+        color: "white"
+    },
+    nfAddInfoText: {
+        fontWeight: "bold",
+        color: "white",
+    },
+    nfAddInfoModal: {
+        zIndex: 1,
+        height: "100%",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    nfAddInfoModalView: {
+        backgroundColor: "white"
+    },
+    nfAddInfoImg: {
+        width: width-20,
+        height: (width-20)*1.5,
+    },
+    nfClosec: {
+        zIndex: 2,
+        right: 0,
+        position: "absolute",
+        margin: 5
     }
 })
 

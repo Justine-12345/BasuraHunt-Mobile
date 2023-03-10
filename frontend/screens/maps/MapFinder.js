@@ -34,7 +34,7 @@ const MapFinder = () => {
                 setLatMarker(0)
                 setLngMarker(0)
             }
-
+            getUserLocation()
         }, [mapLatitude, mapLongtitude])
     )
 
@@ -44,7 +44,7 @@ const MapFinder = () => {
             payload: { initializing: true }
         })
         getUserLocation()
-    }, [])
+    }, [latUser])
     const dispatch = useDispatch()
 
     const [latUser, setLatUser] = useState(0)
@@ -66,19 +66,18 @@ const MapFinder = () => {
             alert('Permission to access location was denied');
         }
 
-
-
-        let location = await Location.getCurrentPositionAsync({});
+        console.log("!!!")
+        let location = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.Balanced});
         // // console.log("i",location.coords.latitude);
         // // console.log(location.coords.longitude);
         setLatUser(location.coords.latitude)
         setLngUser(location.coords.longitude)
         setLatInit(location.coords.latitude)
         setLngInit(location.coords.longitude)
-
+        console.log("222")
 
         const data = { latitude: location.coords.latitude, longitude: location.coords.longitude }
-        console.log("init", data);
+        // console.log("init", data);
         dispatch({
             type: SET_COORDINATE,
             payload: data
@@ -104,7 +103,11 @@ const MapFinder = () => {
 
     return (
         <>
+        {/* {console.log("latInit",latInit)}
+        {console.log("lngInit",lngInit)} */}
             <View style={styles.container}>
+            {/* <Text>latInit {latInit}</Text>
+            <Text>lngInit {lngInit}</Text> */}
                 {latInit !== 0 && lngInit !== 0 ?
                     <MapView style={[styles.map]}
                         provider={PROVIDER_GOOGLE}
@@ -114,7 +117,7 @@ const MapFinder = () => {
                             latitudeDelta: 0.00056,
                             longitudeDelta: 0.00011,
                         }}
-                        loadingEnabled={true}
+                        // loadingEnabled={true}
                         onMapReady={getUserLocation}
                         onMapLoaded={()=>{
                             dispatch({

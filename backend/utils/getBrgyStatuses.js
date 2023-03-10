@@ -1,5 +1,5 @@
 const Dump = require('../models/dump')
-const barangayStatuses = async (startDate, endDate, barangay) => {
+const barangayStatuses = async (startDate, endDate, barangay, listOfViolation) => {
     let barangayStatusesObj = {
         clusterName:barangay,
         statuses:{}
@@ -11,7 +11,8 @@ const barangayStatuses = async (startDate, endDate, barangay) => {
                 $lte: new Date(endDate)
             },
             "status": "Cleaned",
-            "barangay": barangay
+            "barangay": barangay,
+            "category_violation": { $in: listOfViolation }
         }
 
     ).countDocuments()
@@ -23,7 +24,8 @@ const barangayStatuses = async (startDate, endDate, barangay) => {
                 $lte: new Date(endDate)
             },
             "status":{$in:["Confirmed","Unfinish"]},
-            "barangay": barangay
+            "barangay": barangay,
+            "category_violation": { $in: listOfViolation }
         }
 
     ).countDocuments()

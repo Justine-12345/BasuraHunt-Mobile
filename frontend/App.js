@@ -29,6 +29,7 @@ import { navigationRef } from './navigators/RootNavigation';
 import * as RootNavigation from './navigators/RootNavigation';
 import { SET_PUSH_NOTIFICATION } from './Redux/Constants/pushNotificationConstants';
 import { getTodayCollectionPointList } from './Redux/Actions/collectionPointActions';
+import { getItemDetails } from './Redux/Actions/itemActions';
 import Icon from 'react-native-vector-icons/Ionicons';
 import About from './screens/home/extras/about';
 import { loadUser } from './Redux/Actions/userActions';
@@ -86,12 +87,14 @@ export default function App() {
 
     Notifications.addNotificationReceivedListener(notification => {
       const screen = notification.request.content.data.screen;
+     const obj_id = notification.request.content.data.object
       if (screen === 'SchedNotifView') {
         store.dispatch(getTodayCollectionPointList())
       }
       else if (screen === 'MyPublicReportsView') {
         store.dispatch(getLevelExp())
       } else if (screen === 'MyPublicDonationsView') {
+        store.dispatch(getItemDetails(obj_id))
         store.dispatch(getLevelExp())
       }
       else if (screen === 'MyPublicClaimedDonationsView') {

@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Profile from "../screens/user/profile/profile";
 import ProfileUpdate from "../screens/user/profile/profile-update";
 import ProfileUpdatePassword from "../screens/user/profile/profile-update-password";
+import FeedbackNav from "./feedbackNav";
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -28,6 +29,13 @@ function MyStack() {
             <Stack.Screen
                 name="ProfileUpdatePassword"
                 component={ProfileUpdatePassword}
+                options={{
+                    headerShown:false
+                }}
+            />
+             <Stack.Screen
+                name="FeedbackNav"
+                component={FeedbackNav}
                 options={{
                     headerShown:false
                 }}

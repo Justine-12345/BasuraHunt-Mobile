@@ -50,9 +50,18 @@ const dumpSchema = new mongoose.Schema({
         maxLength: [100, 'Complete address cannot exceed 255 characters']
     },
 
+    purok: {
+        type: String
+    },
+
+
     district: {
         type: Number,
         required: true,
+    },
+
+    approxDayToClean: {
+        type: String
     },
 
     landmark: {
@@ -72,6 +81,7 @@ const dumpSchema = new mongoose.Schema({
         type:String,
         default:''
     },
+
 
     waste_size : {
         type: String,

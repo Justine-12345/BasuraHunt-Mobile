@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from "react-native";
+import { ScrollView, Text, View, FlatList, TouchableOpacity, Image, ActivityIndicator, RefreshControl } from "react-native";
 import { HStack, VStack } from "native-base";
 import Empty1 from "../../../stylesheets/empty1";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -16,6 +16,9 @@ import { readNoficationMobile, loadUser } from "../../../Redux/Actions/userActio
 import { getNewsfeedDetails } from "../../../Redux/Actions/newsfeedActions";
 import { NEWSFEED_PAGE_SET } from "../../../Redux/Constants/newsfeedConstants";
 import { Skeleton } from "@rneui/themed";
+import { Modal } from "react-native";
+import { AntDesign } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 const newsfeedData = require('../../../assets/sampleData/newsfeed.json')
 
 const Newsfeed = ({ navigation }) => {
@@ -27,6 +30,9 @@ const Newsfeed = ({ navigation }) => {
     const [currentPage, setCurrentPage] = useState(1)
     const [newsfeeds, setNewsfeeds] = useState([])
     const [refreshing, setRefreshing] = useState(false);
+
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalImg, setModalImg] = useState("")
 
     const onRefresh = useCallback(() => {
         setRefreshing(true);
@@ -119,11 +125,11 @@ const Newsfeed = ({ navigation }) => {
             dispatch(getNewsfeedDetails(object))
             navigation.navigate("Home", { screen: 'NewsfeedNav', params: { screen: 'NewsfeedView' } })
             // console.log("object",object)
-        }else{
+        } else {
             navigation.navigate("Report")
         }
 
-       
+
 
 
     }, [screen, object, message, code])
@@ -191,10 +197,32 @@ const Newsfeed = ({ navigation }) => {
         )
     }
 
-    return (
+    const modalImgs = [
+        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb1_xsjwym.png",
+        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb2_avjdl3.png",
+        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb3_tqsuge.png",
+        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb4_toljjp.png"
+    ]
+    const getModalImg = (index) => {
+        setModalImg(modalImgs[index]);
+        setModalVisible(true);
+    }
 
+    return (
         <>
-            {newsfeeds && newsfeeds.length <= 0 ? <LoadingNewsfeed /> : null}
+            <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
+                <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                    <ScrollView contentContainerStyle={RandomStyle.nfAddInfoModal}>
+                        <View style={RandomStyle.nfAddInfoModalView}>
+                            <Image source={{ uri: modalImg }} style={RandomStyle.nfAddInfoImg} />
+                            <TouchableOpacity style={RandomStyle.nfClosec} onPress={() => setModalVisible(false)}>
+                                <AntDesign name="closecircleo" size={30} />
+                            </TouchableOpacity>
+                        </View>
+                    </ScrollView>
+                </View>
+            </Modal>
+            {newsfeeds && newsfeeds.length <= 0 ? <View height={"100%"}><LoadingNewsfeed /></View> : null}
             {/* {console.log("newsfeeds", newsfeeds.length)} */}
             {newsfeeds && newsfeeds.length > 0 ?
                 <>
@@ -226,6 +254,36 @@ const Newsfeed = ({ navigation }) => {
                                     : null}
                             </>
                         }
+                        ListHeaderComponent={() =>
+                            <>
+                                <View style={RandomStyle.nfAddInfoContainer}>
+                                    <TouchableOpacity onPress={() => getModalImg(0)}>
+                                        <LinearGradient colors={["green", "darkgreen"]} style={RandomStyle.nfAddInfo}>
+                                            <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                            <Text style={RandomStyle.nfAddInfoText}>ANTI-LITTERING LAW</Text>
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => getModalImg(1)}>
+                                        <LinearGradient colors={["red", "darkred"]} style={RandomStyle.nfAddInfo}>
+                                            <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                            <Text style={RandomStyle.nfAddInfoText}>ACCOUNT DEACTIVATION</Text>
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => getModalImg(2)}>
+                                        <LinearGradient colors={["limegreen", "green"]} style={RandomStyle.nfAddInfo}>
+                                            <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                            <Text style={RandomStyle.nfAddInfoText}>LEVELING UP</Text>
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity onPress={() => getModalImg(3)}>
+                                        <LinearGradient colors={["gold", "goldenrod"]} style={RandomStyle.nfAddInfo}>
+                                            <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                            <Text style={RandomStyle.nfAddInfoText}>RANKS</Text>
+                                        </LinearGradient>
+                                    </TouchableOpacity>
+                                </View>
+                            </>
+                        }
                     />
                     {/* {loading && currentPage >= 2 ?
                         <View>
@@ -235,11 +293,39 @@ const Newsfeed = ({ navigation }) => {
                     } */}
                 </>
                 :
-                <View style={Empty1.container}>
-                    <Text style={Empty1.text1}>
-                        No posts yet!
-                    </Text>
-                </View>
+                <>
+                    <View style={RandomStyle.nfAddInfoContainer}>
+                        <TouchableOpacity onPress={() => getModalImg(0)}>
+                            <LinearGradient colors={["green", "darkgreen"]} style={RandomStyle.nfAddInfo}>
+                                <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                <Text style={RandomStyle.nfAddInfoText}>ANTI-LITTERING LAW</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => getModalImg(1)}>
+                            <LinearGradient colors={["red", "darkred"]} style={RandomStyle.nfAddInfo}>
+                                <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                <Text style={RandomStyle.nfAddInfoText}>ACCOUNT DEACTIVATION</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => getModalImg(2)}>
+                            <LinearGradient colors={["limegreen", "green"]} style={RandomStyle.nfAddInfo}>
+                                <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                <Text style={RandomStyle.nfAddInfoText}>LEVELING UP</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                        <TouchableOpacity onPress={() => getModalImg(3)}>
+                            <LinearGradient colors={["gold", "goldenrod"]} style={RandomStyle.nfAddInfo}>
+                                <Text style={RandomStyle.nfAddInfoSmall}>Read about</Text>
+                                <Text style={RandomStyle.nfAddInfoText}>RANKS</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
+                    </View>
+                    <View style={Empty1.container}>
+                        <Text style={Empty1.text1}>
+                            No posts yet!
+                        </Text>
+                    </View>
+                </>
             }
         </>
 

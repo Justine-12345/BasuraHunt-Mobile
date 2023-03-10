@@ -182,7 +182,7 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 	// const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id').populate('user_id'), req.query).search().filter();
 	let apiFeatures
 	if (req.query.ismobile == "true") {
-		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("complete_address additional_desciption images createdAt"), req.query).search().filter();
+		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("complete_address additional_desciption images createdAt status"), req.query).search().filter();
 		if (!req.query.keyword) {
 			apiFeatures.pagination(resPerPage);
 		}
@@ -614,11 +614,11 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 			dump.accomplished_images = imagesLinks
 
 			await user.save();
-		
+
 		} else {
 
 			dump.date_cleaned = null;
-		
+
 		}
 	} else {
 
@@ -629,24 +629,26 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 			user.exp = minusExp[0];
 			user.level = minusExp[1];
 			dump.score = 0;
-		
+
 			for (let i = 0; i < dump.accomplished_images.length; i++) {
 				const result = await cloudinary.v2.uploader.destroy(dump.accomplished_images[i].public_id)
 			}
-			
+
 			dump.accomplished_images = []
 
 			await user.save();
-		
+
 
 		}
 
 		if (req.body.new_status !== "Cleaned") {
 			dump.date_cleaned = null;
-		
+
 		}
 	}
-
+	const approxDay = dump.approxDayToClean
+	dump.approxDayToClean = approxDay
+	dump.purok = req.body.purok
 	dump.status = req.body.new_status
 	await dump.save();
 
@@ -736,17 +738,41 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 	let mostReportedBrgyDone = await Dump.aggregate(
 		[
 			{ $match: { status: "Cleaned" } },
-			{ $group: { _id: "$barangay", count: { $sum: 1 } } },
+			{ $group: { _id: { barangay: "$barangay", purok: "$purok" }, counter: { $sum: 1 } } },
+			{ $group: { _id: { barangay: "$_id.barangay" }, puroks: { $push: { purok: "$_id.purok", purokCount: "$counter" } } } },
+			{ $group: { _id: { barangay: "$_id.barangay", puroks: "$puroks" }, count: { $sum: "$_id.purok" } } },
 			{ $sort: { count: -1, _id: 1 } }
 		]
 	)
+
+	for (let count = 0; count < mostReportedBrgyDone.length; count++) {
+		let purokCount = 0;
+		for (let purokIndex = 0; purokIndex < mostReportedBrgyDone[count]._id.puroks.length; purokIndex++) {
+			purokCount += mostReportedBrgyDone[count]._id.puroks[purokIndex].purokCount;
+		}
+		console.log(mostReportedBrgyDone[count]._id.puroks)
+		mostReportedBrgyDone[count].count = purokCount;
+	}
+
+
 	let mostReportedBrgyUndone = await Dump.aggregate(
 		[
 			{ $match: { status: { $in: ["Confirmed", "Unfinish", "Cleaned"] } } },
-			{ $group: { _id: "$barangay", count: { $sum: 1 } } },
+			{ $group: { _id: { barangay: "$barangay", purok: "$purok" }, counter: { $sum: 1 } } },
+			{ $group: { _id: { barangay: "$_id.barangay" }, puroks: { $push: { purok: "$_id.purok", purokCount: "$counter" } } } },
+			{ $group: { _id: { barangay: "$_id.barangay", puroks: "$puroks" }, count: { $sum: "$_id.purok" } } },
 			{ $sort: { count: -1, _id: 1 } }
 		]
 	)
+
+	for (let count = 0; count < mostReportedBrgyUndone.length; count++) {
+		let purokCount = 0;
+		for (let purokIndex = 0; purokIndex < mostReportedBrgyUndone[count]._id.puroks.length; purokIndex++) {
+			purokCount += mostReportedBrgyUndone[count]._id.puroks[purokIndex].purokCount;
+		}
+		console.log(mostReportedBrgyUndone[count]._id.puroks)
+		mostReportedBrgyUndone[count].count = purokCount;
+	}
 
 
 	// res.status(200).json({
@@ -780,8 +806,21 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 		cluster = "$barangay"
 	}
 
-	let barangaysOrDistrictStatuses = []
+	let listOfViolation = []
+	if (req.body.rpbViolation) {
+		listOfViolation = [req.body.rpbViolation]
+	} else {
+		listOfViolation = [
+			"Littering, Illegal dumping, Illegal disposal of garbage",
+			"Dirty frontage and immediate surroundings for establisments owners",
+			"Improper and untimely stacking of garbage outside residence or establishment",
+			"Obstruction",
+			"Other"
+		]
+	}
 
+
+	let barangaysOrDistrictStatuses = []
 	if (cluster === "$barangay") {
 		let mostReportedPerBrgyTotals = await Dump.aggregate(
 			[
@@ -812,7 +851,7 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 
 		for (const BrgyTotals of mostReportedPerBrgyTotals) {
-			const result = await barangayStatuses(req.body.rpbStartDate, req.body.rpbEndDate, BrgyTotals._id)
+			const result = await barangayStatuses(req.body.rpbStartDate, req.body.rpbEndDate, BrgyTotals._id, listOfViolation)
 			barangaysOrDistrictStatuses.push(result)
 		}
 
@@ -844,7 +883,7 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 		)
 
 		for (const districtTotals of mostReportedPerDistrictsTotals) {
-			const result = await districtStatuses(req.body.rpbStartDate, req.body.rpbEndDate, districtTotals._id)
+			const result = await districtStatuses(req.body.rpbStartDate, req.body.rpbEndDate, districtTotals._id, listOfViolation)
 			barangaysOrDistrictStatuses.push(result)
 		}
 	}
@@ -911,7 +950,6 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 
 })
-
 
 
 

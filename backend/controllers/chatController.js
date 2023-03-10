@@ -54,6 +54,7 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 		time: req.body.time
 	}]
 
+
 	chat.chats = current_chats
 
 	await chat.save();
@@ -62,20 +63,23 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 
 	const NotifTitle = `New Message From ${req.user.first_name}: ${req.body.message}`
 
+	// console.log("req.body.receiver", req.body.receiver)
+	// 	console.log("req.body", req.body)
+
 
 	if (req.body.chatCategory == "donation") {
 
-		const item = await Item.find({ chat_id: req.params.id }).populate('chat_id').populate("user_id").populate("receiver_id");
+		const item = await Item.find({ chat_id: req.params.id }).populate('chat_id').populate("user_id");
 		const chatDetail = { _id: item[0].chat_id._id, room: item[0].chat_id.room }
 		const chatId = { _id: item[0].chat_id._id }
 		const chatLength = { length: item[0].chat_id.chats.length }
 		const itemId = { _id: item[0]._id }
 		const itemName = { name: item[0].name }
 		const itemObj = {
-			barangay_hall: item[0].barangay_hall,
+			barangay_hall: false,
 			user_id: item[0].user_id._id,
-			receiver_id: item[0].receiver_id._id,
-			receiver_name: item[0].receiver_id.first_name,
+			receiver_id: false,
+			receiver_name: false,
 			user_name: item[0].user_id.first_name
 		}
 
@@ -88,25 +92,47 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 			itemName,
 			itemObj
 		}
-
-
-		const bulk = await User.find({ _id: req.body.receiver }).updateMany({
-			$push: {
-				notifications: {
-					room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
-					title: NotifTitle,
-					sender_id: req.user.id,
-					receiver_id: req.body.receiver,
-					time: new Date(Date.now()),
-					barangay: req.user.barangay,
-					link: req.body.link,
-					notifCode: req.body.notifCode,
-					status: 'unread',
-					category: 'donation-new-message',
-					modelObj: obj
+		if (req.body.receiver == "administrator") {
+			const bulk = await User.find({ role: "administrator" }).updateMany({
+				$push: {
+					notifications: {
+						room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
+						title: NotifTitle,
+						sender_id: req.user.id,
+						time: new Date(Date.now()),
+						barangay: req.user.barangay,
+						link: req.body.link,
+						notifCode: req.body.notifCode,
+						status: 'unread',
+						category: 'donation-new-message',
+						modelObj: obj
+					}
 				}
-			}
-		});
+			});
+		} else {
+			
+			const bulk = await User.find({ _id: req.body.receiver }).updateMany({
+				$push: {
+					notifications: {
+						room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
+						title: NotifTitle,
+						sender_id: req.user.id,
+						receiver_id: req.body.receiver,
+						time: new Date(Date.now()),
+						barangay: req.user.barangay,
+						link: req.body.link,
+						notifCode: req.body.notifCode,
+						status: 'unread',
+						category: 'donation-new-message',
+						modelObj: obj
+					}
+				}
+			});
+
+			// console.log("bulk", bulk)
+
+		}
+
 
 		const userForPushNotification = await User.find({ _id: req.body.receiver }).select('push_tokens activeChat')
 		expoSendNotification(userForPushNotification, NotifTitle, 'PublicDonationsChat', obj, req.body.notifCode)
@@ -161,7 +187,7 @@ exports.updateChat = catchAsyncErrors(async (req, res, next) => {
 		if (req.user.role == "administrator") {
 
 
-			const bulk = await User.find({ _id: req.body.receiver, activeChat:false }).updateMany({
+			const bulk = await User.find({ _id: req.body.receiver, activeChat: false }).updateMany({
 				$push: {
 					notifications: {
 						room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',

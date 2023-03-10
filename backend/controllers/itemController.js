@@ -145,8 +145,16 @@ exports.addItem = catchAsyncErrors(async (req, res, next) => {
 		district,
 		// status,
 		// date_recieved,
-		user_id: req.user.id
+		user_id: req.user.id,
+		code: Math.random().toString(36).substring(2, 20)
 	})
+
+	const chat = await Chat.create({
+		room: item._id + "-" + Math.floor(Math.random() * Date.now())
+	})
+
+	item.chat_id = chat._id
+	await item.save();
 
 	const user = await User.findById(req.user.id);
 	let donated_items = [...user.donated_items, { item: item._id }]
@@ -173,8 +181,8 @@ exports.addItem = catchAsyncErrors(async (req, res, next) => {
 		}
 	});
 
-	const userForPushNotification = await User.find({ _id: { $ne: req.user.id }, role: { $in: ['user'] } })
-	expoSendNotification(userForPushNotification, NotifTitle, 'PublicDonationsView', item._id)
+	// const userForPushNotification = await User.find({ _id: { $ne: req.user.id }, role: { $in: ['user'] } })
+	// expoSendNotification(userForPushNotification, NotifTitle, 'PublicDonationsView', item._id)
 
 
 	res.status(201).json({
@@ -358,29 +366,62 @@ exports.confirmItem = catchAsyncErrors(async (req, res, next) => {
 
 exports.receiveItem = catchAsyncErrors(async (req, res, next) => {
 
-	const newItemData = {
-		status: "Received",
-		date_recieved: Date.now()
+	// const newItemData = {
+	// 	status: "Received",
+	// 	date_recieved: Date.now()
+	// }
+
+	// let item = await Item.findByIdAndUpdate(req.params.id, newItemData, {
+	// 	new: true,
+	// 	runValidators: true,
+	// 	useFindandModify: false
+	// })
+
+	let item = await Item.findById(req.params.id)
+
+	let images = []
+
+	if (typeof req.body.images === 'string') {
+		images.push(req.body.images)
+	} else {
+		images = req.body.images
 	}
 
-	let item = await Item.findByIdAndUpdate(req.params.id, newItemData, {
-		new: true,
-		runValidators: true,
-		useFindandModify: false
-	})
+	let imagesLinks = [];
+
+	if (req.body.images) {
+		for (let i = 0; i < images.length; i++) {
+			const result = await cloudinary.uploader.upload(images[i], {
+				folder: 'BasuraHunt/Item',
+				width: 150,
+				crop: "scale"
+			});
+
+			imagesLinks.push({
+				public_id: result.public_id,
+				url: result.secure_url
+			})
+		}
+	}
+
+	item.received_images = imagesLinks
+	item.status = "Received"
+	item.date_recieved =  Date.now()
+	item.receiver_name =  req.body.receiver_name
+	item.score =  req.body.rate
+	await item.save();
+
+	const user = await User.findById(item.user_id);
+	const addedExp = AddExp(user.exp, req.body.rate);
+	user.exp = addedExp[0];
+	user.level = addedExp[1];
+	await user.save();
 
 
-	// const user = await User.findById(item.user_id);
-	// const addedExp = AddExp(user.exp, req.body.rate);
-	// user.exp = addedExp[0];
-	// user.level = addedExp[1];
-	// await user.save();
-
-
-	receiver = await User.findById(item.receiver_id);
-	let receiveItems = [...receiver.received_items, { item: item._id }]
-	receiver.received_items = receiveItems
-	await receiver.save();
+	// receiver = await User.findById(item.receiver_id);
+	// let receiveItems = [...receiver.received_items, { item: item._id }]
+	// receiver.received_items = receiveItems
+	// await receiver.save();
 
 	const NotifTitle = `Your donated item has been received by ${req.user.first_name}`
 	const bulk1 = await User.find({ _id: item.user_id }).updateMany({

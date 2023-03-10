@@ -100,7 +100,7 @@ function MyTabs() {
                 })}
 
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name="MyClaimed"
                 component={MyClaimed}
                 options={{
@@ -142,7 +142,7 @@ function MyTabs() {
 
                     },
                 })}
-            />
+            /> */}
 
         </Tab.Navigator>
     )

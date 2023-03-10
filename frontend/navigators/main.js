@@ -13,12 +13,13 @@ import ScheduleView from "../screens/schedule/schedule-view";
 import AccessDenied from "../screens/extras/access-denied";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useSelector } from "react-redux";
+import PublicDonationsAdd from "../screens/donation/public-donations-add";
 const Tab = createBottomTabNavigator();
 
 
 const Main = () => {
     const [user, setUser] = useState()
-    const {user: authUser } = useSelector(state => state.auth);
+    const { user: authUser } = useSelector(state => state.auth);
     useEffect(() => {
 
         AsyncStorage.getItem("user")
@@ -27,9 +28,9 @@ const Main = () => {
             })
             .catch((error) => console.log(error))
 
-            return ()=>{
-                setUser()
-            }
+        return () => {
+            setUser()
+        }
 
     }, [authUser])
 
@@ -117,7 +118,7 @@ const Main = () => {
                     }
                 }}
             />
-            <Tab.Screen
+            {/* <Tab.Screen
                 name="Donation"
                 component={DonationsNav}
                 options={{
@@ -139,12 +140,25 @@ const Main = () => {
                         if (user.role === 'newUser') {
                             navigation.navigate('AccessDeniedDonation')
                         } else {
-                            navigation.navigate('Donation', { screen: 'PublicDonationsList'});
+                            navigation.navigate('Donation');
                         }
 
 
                     },
                 })}
+            /> */}
+            <Tab.Screen
+                name="Donate"
+                component={PublicDonationsAdd}
+                options={{
+                    tabBarIcon: (props) => {
+                        return <FontAwesome5
+                            name="box"
+                            color={props.color}
+                            size={25}
+                        />
+                    }
+                }}
             />
             <Tab.Screen
                 name="AccessDeniedDonation"
@@ -187,8 +201,15 @@ const Main = () => {
                     tabBarButton: () => null,
                     tabBarVisible: false,
                 }}
+            />
 
-
+            <Tab.Screen
+                name="Donation"
+                component={DonationsNav}
+                options={{
+                    tabBarButton: () => null,
+                    tabBarVisible: false,
+                }}
 
             />
 

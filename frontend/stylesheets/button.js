@@ -56,6 +56,12 @@ const BhButton = styled.TouchableOpacity`
             `
         }
         ${(props) => 
+            props.fullwidthBorder &&
+            css`
+                width: 100%
+            `
+        }
+        ${(props) => 
             props.gray &&
             css`
                 background: gray

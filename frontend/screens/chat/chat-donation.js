@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState, Fragment } from "react";
 import { Keyboard, AppState, Animated, Text, FlatList, StyleSheet, View, Image, TextInput, TouchableOpacity, Easing, Dimensions, ActivityIndicator } from "react-native";
-import { HStack } from "native-base";
+import { Button, HStack } from "native-base";
 import ReversedFlatList from 'react-native-reversed-flat-list';
 import ChatBubble from "../../stylesheets/chatBubble";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -15,13 +15,14 @@ import { activeChat } from "../../Redux/Actions/chatActions";
 import { getItemDetails } from "../../Redux/Actions/itemActions";
 import RandomStringGenerator from "../extras/randomStringGenerator";
 import NotificationSender from "../extras/notificationSender";
+import BhButton from "../../stylesheets/button";
 const socket = io.connect(SOCKET_PORT);
 let deviceWidth = Dimensions.get('window').width
 const ChatDonation = (props) => {
     const dispatch = useDispatch();
 
     const { chat: chatCompleteDetail, loading: chatLoading, chats } = useSelector(state => state.chatDetails)
-    
+
 
     const chatDetail = props.route.params.chatDetail
     const category = props.route.params.category
@@ -32,7 +33,7 @@ const ChatDonation = (props) => {
     const barangay_hall = props.route.params.barangay_hall
     const user_id = props.route.params.user_id
     const receiver_id = props.route.params.receiver_id
-    const receiver_name= props.route.params.receiver_name
+    const receiver_name = props.route.params.receiver_name
     const user_name = props.route.params.user_name
     const sampleData = require("../../assets/sampleData/chat.json");
     const [message, setMessage] = useState("");
@@ -47,7 +48,7 @@ const ChatDonation = (props) => {
         useCallback(() => {
             console.log("barangay_hall", barangay_hall)
             console.log("user_id", user_id)
-            console.log("receiver_id",receiver_id)
+            console.log("receiver_id", receiver_id)
             const formDataActive = new FormData();
             formDataActive.append("activeChat", "true");
             dispatch(activeChat(formDataActive))
@@ -70,7 +71,7 @@ const ChatDonation = (props) => {
                     const formDataDeactive = new FormData();
                     formDataDeactive.append("activeChat", "false");
                     dispatch(activeChat(formDataDeactive))
-                } 
+                }
             });
 
             socket.connect()
@@ -116,11 +117,23 @@ const ChatDonation = (props) => {
         // }
     }, [chats])
 
+    function formatAMPM(time) {
+        const timeArray = time.split(":");
+        var hours = timeArray[0];
+        var minutes = timeArray[1];
+        var ampm = hours >= 12 ? 'pm' : 'am';
+        hours = hours % 12;
+        hours = hours ? hours : 12; // the hour '0' should be '12'
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        var strTime = hours + ':' + minutes + ' ' + ampm;
+        return strTime;
+    }
+
     const sendHandler = () => {
         // console.log("meron")
         // console.log(data)
         if (message !== "") {
-            const chatTime = new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes()
+            const chatTime = new Date().toLocaleDateString("en-US") + " " + formatAMPM(new Date(Date.now()).getHours() + ":" + new Date(Date.now()).getMinutes())
             const messageData = {
                 room: chatDetail.room,
                 author: user,
@@ -130,12 +143,12 @@ const ChatDonation = (props) => {
             const linkForNotif = `/donation/${itemId}/true`
             const notifCodeForChat = RandomStringGenerator(40)
             let chatReceiver
-			if (String(userDetail._id) === String(user_id)) {
-				chatReceiver = receiver_id
-			}
-			else {
-				chatReceiver = user_id
-			}
+            if (String(userDetail._id) === String(user_id)) {
+                chatReceiver = receiver_id
+            }
+            else {
+                chatReceiver = user_id
+            }
             const formData = new FormData();
             formData.append('message', message);
             formData.append('notifCode', notifCodeForChat);
@@ -159,12 +172,12 @@ const ChatDonation = (props) => {
             socket.emit("send_message", messageData);
 
             if (String(userDetail._id) === String(user_id)) {
-				NotificationSender(`New message from ${userDetail.first_name}: ${message}`, user_id, receiver_id, barangay_hall, 'donation-new-message', notifCodeForChat, {_id: itemId})
-			}
-			else {
-				NotificationSender(`New message from ${userDetail.first_name}: ${message}`, receiver_id, user_id, barangay_hall, 'donation-new-message', notifCodeForChat,{_id: itemId})
+                NotificationSender(`New message from ${userDetail.first_name}: ${message}`, user_id, receiver_id, barangay_hall, 'donation-new-message', notifCodeForChat, { _id: itemId })
+            }
+            else {
+                NotificationSender(`New message from ${userDetail.first_name}: ${message}`, receiver_id, user_id, barangay_hall, 'donation-new-message', notifCodeForChat, { _id: itemId })
 
-			}
+            }
 
         }
     }
@@ -321,11 +334,11 @@ const ChatDonation = (props) => {
                             outputRange: [0, 1]
                         })
                     }]}>
-                    {user_id === user?
-                        `${receiver_name}(receiver)`:
+                    {user_id === user ?
+                        `Chat With Admininstator` :
                         `${user_name}(donor)`
                     }
-                   
+
                 </Animated.Text>
 
 
@@ -335,7 +348,14 @@ const ChatDonation = (props) => {
             </View>
             <View style={{ backgroundColor: "#1E5128", paddingHorizontal: 12 }}>
                 <Text style={{ fontSize: 10, width: deviceWidth, color: "white" }}>Name: {itemName}</Text>
+            <BhButton onPress={() => {
+                    dispatch(getItemDetails(itemId))
+                    props.navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item_id: itemId } } })
+                }}  style={{ borderColor:"white", borderWidth:2}} fullwidth>
+                <Text style={{ color: "white" }}>View Details</Text>
+            </BhButton>
             </View>
+           
             {/* {console.log("messageList", messageList === undefined || messageList.length <= 0)} */}
             <FlatList
                 ref={flatlist}

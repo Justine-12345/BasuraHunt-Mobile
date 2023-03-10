@@ -33,22 +33,55 @@ const Ranking1 = () => {
         }, 2000);
     }, []);
 
+    const purok = (purokList) => {
+        let count = 1
+        let list1 = ""
+        let list2 = ""
+        console.log(purokList)
+
+        purokList.forEach(purok => {
+            if (count <= 3) {
+                list1 = list1 + "Purok " + purok.purok;
+
+                if (count < purokList.length) {
+                    list1 = list1 + ", ";
+                }
+                count++
+            }
+            else if (count > 3 && count < purokList.length) {
+                list2 = list2 + "Purok " + purok.purok + ", ";
+                count++
+            }
+            else if (count === purokList.length) {
+                list2 = list2 + "Purok " + purok.purok;
+            }
+
+        });
+
+        return (
+            list1 + " " + list2
+        );
+    }
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}
             refreshControl={
                 <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+
         >
+           
             {/* most reported */}
             <View style={RandomStyle.rContainer}>
                 <Text style={RandomStyle.rText1}>Barangays with Most Reported Illegal Dumps</Text>
                 {mostReportedBrgyUndone && mostReportedBrgyUndone.length > 0 ?
                     mostReportedBrgyUndone.map((item, index) => {
+                        {/* {console.log("item._id.barangay", item._id.barangay)} */}
                         return (
-                            <HStack key={item._id} style={RandomStyle.rItems}>
+                            <HStack key={item._id.barangay} style={RandomStyle.rItems}>
                                 <Text style={RandomStyle.rItem4}>{index + 1}</Text>
                                 <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.rItem1}>{item._id}</Text>
-                                    <Text numberOfLines={1} style={RandomStyle.rItem3}>Kap. <Kapitan barangay={item._id} /></Text>
+                                    <Text numberOfLines={1} style={RandomStyle.rItem1}>{item._id && item._id.barangay}</Text>
+                                    <Text numberOfLines={1} style={RandomStyle.rItem3}>{purok(item._id.puroks)}</Text>
                                 </VStack>
                                 <Text style={RandomStyle.rItem2}>{item.count}</Text>
                             </HStack>

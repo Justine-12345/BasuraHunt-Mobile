@@ -28,11 +28,6 @@ const LoadingPublicDonationsView = (props) => {
                     </HStack>
                     {/* Claim */}
                 </View>
-                <HStack>
-                    <Text style={RandomStyle.vText2}>Drop point: </Text>
-                    <Skeleton style={{alignSelf: "center"}} width={100} animation="pulse"/>
-                </HStack>
-                <Skeleton style={RandomStyle.vMapContainer} animation="pulse"/>
                 <View style={RandomStyle.vImages}>
                     <Skeleton style={RandomStyle.vImage} animation="pulse"/>
                     <Skeleton style={RandomStyle.vImage} animation="pulse"/>

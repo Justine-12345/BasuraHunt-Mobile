@@ -13,16 +13,31 @@ const itemSchema = new mongoose.Schema({
             },
         }
     ],
+    received_images: [
+        {
+            public_id: {
+                type: String,
+                required: true,
+            },
+            url: {
+                type: String,
+                required: true,
+            },
+        }
+    ],
+
+    receiver_name : {
+        type: String,
+        trim: true    
+    },
 
     barangay_hall: {
         type: String,
-        required: [true, 'Please select barangay hall'],
         trim: true
     },
     
     district: {
         type: Number,
-        required: true,
     },
 
     item_type:[{
@@ -95,6 +110,11 @@ const itemSchema = new mongoose.Schema({
 
     code : {
         type: String
+    },
+    
+    score: {
+        type: Number,
+        default:0
     },
 
     receiver_id: {

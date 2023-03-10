@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const { 
+    getLandingPageTodayCollectionPointList,
     getTodayCollectionPointList,
     getUpcomingCollectionPointList,
     getSingleCollectionPoint,
@@ -15,6 +16,8 @@ const {
 } = require('../controllers/collectionPointController');
 
 const { isAuthenticatedUser,authorizeRoles } = require('../middlewares/auth');
+
+router.route('/collectionPoint/landingPage/today').get(getLandingPageTodayCollectionPointList);
 
 router.route('/collectionPoint/today').get(isAuthenticatedUser, getTodayCollectionPointList);
 router.route('/collectionPoint/upcoming').get(isAuthenticatedUser, getUpcomingCollectionPointList);

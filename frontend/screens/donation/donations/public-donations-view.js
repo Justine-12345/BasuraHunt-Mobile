@@ -33,48 +33,27 @@ const PublicDonationsView = (props) => {
     const [item, setItem] = useState()
     const [rate, setRate] = useState(0)
     const [rateError, setRateError] = useState(false)
+    const [imgIndexCleaned, setImgIndexCleaned] = useState(0);
+    const [openImagesCleaned, setOpenImagesCleaned] = useState(false);
     // const creationDate = new Date(item.createdAt).toLocaleDateString()
 
     const { error: itemError, item: itemDetail, loading: itemLoading } = useSelector(state => state.itemDetails);
     const { loading, error, isClaimed, isCanceled, isConfirmed, isReceived, isDeleted } = useSelector(state => state.item);
 
-    const barangays = {
-        Bagumbayan: [121.05924206803411, 14.473774649313196],
-        Bambang: [121.07297471217399, 14.52577008620341],
-        Calzada: [121.08000894132097, 14.533619787394496],
-        Hagonoy: [121.06162966585019, 14.511649221382521],
-        "Ibayo-Tipas": [121.08475762358806, 14.541766751550389],
-        "Ligid-Tipas": [121.08473120422887, 14.541773687735182],
-        "Lower Bicutan": [121.06229965724987, 14.488944645566308],
-        "New Lower Bicutan": [121.0652470367573, 14.505379302559184],
-        Napindan: [121.0961600538771, 14.540263915184013],
-        Palingon: [121.08018865634412, 14.538256882049698],
-        "San Miguel": [121.07480765437771, 14.517814348623812],
-        "Santa Ana": [121.07686198942896, 14.527932178623535],
-        Tuktukan: [121.07181460457123, 14.528203695545075],
-        Ususan: [121.06870824841819, 14.535486937998462],
-        Wawa: [121.07509642634135, 14.521833881862982],
-        "Central Bicutan": [121.05406605687651, 14.49200668084731],
-        "Central Signal Village": [121.05654718163518, 14.511360625728697],
-        "Fort Bonifacio": [121.02685222392394, 14.5256292940773],
-        Katuparan: [121.05838280343642, 14.521473719288505],
-        "Maharlika Village": [121.05539748012504, 14.497235903682506],
-        "North Daang Hari": [121.04829074488599, 14.485817269464212],
-        "North Signal Village": [121.05557948004248, 14.51529618707773],
-        Pinagsama: [121.0556073, 14.5230837],
-        "South Daang Hari": [121.04876862250126, 14.47146040914458],
-        "South Signal Village": [121.05354243593912, 14.505188137766536],
-        Tanyag: [121.04944295523825, 14.47817374094515],
-        "Upper Bicutan": [121.05034993106864, 14.496916364200366],
-        "Western Bicutan": [121.03811937461039, 14.509578360670313],
-    }
-
+    
     let uniqueIt = []
     let images = [];
+    let imagesPreview = [];
 
     const showImages = (index) => {
         setOpenImages(true);
         setImgIndex(index);
+    }
+
+    
+    const showImagesCleaned = (index) => {
+        setOpenImagesCleaned(true);
+        setImgIndexCleaned(index);
     }
 
     const donatedUsing = (item) => {
@@ -253,6 +232,12 @@ const PublicDonationsView = (props) => {
     item && item.images && item.images.forEach(img => {
         images.push({ uri: img.url })
     });
+
+    item && item.received_images && item.received_images.forEach(img => {
+        imagesPreview.push({ uri: img.url })
+    });
+
+
     useEffect(() => {
         // console.log("item_id",item_id)
         if (item_id) {
@@ -286,6 +271,13 @@ const PublicDonationsView = (props) => {
                                     <HStack>
                                         <Text style={RandomStyle.vText2}>Date Received: </Text>
                                         <Text>{item && (formatDate(item.date_recieved))}</Text>
+                                    </HStack>
+                                    : null
+                                }
+                                {item && item.receiver_name != null ?
+                                    <HStack>
+                                        <Text style={RandomStyle.vText2}>Received By: </Text>
+                                        <Text>{item && item.receiver_name}</Text>
                                     </HStack>
                                     : null
                                 }
@@ -427,24 +419,15 @@ const PublicDonationsView = (props) => {
                                 </>
                             }
                             {/* {console.log(item&&item)} */}
-                            {item && item.status !== 'Unclaimed' ?
+                            {/* {item && item.status !== 'Unclaimed' ? */}
                                 <TouchableOpacity onPress={() => { props.navigation.navigate('PublicDonationsChat', { chat: item && item.chat_id && item.chat_id.chats, chatDetail: item && item.chat_id, chatId: item && item.chat_id && item.chat_id._id, itemId: item && item._id, itemName: item && item.name, chatLength: item && item.chat_id && item.chat_id.chats && item.chat_id.chats.length, category: category, barangay_hall: item && item.barangay_hall, user_id: item && item.user_id && item.user_id._id, receiver_id: item && item.receiver_id && item.receiver_id._id, receiver_name: item && item.receiver_id && item.receiver_id.first_name, user_name: item && item.user_id && item.user_id.first_name }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
                                     <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                                </TouchableOpacity> : null
-                            }
+                                </TouchableOpacity> 
+                              
+                            {/* } */}
 
 
                         </HStack>
-                    </View>
-                    <HStack>
-                        <Text style={RandomStyle.vText2}>Drop point: </Text>
-                        <Text>{item && item.barangay_hall}</Text>
-                    </HStack>
-                    <View style={RandomStyle.vMapContainer}>
-                        {/* {console.log("item",item&&item)} */}
-                        {item && item.barangay_hall ?
-                            <MapViewer long={barangays && barangays[item && item.barangay_hall][0]} lati={barangays && barangays[item && item.barangay_hall][1]} /> : null
-                        }
                     </View>
                     <View style={RandomStyle.vImages}>
                         {item && item.images && item.images.map((img, index) =>
@@ -459,6 +442,28 @@ const PublicDonationsView = (props) => {
                             onRequestClose={() => setOpenImages(false)}
                         />
                     </View>
+
+                  
+                   
+                    {item && item.status === "Received" ?
+                            <>
+                            <Text style={RandomStyle.vText2}>Proof of Receive</Text>
+                                <View style={RandomStyle.vImages}>
+                                    {item && item.received_images && item.received_images.map((img, index) =>
+                                        <TouchableOpacity key={index} onPress={() => showImagesCleaned(index)}>
+                                            <Image style={RandomStyle.vImage} source={{ uri: img.url }} resizeMode="cover" />
+                                        </TouchableOpacity>
+                                    )}
+                                    <ImageView
+                                        images={imagesPreview}
+                                        imageIndex={imgIndexCleaned}
+                                        visible={openImagesCleaned}
+                                        onRequestClose={() => setOpenImagesCleaned(false)}
+                                    />
+                                </View>
+                            </> : null
+                        }
+
 
                     <Text style={RandomStyle.vText2}>Type</Text>
                     <View style={RandomStyle.vContainer2}>

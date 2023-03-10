@@ -35,6 +35,16 @@ const Form1 = StyleSheet.create({
         padding: 5,
         width: "100%"
     },
+
+    textInput2AdditionalDetails: {
+        borderWidth: 1,
+        borderColor: "lightgrey",
+        borderRadius: 5,
+        fontSize: 15,
+        padding: 5,
+        width: "100%",
+        backgroundColor:"white"
+    },
     birthdate: {
         fontSize: 20,
         textAlign: "center"

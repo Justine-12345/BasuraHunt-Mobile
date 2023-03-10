@@ -39,6 +39,7 @@ const AssignedAccomplished = (props) => {
     const user_id = props.route.params.user_id
     const long = props.route.params.long
     const lati = props.route.params.lati
+    const purokParams = props.route.params.purok
     const dumpBarangay = props.route.params.barangay
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
@@ -56,6 +57,7 @@ const AssignedAccomplished = (props) => {
     const [landmark, setLandmark] = useState('')
     const [barangay, setBarangay] = useState('')
     const [user, setUser] = useState();
+    const [purok, setPurok] = useState(`${purokParams}`);
 
 
 
@@ -110,9 +112,9 @@ const AssignedAccomplished = (props) => {
                 setUser(JSON.parse(res))
             })
             .catch((error) => console.log(error))
-        
-            console.log("role", role)
-            console.log("user_id", user_id)
+
+        console.log("role", role)
+        console.log("user_id", user_id)
 
         if (isUpdatedStatus) {
             // dispatch(getDumpList());
@@ -129,11 +131,11 @@ const AssignedAccomplished = (props) => {
 
             let notifTitle = "Congratulations! Your reported illegal dump has been cleaned"
 
-            NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id:id })
+            NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
 
             if (role === "newUser") {
                 const notifTitle1 = "Congratulation you are now a verified user."
-                NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id:id })
+                NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
 
             }
 
@@ -245,6 +247,7 @@ const AssignedAccomplished = (props) => {
             formData.append('rate', rate)
             formData.append('notifCode', notifCode);
             formData.append('notifCode1', notifCode1);
+            formData.append('purok', purok);
 
             images.forEach(image => {
                 formData.append('accomplished_images', image)
@@ -320,6 +323,11 @@ const AssignedAccomplished = (props) => {
 
 
                         />
+
+                        <VStack>
+                            <Text style={RandomStyle.vText2}>Purok: </Text>
+                            <TextInput value={purok} keyboardType="numeric" onChangeText={(purok_value) => { setPurok(purok_value) }} placeholder="" style={Form1.textInput2} />
+                        </VStack>
 
                         <BhButton center medium onPress={submitHandle}>
                             <Text style={{ color: "white" }}>Submit</Text>

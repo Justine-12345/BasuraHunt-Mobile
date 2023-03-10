@@ -7,8 +7,8 @@ const {
 
 const { isAuthenticatedUser,authorizeRoles } = require('../middlewares/auth');
 
-router.route('/chat/:id').get(isAuthenticatedUser, authorizeRoles('administrator','user'), getChat);
-router.route('/chat/new').post(isAuthenticatedUser, authorizeRoles('administrator','user'), newChat);
-router.route('/chat/:id').put(isAuthenticatedUser, authorizeRoles('administrator','user'), updateChat);
+router.route('/chat/:id').get(isAuthenticatedUser, authorizeRoles('administrator','user',  'newUser'), getChat);
+router.route('/chat/new').post(isAuthenticatedUser, authorizeRoles('administrator','user',  'newUser'), newChat);
+router.route('/chat/:id').put(isAuthenticatedUser, authorizeRoles('administrator','user',  'newUser'), updateChat);
 router.route('/chat/active-chat').post(isAuthenticatedUser, activeChat);
 module.exports = router;

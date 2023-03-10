@@ -243,6 +243,7 @@ const PublicReportsList = ({ navigation }) => {
                 }} activeOpacity={.8}>
                     <View style={RandomStyle.lContainer2}>
                         <HStack>
+                        <Text style={RandomStyle.vBadge}>{item.status === "newReport" ? "New Report" : item.status}</Text>
                             <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                             <VStack>
                                 <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>

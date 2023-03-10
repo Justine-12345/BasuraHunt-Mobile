@@ -16,6 +16,8 @@ import { ADD_ITEM_RESET } from "../../Redux/Constants/itemConstants";
 import NotificationSender from "../extras/notificationSender";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import RandomStringGenerator from "../extras/randomStringGenerator";
+const swearjarEng = require('swearjar-extended2');
+const swearjarFil = require('swearjar-extended2');
 const windowHeight = Dimensions.get('window').height;
 const PublicReportsAdd = ({ navigation }) => {
 
@@ -35,7 +37,6 @@ const PublicReportsAdd = ({ navigation }) => {
     const [images, setImages] = useState([]);
     const [imagesPreview, setImagesPreview] = useState([]);
     const [type, setType] = useState("");
-    const [barangay, setBarangay] = useState("");
 
     const [typeFO, setTypeFO] = useState(false);
     const [typeCL, setTypeCL] = useState(false);
@@ -105,37 +106,6 @@ const PublicReportsAdd = ({ navigation }) => {
     }
 
 
-    const barangayList = [
-        { value: "Bagumbayan" },
-        { value: "Bambang" },
-        { value: "Calzada" },
-        { value: "Hagonoy" },
-        { value: "Ibayo-Tipas" },
-        { value: "Ligid-Tipas" },
-        { value: "Lower Bicutan" },
-        { value: "New Lower Bicutan" },
-        { value: "Napindan" },
-        { value: "Palingon" },
-        { value: "San Miguel" },
-        { value: "Santa Ana" },
-        { value: "Tuktukan" },
-        { value: "Ususan" },
-        { value: "Wawa" },
-        { value: "Central Bicutan" },
-        { value: "Central Signal Village" },
-        { value: "Fort Bonifacio" },
-        { value: "Katuparan" },
-        { value: "Maharlika Village" },
-        { value: "North Daang Hari" },
-        { value: "North Signal Village" },
-        { value: "Pinagsama" },
-        { value: "South Daang Hari" },
-        { value: "South Signal Village" },
-        { value: "Tanyag" },
-        { value: "Upper Bicutan" },
-        { value: "Western Bicutan" }
-    ];
-
     useEffect(() => {
 
         AsyncStorage.getItem("user")
@@ -155,13 +125,13 @@ const PublicReportsAdd = ({ navigation }) => {
 
             setName('')
             setAdditionalDescription('')
-            setBarangay('')
+        
             setItemTypes([])
             setItemDesc('')
             setDonateUsing('')
             dispatch({ type: ADD_ITEM_RESET })
 
-            NotificationSender(`New donated item has been added`, user._id, null, barangay, 'donation-new', notifCode, item && item)
+            NotificationSender(`New donated item has been added`, user._id, null, null, 'donation-new', notifCode, item && item)
             navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'UserDonationsList' } })
 
         }
@@ -184,7 +154,6 @@ const PublicReportsAdd = ({ navigation }) => {
         // console.log(imagesPreview.length)
         // console.log(images.length) 
         // console.log(name)
-        // console.log(barangay)
         // console.log(additionalDescription)
         // console.log(itemDesc)
         // console.log(additionalDescription)
@@ -194,8 +163,13 @@ const PublicReportsAdd = ({ navigation }) => {
         const formData = new FormData();
 
         formData.append("name", name);
-        formData.append("addional_desciption", additionalDescription);
-        formData.append("barangay_hall", barangay);
+
+        swearjarEng.setLang("en");
+        const cleanAddDescEng = swearjarEng.censor(additionalDescription);
+        swearjarFil.setLang("ph");
+        const cleanAddDescFil = swearjarEng.censor(cleanAddDescEng);
+
+        formData.append("addional_desciption", cleanAddDescFil);
         if (itemTypes.includes("Other")) {
             formData.append("item_desc", itemDesc);
         } else {
@@ -259,20 +233,6 @@ const PublicReportsAdd = ({ navigation }) => {
 
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Barangay Hall: </Text>
-                    <Text style={{ fontStyle: "italic" }}>(To ensure the security of both parties, the meetup location for donation should only be in the Barangay Hall of one of the involved parties. )</Text>
-                    <View style={RandomStyle.vContainer3}>
-                        <Select marginTop={1} placeholder="Select Barangay" selectedValue={barangay} onValueChange={item => setBarangay(item)}>
-                            {barangayList.length > 0 ?
-                                barangayList.map(item => {
-                                    return (
-                                        <Select.Item key={item} label={item.value} value={item.value} />
-                                    )
-                                })
-                                : null}
-                        </Select>
-                    </View>
-
                     <Text style={RandomStyle.vText2}>Type of Donation</Text>
                     <View style={RandomStyle.vContainer2}>
                         <CheckboxBtn isChecked={itemTypes.includes("Food")} onPress={(e) => { !itemTypes.includes("Food") ? setItemTypes(oldArray => [...oldArray, "Food"]) : setItemTypes(itemTypes.filter(type => type !== "Food")) }} >
@@ -292,6 +252,9 @@ const PublicReportsAdd = ({ navigation }) => {
                         </CheckboxBtn>
                         <CheckboxBtn isChecked={itemTypes.includes("Other")} onPress={(e) => { !itemTypes.includes("Other") ? setItemTypes(oldArray => [...oldArray, "Other"]) : setItemTypes(itemTypes.filter(type => type !== "Other")); setTypeOther(!typeOther) }} >
                             <Text style={{ color: "white" }}>Other</Text>
+                        </CheckboxBtn>
+                        <CheckboxBtn isChecked={itemTypes.includes("Cleaning Materials")} onPress={(e) => { !itemTypes.includes("Cleaning Materials") ? setItemTypes(oldArray => [...oldArray, "Cleaning Materials"]) : setItemTypes(itemTypes.filter(type => type !== "Cleaning Materials")) }} >
+                            <Text style={{ color: "white" }}>Cleaning Materials</Text>
                         </CheckboxBtn>
 
                         {typeOther === true ?
