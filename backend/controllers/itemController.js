@@ -215,7 +215,7 @@ exports.claimItem = catchAsyncErrors(async (req, res, next) => {
 	itemForChat.chat_id = chat._id
 	await itemForChat.save();
 
-	const NotifTitle = `Your donated item has been claimed by ${item.receiver_id.first_name}`
+	const NotifTitle = `Your donated item has claimed by ${item.receiver_id.first_name}`
 
 	const bulk = await User.find({ _id: item.user_id }).updateMany({
 		$push: {
