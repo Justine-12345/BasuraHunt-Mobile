@@ -140,7 +140,7 @@ const PublicReportsAdd = ({ navigation }) => {
             Toast.show({
                 type: 'error',
                 text1: error,
-                text2: 'Something went wrong, please try again later'
+                text2: 'Something went wrong! Please try again later'
             });
             console.log(error)
             dispatch(clearErrors())
@@ -266,7 +266,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         }
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Item Name: </Text>
+                    <Text style={RandomStyle.vText2}>Item Name:  </Text>
                     <View style={RandomStyle.vContainer2}>
                         <TextInput placeholder="..." style={Form1.textInput2} value={name} onChangeText={(value) => { setName(value) }} />
                     </View>
