@@ -264,10 +264,10 @@ const AssignedAccomplished = (props) => {
     return (
         <>
 
-            {loading ?
+            {dumpLoading ?
                 <View style={{ position: "relative", top: windowHeight / 3 }}>
                     <ActivityIndicator size="large" color="#1E5128" />
-                    <Text style={[{ color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}>Submitting Report </Text>
+                    <Text style={[{ color: "grey", textAlign: "center", marginVertical: 24, fontStyle: "italic" }]}>Updating Report </Text>
                 </View> :
 
                 <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
@@ -280,6 +280,10 @@ const AssignedAccomplished = (props) => {
                             <Text style={RandomStyle.vText1}> Accomplishment of Illegal Dump Report</Text>
                         </View>
                         {/* ========== */}
+
+
+
+
                         <>
                             <HStack justifyContent={"space-between"}>
                                 <BhButton medium onPress={pickImage}>

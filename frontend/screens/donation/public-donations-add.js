@@ -28,7 +28,7 @@ const PublicReportsAdd = ({ navigation }) => {
     const [additionalDescription, setAdditionalDescription] = useState('');
     const [itemTypes, setItemTypes] = useState([]);
     const [itemDesc, setItemDesc] = useState('');
-    const [donateUsing, setDonateUsing] = useState('');
+    const [donateUsing, setDonateUsing] = useState('Real Name');
     const [status, setStatus] = useState('');
 
     const [openImages, setOpenImages] = useState(false);
@@ -184,7 +184,7 @@ const PublicReportsAdd = ({ navigation }) => {
             formData.append('item_types', it)
         })
 
-        formData.append("donate_using", donateUsing)
+        formData.append("donate_using", "Real name")
         formData.append('notifCode', notifCode);
         // console.log(formData)
         dispatch(addItem(formData))
@@ -273,14 +273,14 @@ const PublicReportsAdd = ({ navigation }) => {
                         <TextInput textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} value={additionalDescription} onChangeText={(value) => { setAdditionalDescription(value) }} />
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Donated by: </Text>
+                    {/* <Text style={RandomStyle.vText2}>Donated by: </Text>
                     <View style={RandomStyle.vContainer3}>
                         <Select marginTop={1} placeholder="Name to be shown" selectedValue={donateUsing} onValueChange={item => setDonateUsing(item)}>
                             <Select.Item label="Real Name" value="Real name" />
                             <Select.Item label="Alias" value="Alias" />
                             <Select.Item label="Anonymous" value="Anonymous" />
                         </Select>
-                    </View>
+                    </View> */}
 
 
                     {loading ?

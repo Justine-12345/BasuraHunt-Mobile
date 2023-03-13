@@ -488,10 +488,10 @@ const PublicDonationsView = (props) => {
                         <Text>{item && item.addional_desciption}</Text>
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Donated by</Text>
+                    {/* <Text style={RandomStyle.vText2}>Donated by</Text>
                     <View style={RandomStyle.vContainer2}>
                         <Text>*{donatedUsing(item && item)}*</Text>
-                    </View>
+                    </View> */}
 
                 </View>
             </ScrollView>

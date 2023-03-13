@@ -68,15 +68,13 @@ update dumps status for collector
 add recieve item tab in profile
 fix image preview
 
-PR = ()
-//---feedback-new (pagawan ng desing feedback)
+PR = (Used)
 collector update dump
 web: not require collector when confirmed dump
 web and mobile: collector collection today, even if his not barangay
 
-web users record
-hide e-cert Button
-mobile: seperate header for auth and visitor
+PR = (Used)
+--- hide e-cert Button
 refresh
     newsfeed
     PublicReportsList
@@ -85,12 +83,13 @@ refresh
     Ranking3
     Ranking4
     UserReportList
-//--- donation code
-load map before report
-report dump firt page with i understand
+//---load map before report
+--- report dump firt page with i understand
 --- edit capture button (pagawa kay cel)
- infinite loading of level in profile, revise web
+//---infinite loading of level in profile, revise web
  put click to searches
+
+PR = ()
  admin crud loading 
  fix status select
  cleaned label

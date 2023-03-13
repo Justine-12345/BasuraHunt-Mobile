@@ -28,7 +28,7 @@ router.route(`/dashboard/totalUsers`).get(isAuthenticatedUser, authorizeRoles('a
 router.route(`/dashboard/totalDumps`).get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'),getTotalDumps);
 router.route(`/dashboard/totalDonations`).get(isAuthenticatedUser, authorizeRoles('administrator'),getTotalDonations);
 
-router.route(`/dashboard/reportsPerCategory`).post(isAuthenticatedUser, authorizeRoles('administrator'), getReportsPerCategory);
+router.route(`/dashboard/reportsPerCategory`).post(isAuthenticatedUser, authorizeRoles('administrator','barangayAdministrator'), getReportsPerCategory);
 router.route(`/dashboard/donationsPerCategory`).post(isAuthenticatedUser, authorizeRoles('administrator'), getDonationsPerCategory);
 router.route(`/dashboard/topUserDonation`).post(isAuthenticatedUser, authorizeRoles('administrator'), getTopUserDonation);
 router.route(`/dashboard/topUserReport`).post(isAuthenticatedUser, authorizeRoles('administrator'), getTopUserReport);

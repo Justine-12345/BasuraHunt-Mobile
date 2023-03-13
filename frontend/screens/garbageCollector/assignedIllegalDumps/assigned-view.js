@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect, Fragment } from "react";
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from "react-native";
 import { HStack, InputGroup, Select, VStack } from "native-base";
+import moment from "moment";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -21,6 +22,7 @@ import { updateDumpStatus, clearErrors } from "../../../Redux/Actions/dumpAction
 import RandomStringGenerator from "../../extras/randomStringGenerator";
 import { UPDATE_DUMP_STATUS_RESET } from "../../../Redux/Constants/dumpConstants";
 import NotificationSender from "../../extras/notificationSender";
+import Star from "../../home/extras/Star";
 //import item from "../../../assets/sampleData/items";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
@@ -270,6 +272,27 @@ const AssignedView = (props) => {
         // console.log(new_status)
     }
 
+    const getCleanedDuration = () => {
+        // const date_created = new Date(dump && dump.createdAt)
+        // const date_cleaned = new Date(dump && dump.date_cleaned)
+
+        // const dif = Math.abs(date_cleaned - date_created);
+        // const d = dif / (1000 * 3600 * 24)
+        // return Math.ceil(d)
+        const minute = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "minutes")
+	    const hour = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "hours")
+		const day = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "days") 
+		
+		if(day === 0 && hour >= 1){
+			return hour +` hour${hour>=2? "s": ""}`
+		}
+		else if(day === 0 && hour === 0){
+			return minute +` minute${minute>=2? "s": ""}`
+		}else{
+			return day +` day${day>=2? "s": ""}`
+		}	
+    }
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <View style={RandomStyle.vContainer}>
@@ -398,7 +421,13 @@ const AssignedView = (props) => {
 
                                 <Text style={[RandomStyle.vText2, { marginVertical: 10 }]}>Status: </Text>
                                 {status === "Cleaned" ?
-                                    <Text style={{ marginTop: 10 }}>{status}</Text>
+                                    <>
+                                     {dump && dump.date_cleaned ?
+                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump&&dump.score/10}/></Text> :
+                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "":`approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "":dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "":"to clean"}</Text>
+                                    }
+                                    
+                                    </>
                                     :
                                     <Select
                                         minWidth="200"
@@ -409,7 +438,6 @@ const AssignedView = (props) => {
                                         <Select.Item key={"Cleaned"} value={"Cleaned"} label={"Cleaned"} style={status === "Cleaned" ? { display: "none" } : null} />
                                     </Select>
                                 }
-
 
 
                                 {/* <Text>{status === "newReport" ? "New Report" : status}</Text> */}

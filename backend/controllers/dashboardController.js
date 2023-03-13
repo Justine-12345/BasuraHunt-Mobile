@@ -29,9 +29,9 @@ exports.getTotalDumps = catchAsyncErrors(async (req, res, next) => {
 	let dumpsTotal = [];
 
 	if (req.user.role == 'administrator') {
-		dumpsTotal = await Dump.countDocuments()
+		dumpsTotal = await Dump.countDocuments({status: { $in: ["Confirmed", "Unfinish", "Cleaned"] }})
 	} else {
-		dumpsTotal = await Dump.countDocuments({ barangay: req.user.barangay })
+		dumpsTotal = await Dump.countDocuments({ barangay: req.user.barangay, status: { $in: ["Confirmed", "Unfinish", "Cleaned"] } })
 	}
 
 	res.status(200).json({
@@ -541,37 +541,74 @@ exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
 exports.getReportsPerCategory = catchAsyncErrors(async (req, res, next) => {
 	let reportsPerCategory = [];
 
-	reportsPerCategory = await Dump.aggregate([
-		{
-			$unwind: "$waste_type"
-		},
-		{
-			$match:
-			{
-				"createdAt": {
-					$gte: new Date(req.body.rcStartDate),
-					$lte: new Date(req.body.rcEndDate)
-				},
-			}
-		},
-		{
-			$group:
-			{
-				_id: {
-					waste_type: "$waste_type.type",
-				},
-				total: { $sum: 1 }
-			}
-		},
-		{
-			$sort:
-			{
-				"_id": 1
-			}
-		}
-	])
 
-	console.log("reportPerCAt", reportsPerCategory)
+	console.log("req.user.role", req.user.role)
+
+	if (req.user.role === "administrator") {
+
+		reportsPerCategory = await Dump.aggregate([
+			{
+				$unwind: "$waste_type"
+			},
+			{
+				$match:
+				{
+					"createdAt": {
+						$gte: new Date(req.body.rcStartDate),
+						$lte: new Date(req.body.rcEndDate)
+					},
+					"status": { $in: ["Confirmed", "Unfinish", "Cleaned"] }
+				}
+			},
+			{
+				$group:
+				{
+					_id: {
+						waste_type: "$waste_type.type",
+					},
+					total: { $sum: 1 }
+				}
+			},
+			{
+				$sort:
+				{
+					"_id": 1
+				}
+			}
+		])
+	}else{
+		reportsPerCategory = await Dump.aggregate([
+			{
+				$unwind: "$waste_type"
+			},
+			{
+				$match:
+				{
+					"createdAt": {
+						$gte: new Date(req.body.rcStartDate),
+						$lte: new Date(req.body.rcEndDate)
+					},
+					barangay: req.user.barangay,
+					"status": { $in: ["Confirmed", "Unfinish", "Cleaned"] }
+				}
+			},
+			{
+				$group:
+				{
+					_id: {
+						waste_type: "$waste_type.type",
+					},
+					total: { $sum: 1 }
+				}
+			},
+			{
+				$sort:
+				{
+					"_id": 1
+				}
+			}
+		])
+	}
 
 	res.status(200).json({
 		success: true,
@@ -582,7 +619,7 @@ exports.getReportsPerCategory = catchAsyncErrors(async (req, res, next) => {
 
 exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 	let donationsPerCategory = [];
-	
+
 	donationsPerCategory = await Item.aggregate([
 		{
 			$unwind: "$item_type"
@@ -612,7 +649,7 @@ exports.getDonationsPerCategory = catchAsyncErrors(async (req, res, next) => {
 			}
 		}
 	])
-	
+
 	res.status(200).json({
 		success: true,
 		donationsPerCategory
@@ -634,7 +671,7 @@ exports.getTopUserDonation = catchAsyncErrors(async (req, res, next) => {
 				as: "userDetail"
 			}
 		},
-		
+
 		{
 			$match:
 			{
@@ -644,24 +681,24 @@ exports.getTopUserDonation = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		},
-		
+
 		{
 			$addFields:
 			{
 				"alias": '$userDetail.alias'
 			}
 		},
-		{ 
-			$limit : 10
+		{
+			$limit: 10
 		},
 		{
 			$group:
 			{
 				_id: {
 					user_id: "$user_id",
-					user_name:"$alias"
+					user_name: "$alias"
 				},
-				
+
 				total: { $sum: 1 }
 
 			}
@@ -669,7 +706,7 @@ exports.getTopUserDonation = catchAsyncErrors(async (req, res, next) => {
 		{
 			$sort:
 			{
-				total:-1,
+				total: -1,
 				user_id: 1
 			}
 		}
@@ -696,7 +733,7 @@ exports.getTopUserReport = catchAsyncErrors(async (req, res, next) => {
 				as: "userDetail"
 			}
 		},
-		
+
 		{
 			$match:
 			{
@@ -704,10 +741,10 @@ exports.getTopUserReport = catchAsyncErrors(async (req, res, next) => {
 					$gte: new Date(req.body.turStartDate),
 					$lte: new Date(req.body.turEndDate)
 				},
-				"status": { $nin: [ "newReport", "Rejected"] } 
+				"status": { $nin: ["newReport", "Rejected"] }
 			}
 		},
-		
+
 		{
 			$addFields:
 			{
@@ -719,20 +756,20 @@ exports.getTopUserReport = catchAsyncErrors(async (req, res, next) => {
 			{
 				_id: {
 					user_id: "$user_id",
-					user_name:"$alias"
+					user_name: "$alias"
 				},
-				
+
 				total: { $sum: 1 }
 
 			}
 		},
-		{ 
-			$limit : 10
+		{
+			$limit: 10
 		},
 		{
 			$sort:
 			{
-				total:-1,
+				total: -1,
 				user_id: 1
 			}
 		}

@@ -587,7 +587,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
                                 <VStack>
                                     <Text style={RandomStyle.vText2}>Purok (optional): </Text>
-                                    <TextInput keyboardType="numeric" value={purok} onChangeText={(purok_value) => { setPurok(purok_value) }} placeholder="..." style={Form1.textInput2} />
+                                    <TextInput keyboardType="numeric" value={purok} onChangeText={(purok_value) => { purok_value>=0?setPurok(purok_value):null }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
 
@@ -654,6 +654,9 @@ const PublicReportsAdd = ({ navigation }) => {
                                     </CheckboxBtn>
                                     <CheckboxBtn isChecked={waste_type.includes("Electronics")} /*onPress={()=>setTypeEL(!typeEL)}*/ onPress={(e) => { !waste_type.includes("Electronics") ? setWaste_type(oldArray => [...oldArray, "Electronics"]) : setWaste_type(waste_type.filter(type => type !== "Electronics")) }}>
                                         <Text style={{ color: "white" }}>Electronics</Text>
+                                    </CheckboxBtn>
+                                    <CheckboxBtn isChecked={waste_type.includes("Hazardous")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Hazardous") ? setWaste_type(oldArray => [...oldArray, "Hazardous"]) : setWaste_type(waste_type.filter(type => type !== "Hazardous")) }}>
+                                        <Text style={{ color: "white" }}>Hazardous</Text>
                                     </CheckboxBtn>
                                     <CheckboxBtn isChecked={waste_type.includes("Household")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Household") ? setWaste_type(oldArray => [...oldArray, "Household"]) : setWaste_type(waste_type.filter(type => type !== "Household")) }}>
                                         <Text style={{ color: "white" }}>Household</Text>

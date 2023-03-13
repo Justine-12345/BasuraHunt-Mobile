@@ -442,6 +442,8 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 
 	req.body.collectors = collectors
 
+
+
 	dump = await Dump.findByIdAndUpdate(req.params.id, req.body, {
 		new: true,
 		runValidators: true,
@@ -648,7 +650,9 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 	}
 	const approxDay = dump.approxDayToClean
 	dump.approxDayToClean = approxDay
-	dump.purok = req.body.purok
+	if (req.body.purok) {
+		dump.purok = req.body.purok
+	}
 	dump.status = req.body.new_status
 	await dump.save();
 
@@ -747,12 +751,22 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 	for (let count = 0; count < mostReportedBrgyDone.length; count++) {
 		let purokCount = 0;
+
+
+		const sortedPurok = mostReportedBrgyDone[count]._id.puroks.sort((a, b) => b.purokCount - a.purokCount);
+		mostReportedBrgyDone[count]._id.puroks = sortedPurok
+
 		for (let purokIndex = 0; purokIndex < mostReportedBrgyDone[count]._id.puroks.length; purokIndex++) {
 			purokCount += mostReportedBrgyDone[count]._id.puroks[purokIndex].purokCount;
 		}
-		console.log(mostReportedBrgyDone[count]._id.puroks)
+		// console.log("mostReportedBrgyDone",mostReportedBrgyDone[count]._id.puroks)
 		mostReportedBrgyDone[count].count = purokCount;
 	}
+
+	mostReportedBrgyDone.sort((a, b) => b.count - a.count);
+
+
+
 
 
 	let mostReportedBrgyUndone = await Dump.aggregate(
@@ -767,20 +781,20 @@ exports.rankings = catchAsyncErrors(async (req, res, next) => {
 
 	for (let count = 0; count < mostReportedBrgyUndone.length; count++) {
 		let purokCount = 0;
+
+		const sortedPurok = mostReportedBrgyUndone[count]._id.puroks.sort((a, b) => b.purokCount - a.purokCount);
+		mostReportedBrgyUndone[count]._id.puroks = sortedPurok
+
+
 		for (let purokIndex = 0; purokIndex < mostReportedBrgyUndone[count]._id.puroks.length; purokIndex++) {
 			purokCount += mostReportedBrgyUndone[count]._id.puroks[purokIndex].purokCount;
 		}
-		console.log(mostReportedBrgyUndone[count]._id.puroks)
+		// console.log(mostReportedBrgyUndone[count]._id.puroks)
 		mostReportedBrgyUndone[count].count = purokCount;
 	}
 
+	mostReportedBrgyUndone.sort((a, b) => b.count - a.count);
 
-	// res.status(200).json({
-	// 	success:true,
-	// 	mostReportedBrgyDone,
-	// 	mostReportedBrgyUndone,
-	// 	user
-	// })
 
 	let topBrgyUser = await User.aggregate(
 		[
@@ -1010,9 +1024,12 @@ exports.addComment = catchAsyncErrors(async (req, res, next) => {
 				}
 			}
 		});
+		const userForPushNotification = await User.find({ _id: dump.user_id })
+		expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
+
 	}
-	const userForPushNotification = await User.find({ _id: dump.user_id })
-	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
+
+
 
 	let dumpComments = dump.comments
 
@@ -1047,8 +1064,8 @@ exports.deleteComment = catchAsyncErrors(async (req, res, next) => {
 		"$pull": { comments: { _id: req.body.commentId } }
 	});
 
-	console.log(req.params.id)
-	console.log(req.body.commentId)
+	// console.log(req.params.id)
+	// console.log(req.body.commentId)
 
 
 	res.status(200).json({
