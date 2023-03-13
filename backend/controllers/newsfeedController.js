@@ -199,3 +199,22 @@ exports.deleteNewsfeed = catchAsyncErrors(async(req,res,next) =>{
 	 	message: 'Newsfeed deleted'
 	})
 })
+
+// Public Newsfeed Page--------------------------------------------
+exports.getNewsfeedListPublic = catchAsyncErrors(async(req,res,next) => {
+	const newsfeeds = await Newsfeed.find().sort({createdAt: -1}).select("-content -tags");
+	
+    res.status(200).json({
+        success: true,
+        newsfeeds
+    })
+})
+
+exports.getSingleNewsfeedPublic = catchAsyncErrors(async(req,res,next) => {
+	const newsfeed = await Newsfeed.findById(req.params.id).populate("user_id", "first_name last_name");
+
+	res.status(200).json({
+	 	success: true,
+	 	newsfeed,
+	})
+})

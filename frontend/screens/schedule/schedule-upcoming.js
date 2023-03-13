@@ -79,7 +79,7 @@ const ScheduleUpcoming = () => {
         }
     }
 
-    const upcomingDate = (repeat, proper) => {
+    const upcomingDate = (repeat) => {
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday"];
         const months = ["January", "February", "March", "April", "May", "June",
@@ -105,9 +105,7 @@ const ScheduleUpcoming = () => {
 
         const date = month + " " + upcomingDay.getDate() + ", " + year;
 
-        if (proper === true) {
-            return date;
-        }
+        return date;
     }
 
     const repeatCheck = (repeat) => {
@@ -138,7 +136,6 @@ const ScheduleUpcoming = () => {
         return repeatCheck;
     }
 
-
     const schedulesList = () => {
         const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
             "Saturday"];
@@ -147,37 +144,43 @@ const ScheduleUpcoming = () => {
         const noSched = "No upcoming schedule"
         const schedAll = [];
 
+        const getPoints = (schedpoint) => {
+            let points = [];
+            schedpoint.collectionPoints.forEach((cp)=>{
+                console.log(cp);
+                points.push(cp.collectionPoint);
+            })
+            return points.join(", ");
+        }
         const showPoints = (index) => {
             setModalVisible(true);
             setPoints(schedAll[index].points);
-            // console.log(Math.random())
         }
 
         collectionPointsUpcoming.map(collectionPoint => {
             if (collectionPoint) {
                 collectionPoint.repeats.map(repeat => {
                     if (repeat.repeat !== "Once" && repeatCheck(repeat)) {
-                        // if(repeat.repeat !== "Once" && filterRepeat(repeat.repeat) !== day && repeatCheck(repeat)) {
                         if (filterRepeat(repeat.repeat) === "Monday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Tuesday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Wednesday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Thursday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Friday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Saturday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         else if (filterRepeat(repeat.repeat) === "Sunday") {
-                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat, true), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': collectionPoint.collectionPoint });
+                            schedAll.push({ 'id': collectionPoint._id, 'date': upcomingDate(repeat.repeat), 'day': (filterRepeat(repeat.repeat)), 'time': collectionPointTime(collectionPoint), 'type': collectionPoint.type, 'points': getPoints(collectionPoint) });
                         }
                         return null;
                     }
@@ -246,10 +249,6 @@ const ScheduleUpcoming = () => {
                             </Text>
                         </View>
                     }
-
-
-
-
                 </View>
             </>
         )
@@ -257,13 +256,11 @@ const ScheduleUpcoming = () => {
 
     return (
         <>
-            {/* {console.log(collectionPointsUpcoming && collectionPointsUpcoming.length)} */}
             {loading ? <LoadingUpcomingSchedule /> :
                 <>
                     <View style={RandomStyle.lContainer3}>
                         <Text style={RandomStyle.vText1}>Barangay {userID && userID.barangay}</Text>
                     </View>
-
 
                     {collectionPointsUpcoming && collectionPointsUpcoming.length > 0 ?
                         <ScrollView
@@ -281,8 +278,6 @@ const ScheduleUpcoming = () => {
                     }
                 </>
             }
-
-
         </>
     )
 }

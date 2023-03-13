@@ -7,13 +7,17 @@ const {
     getNewsfeeds,
     newNewsfeed,
     updateNewsfeed,
-    deleteNewsfeed
+    deleteNewsfeed,
+    getNewsfeedListPublic,
+    getSingleNewsfeedPublic
 } = require('../controllers/newsfeedController');
 
 const { isAuthenticatedUser,authorizeRoles } = require('../middlewares/auth');
 
 router.route('/newsfeed').get(isAuthenticatedUser, getNewsfeedList);
 router.route('/newsfeed/:id').get(isAuthenticatedUser, getSingleNewsfeed);
+router.route('/public/newsfeed').get(getNewsfeedListPublic);
+router.route('/public/newsfeed/:id').get(getSingleNewsfeedPublic);
 
 // Admin
 router.route('/admin/newsfeeds').get(isAuthenticatedUser, getNewsfeeds);
