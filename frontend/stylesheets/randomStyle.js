@@ -484,16 +484,17 @@ const RandomStyle = StyleSheet.create({
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        maxWidth: width/2.33,
+        width: width/2.33,
         minHeight: height/4.5,
-        elevation: 5
+        elevation: 5,
+        flexGrow: 1,
     },
     usSchedLoading: {
         margin: 5,
         borderRadius: 10,
         justifyContent: "center",
         alignItems: "center",
-        maxWidth: width/2.33,
+        width: width/2.2,
         minHeight: height/4.5,
         elevation: 5
     },

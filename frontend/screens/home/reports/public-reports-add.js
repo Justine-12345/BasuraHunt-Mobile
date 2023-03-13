@@ -533,14 +533,17 @@ const PublicReportsAdd = ({ navigation }) => {
 
                         </> :
                             <>
-                                <HStack justifyContent={"space-between"}>
-                                    <BhButton medium onPress={pickImage}>
-                                        <Text style={{ color: "white" }}>Upload Image</Text>
+                                <VStack justifyContent={"center"} alignItems={'center'}>
+                                    <BhButton large onPress={capImage}>
+                                        <VStack alignItems={"center"}>
+                                            <MaterialCommunityIcons color={"white"} size={30} name="camera"/>
+                                            <Text style={{ color: "white" }}>Capture Image</Text>
+                                        </VStack>
                                     </BhButton>
-                                    <BhButton medium onPress={capImage}>
-                                        <Text style={{ color: "white" }}>Capture Image</Text>
+                                    <BhButton large onPress={pickImage}>
+                                        <Text style={{ color: "white" }}><MaterialCommunityIcons size={15} name="upload"/> Upload Image</Text>
                                     </BhButton>
-                                </HStack>
+                                </VStack>
 
                                 <View style={RandomStyle.vImages}>
                                     {imagesPreview.length > 0 ?
