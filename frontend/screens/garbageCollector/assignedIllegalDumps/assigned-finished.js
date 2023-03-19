@@ -195,13 +195,13 @@ const AssignedFinished = ({ navigation }) => {
     return (
         <>
             <View style={RandomStyle.lContainer3}>
-                <HStack style={RandomStyle.searchContainer}>
+                {/* <HStack style={RandomStyle.searchContainer}>
                     <TextInput style={RandomStyle.searchInput} placeholder="Search" onChangeText={(text) => setKeyword(text)} />
 
                     <TouchableOpacity onPress={() => setFilter(!filter)} style={RandomStyle.searchFilterContainer}>
                         <Text style={RandomStyle.searchFilter}><Ionicons name="options" size={30} color="#1E5128" /></Text>
                     </TouchableOpacity>
-                </HStack>
+                </HStack> */}
                 {filter == false ? null : <FilterOptions />}
             </View>
             {dumps && dumps.length > 0 ?

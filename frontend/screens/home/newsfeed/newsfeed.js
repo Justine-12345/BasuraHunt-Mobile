@@ -52,18 +52,19 @@ const Newsfeed = ({ navigation }) => {
             //         console.log("res",res)
             //     })
             //     .catch((error) => console.log(error))
-            // setNewsfeeds([])
-            if (newsfeeds && newsfeeds.length <= 0) {
+            setNewsfeeds([])
+            setCurrentPage(1)
+            dispatch({ type: ALL_NEWSFEEDS_RESET })
+            if (allNewsFeeds && allNewsFeeds.length <= 0) {
                 dispatch(getNewsfeedList(1))
             }
 
 
             // return () => {
-            //     // setNewsfeeds([])
-
+            //     setNewsfeeds([])
             //     dispatch({ type: ALL_NEWSFEEDS_RESET })
             // }
-        }, [page])
+        }, [])
     )
 
     useEffect(() => {

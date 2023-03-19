@@ -175,6 +175,12 @@ const dumpSchema = new mongoose.Schema({
         }
     }],
 
+    barangayAssigned:{
+        type: String,
+        trim: true    
+    },
+
+
     createdAt: {
         type: Date,
         default: Date.now

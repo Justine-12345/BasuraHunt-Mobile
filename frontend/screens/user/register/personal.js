@@ -56,12 +56,6 @@ const Personal = ({ navigation }) => {
                 text1: 'Invalid First Name',
                 text2: 'Please enter a valid value for first name'
             });
-        } else if (!middle_name) {
-            Toast.show({
-                type: 'error',
-                text1: 'Invalid Middle Name',
-                text2: 'Please enter a valid value for middle name'
-            });
         }else if (!last_name) {
             Toast.show({
                 type: 'error',
@@ -101,20 +95,20 @@ const Personal = ({ navigation }) => {
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <VStack style={Form1.formContainer}>
                 {/* name */}
-                <Text style={Form1.label}>First Name</Text>
+                <Text style={Form1.label}>First Name<Text style={{color:"red"}}>*</Text></Text>
                 <TextInput onChangeText={(first_name_value) => setUser({ ...user, ["first_name"]: first_name_value })} style={Form1.textInput} />
 
                 <Text style={Form1.label}>Middle Name</Text>
                 <TextInput onChangeText={(middle_name_value) => setUser({ ...user, ["middle_name"]: middle_name_value })} style={Form1.textInput} />
 
-                <Text style={Form1.label}>Last Name</Text>
+                <Text style={Form1.label}>Last Name<Text style={{color:"red"}}>*</Text></Text>
                 <TextInput onChangeText={(last_name_value) => setUser({ ...user, ["last_name"]: last_name_value })} style={Form1.textInput} />
 
                 <Text style={Form1.label}>Suffix</Text>
                 <TextInput onChangeText={(suffix_value) => setUser({ ...user, ["suffix"]: suffix_value })} style={Form1.textInput} />
 
                 {/* birthdate */}
-                <Text style={Form1.label}>Birthdate</Text>
+                <Text style={Form1.label}>Birthdate<Text style={{color:"red"}}>*</Text></Text>
                 <HStack style={Form1.birthdateContainer}>
                     <TouchableOpacity onPress={() => setDatepickerStatus(!datepickerStatus)} style={{ width: "100%" }}>
                         <FontAwesome name="calendar" size={20} color={"#1E5128"} style={{ position: "absolute", marginHorizontal: 10 }} />

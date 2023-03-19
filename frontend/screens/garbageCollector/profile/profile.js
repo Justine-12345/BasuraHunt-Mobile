@@ -77,6 +77,9 @@ const Profile = ({ navigation }) => {
                     </VStack> */}
                 </HStack>
                 <HStack position={"absolute"} right={0}>
+                    <TouchableOpacity onPress={() => { navigation.navigate('CollectorProfile', { screen: 'FeedbackNavCollector' } ) }}>
+                        <Ionicons name="md-megaphone" size={30} style={RandomStyle.pButton} />
+                    </TouchableOpacity>
                     <TouchableOpacity onPress={() => { navigation.navigate('CollectorProfile', { screen: 'ProfileUpdateCollector', params: { user: authUser } }) }}>
                         <Ionicons name="pencil" size={30} style={RandomStyle.pButton} />
                     </TouchableOpacity>

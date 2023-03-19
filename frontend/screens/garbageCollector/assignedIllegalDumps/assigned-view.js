@@ -123,7 +123,7 @@ const AssignedView = (props) => {
                 NotificationSender(notifTitle, user && user._id, dump && dump.user_id && dump.user_id._id, dump && dump.barangay, 'illegalDump-update-status', notifCode, dump && dump)
 
                 if (dump.user_id.role === "newUser" && messageStatus === "Cleaned") {
-                    const notifTitle1 = "Congratulation you are now a verified user."
+                    const notifTitle1 = "Congratulations you are now a verified user."
                     console.log("notifcode1", notifCode1)
                     NotificationSender(notifTitle1, user && user._id, dump.user_id._id, dump.barangay, 'user-verified', notifCode1, dump && dump)
                 }
@@ -434,7 +434,7 @@ const AssignedView = (props) => {
                                         selectedValue={status === "Confirmed" ? "Unfinish" : status}
                                         onValueChange={updateDumpStatusHandler}
                                     >
-                                        <Select.Item key={"Unfinish"} value={"Unfinish"} label={"Unfinish"} style={status === "Unfinish" ? { display: "none" } : null} />
+                                        <Select.Item key={"Unfinish"} value={"Unfinish"} label={"Unfinished"} style={status === "Unfinish" ? { display: "none" } : null} />
                                         <Select.Item key={"Cleaned"} value={"Cleaned"} label={"Cleaned"} style={status === "Cleaned" ? { display: "none" } : null} />
                                     </Select>
                                 }

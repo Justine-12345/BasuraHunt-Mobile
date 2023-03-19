@@ -37,22 +37,22 @@ const Start = (props) => {
                 })
                 .catch((error) => console.log(error))
 
-            if(isAdded){
-                NotificationSender(`New record has been added in Collection Point`, user._id, null, user.barangay, 'collection-mass-add', notifCode, collectionPoint&&collectionPoint)
+            if (isAdded) {
+                NotificationSender(`New record has been added in Collection Point`, user._id, null, user.barangay, 'collection-mass-add', notifCode, collectionPoint && collectionPoint)
 
                 Toast.show({
                     type: 'success',
                     text1: "Added Successfully",
                 });
-                dispatch({type:ADD_COLLECTION_NUMBER_OF_TRUCK_RESET})
-    
+                dispatch({ type: ADD_COLLECTION_NUMBER_OF_TRUCK_RESET })
+
             }
         }, [isAdded])
     )
 
     useEffect(() => {
         setCollectionPoint(collectionPointDetail)
-    }, [])
+    }, [collectionPointDetail])
 
     useEffect(() => {
         setNumOfTruckHistory(collectionPoint && collectionPoint.collectionPerTruck)
@@ -98,9 +98,27 @@ const Start = (props) => {
             formData.append("numOfTruck", numOfTruck);
             formData.append('notifCode', notifCode);
             dispatch(addCollectionnumOfTruck(collectionPoint && collectionPoint._id, formData))
-            setNumOfTruckHistory(oldArray=>[...oldArray, {_id:Math.random(), date:new Date(), numOfTruck, type: collectionPoint && collectionPoint.type}])
+            setNumOfTruckHistory(oldArray => [...oldArray, { _id: Math.random(), date: new Date(), numOfTruck, type: collectionPoint && collectionPoint.type }])
             setNumOfTruck(0)
         }
+    }
+
+
+    const collectionPointsList = (collectionPoints) => {
+        console.log("collectionPoints",collectionPoints)
+        let collectionPointsList = "";
+
+        for (let i = 0; i < collectionPoints.length; i++) {
+            console.log("collectionPoints[i]", collectionPoints[i])
+            if (i !== collectionPoints.length - 1) {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint + ", "
+            }
+            else {
+                collectionPointsList = collectionPointsList + collectionPoints[i].collectionPoint
+            }
+        }
+
+        return collectionPointsList;
     }
 
     let TotalTons = 0
@@ -111,9 +129,9 @@ const Start = (props) => {
             <View style={RandomStyle.lContainer3}>
                 <Text style={RandomStyle.vText1}>Barangay {collectionPoint && collectionPoint.barangay}</Text>
                 <Text style={RandomStyle.vText1}>{dateNow()}</Text>
-                <Text style={RandomStyle.vText3}>Time: {collectionPoint && collectionPointTime(collectionPoint)}</Text>
-                <Text style={RandomStyle.vText3}>Collection Points: {collectionPoint && collectionPoint.collectionPoint}</Text>
-                <Text style={RandomStyle.vText3}>Type: {collectionPoint && collectionPoint.type}</Text>
+                <Text style={RandomStyle.vText3}><Text style={{fontWeight:"900"}}>Time:</Text> {collectionPoint && collectionPointTime(collectionPoint)}</Text>
+                <Text style={RandomStyle.vText3}><Text style={{fontWeight:"900"}}>Collection Points:</Text> {collectionPoint && collectionPointsList(collectionPoint.collectionPoints)}</Text>
+                <Text style={RandomStyle.vText3}><Text style={{fontWeight:"900"}}>Type:</Text> {collectionPoint && collectionPoint.type}</Text>
                 <Text style={RandomStyle.vText5}>ON-GOING</Text>
             </View>
 

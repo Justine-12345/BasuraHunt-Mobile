@@ -153,7 +153,7 @@ const Account = ({ navigation }) => {
                 </View>
 
                 {/* email */}
-                <Text style={Form1.label}>Email
+                <Text style={Form1.label}>Email<Text style={{color:"red"}}>*</Text>
                     {availableEmail === true ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}> This Email is Available <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
                     {availableEmail === false ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Already Used <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
                     {availableEmail === "invalid" ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Invalid Format <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
@@ -161,18 +161,18 @@ const Account = ({ navigation }) => {
                 <TextInput onChangeText={(email_value) => { setUser({ ...user, ["email"]: email_value }) }} style={Form1.textInput} />
 
                 {/* alias/nickname */}
-                <Text style={Form1.label}>Alias/Nickname</Text>
+                <Text style={Form1.label}>Alias/Nickname<Text style={{color:"red"}}>*</Text></Text>
                 <TextInput onChangeText={(alias_value) => setUser({ ...user, ["alias"]: alias_value })} style={Form1.textInput} />
 
                 {/* password */}
-                <Text style={Form1.label}>Password
+                <Text style={Form1.label}>Password<Text style={{color:"red"}}>*</Text>
                     {passwordError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}> Approved <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
                 </Text>
                 <TextInput onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={true} style={Form1.textInput} />
 
                 {/* confirm password */}
-                <Text style={Form1.label}>Confirm Password
+                <Text style={Form1.label}>Confirm Password<Text style={{color:"red"}}>*</Text>
                     {passwordMatchError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> Not Match <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordMatchError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}> Match <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
                 </Text>

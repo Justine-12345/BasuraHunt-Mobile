@@ -37,7 +37,7 @@ const PublicReportsList = ({ navigation }) => {
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         setReports([])
-        setCurrentPage(1)
+        // setCurrentPage(1)
         dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
         setTimeout(() => {
             setRefreshing(false);
@@ -58,7 +58,7 @@ const PublicReportsList = ({ navigation }) => {
                 if (reports && reports.length <= 0) {
                     dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
                 }
-            } 
+            }
             // else {
             //     dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
             // }
@@ -231,8 +231,13 @@ const PublicReportsList = ({ navigation }) => {
 
 
     const reportsItem = ({ item, index }) => {
+        let img
+        if (item.images.map(img => img.url)[0]) {
+            img = item.images.map(img => img.url)[0]
+        } else {
+            img = `https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png`
+        }
 
-        let img = item.images.map(img => img.url)[0]
         const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
@@ -243,12 +248,17 @@ const PublicReportsList = ({ navigation }) => {
                 }} activeOpacity={.8}>
                     <View style={RandomStyle.lContainer2}>
                         <HStack>
-                        <Text style={RandomStyle.vBadge}>{item.status === "newReport" ? "New Report" : item.status}</Text>
+                            <Text style={RandomStyle.vBadge}>{item.status === "newReport" ? "New Report" : item.status === "Unfinish" ? "Unfinished" : item.status}</Text>
                             <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                             <VStack>
                                 <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
                                 {/* item.additional_desciption change to item.addition_description */}
-                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption !== "null" ?
+                                    item.additional_desciption : item.waste_type.map((wt) => {
+                                        return (<Text key={wt.type}>{wt.type}&nbsp;</Text>)
+                                    })
+
+                                }</Text>
                                 <View style={{ flex: 1, justifyContent: "flex-end", }}>
                                     <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
                                 </View>
@@ -302,12 +312,12 @@ const PublicReportsList = ({ navigation }) => {
                 </HStack>
                 {filter == false ? null : <FilterOptions />}
             </View>
-            {loading && currentPage === 1  ? <LoadingList /> : null}
+            {loading && currentPage === 1 ? <LoadingList /> : null}
             {reports && reports.length > 0 ?
 
                 <>
 
-                    {!keyword?
+                    {!keyword ?
                         <FlatList
                             data={reports}
                             refreshControl={

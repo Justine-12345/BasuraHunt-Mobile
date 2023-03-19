@@ -173,7 +173,9 @@ const AssignedList = ({ navigation }) => {
                             <TouchableOpacity onPress={() => navigation.navigate("AssignedView", { item })} activeOpacity={.8}>
                                 <View style={RandomStyle.lContainer2}>
                                     <HStack>
-                                        <Text style={RandomStyle.vBadge}> {item.status} </Text>
+                                        <Text style={RandomStyle.vBadge}> {item.status === "newReport" ? "New Report" :
+													item.status === "Unfinish" ? "Unfinished" :
+														item.status} </Text>
 
                                         <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                                         <VStack>

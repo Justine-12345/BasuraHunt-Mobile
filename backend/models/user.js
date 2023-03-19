@@ -49,8 +49,7 @@ const userSchema = new mongoose.Schema({
 	},
 
 	street: {
-		type: String,
-		required: [true, 'Please enter your street']
+		type: String
 	},
 
 

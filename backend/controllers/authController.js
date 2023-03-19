@@ -543,7 +543,7 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
 
 //******Get User List (Admin)******
 exports.allUsers = catchAsyncErrors(async (req, res, next) => {
-	const users = await User.find().sort({ _id: -1 }).select('-avatar -suffix -birthday -alias -level -exp -otp -activeChat -otp_status -reported_dumps -donated_items -received_items -push_tokens -notifications -gender -phone_number');
+	const users = await User.find({ role: { $ne: "administrator" } }).sort({ _id: -1 }).select('-avatar -suffix -birthday -alias -level -exp -otp -activeChat -otp_status -reported_dumps -donated_items -received_items -push_tokens -notifications -gender -phone_number');
 
 	res.status(200).json({
 		success: true,
@@ -878,7 +878,7 @@ exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 					path: 'chat_id',
 					select: { 'room': 1 }
 				},
-				select: { '_id': 1, 'complete_address': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1, 'createdAt': 1 },
+				select: { '_id': 1, 'complete_address': 1, 'waste_type': 1, 'status': 1, 'images': 1, 'complete_address': 1, 'additional_desciption': 1, 'createdAt': 1 },
 			}
 		})
 	} else {

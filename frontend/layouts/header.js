@@ -97,7 +97,7 @@ const Header = () => {
 
     const viewNotification = (notification) => {
 
-        // console.log("category", notification)
+        console.log("notification", notification)
         if (notification.category === "schedule") {
             setModalVisible(false)
             const formData = new FormData();
@@ -157,7 +157,7 @@ const Header = () => {
             dispatch(readNoficationMobile(formData))
             const obj_id = notification.link.split("/")[2];
             dispatch(getItemDetails(obj_id))
-            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item_id: object } } })
+            navigation.navigate("User", { screen: 'MyDonations', params: { screen: 'MyPublicDonationsView', params: { item_id: obj_id, category: "donated" } } })
         }
         if (notification.category === "donation-new-message") {
             setModalVisible(false)
@@ -173,12 +173,12 @@ const Header = () => {
             const formData = new FormData();
             formData.append('notifCode', notification.notifCode);
             dispatch(readNoficationMobile(formData))
-            
+
             const obj_id = notification.link.split("/")[2];
 
-            
+
             dispatch(getNewsfeedDetails(obj_id))
-            navigation.navigate("Home", { screen: 'NewsfeedNav', params:{screen:'NewsfeedView'} })
+            navigation.navigate("Home", { screen: 'NewsfeedNav', params: { screen: 'NewsfeedView' } })
 
         }
         if (notification.category === "user-verified") {
@@ -289,14 +289,12 @@ const Header = () => {
                 </Modal>
 
 
-                {isLogin ?
+                {unReadNotificationCounter >= 1 || prevCount >= 1 ?
                     <>
                         <View style={styles.bellContainer}>
 
                             <FontAwesome name="bell" onPress={() => setModalVisible(true)} size={25} style={[styles.notifBtn]} />
                             {/* {console.log("notificationList", notificationList)} */}
-
-
 
 
 

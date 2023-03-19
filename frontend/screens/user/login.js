@@ -145,7 +145,7 @@ const Login = ({ navigation }) => {
             });
         } else {
             // console.log(email, password)
-            dispatch(login(email, password, expoPushToken))
+            dispatch(login(email.trim(), password, expoPushToken))
         }
     }
 

@@ -16,10 +16,11 @@ const AccessDenied = () => {
             <Text style={Empty1.text2}>
                 Please wait until your account has been verified. Thank you!
             </Text>
-            <View>
-                <TouchableOpacity onPress={() => setModalVisible(true)} style={{ position: "relative", top: -20 }}>
+            <View style={{marginVertical:12}}>
+                {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={{ position: "relative", top: -20 }}>
                     <SimpleLineIcons name="info" size={24} color="#757575" style={{ marginHorizontal: 8, alignSelf:"center", marginVertical: 30 }} />
-                </TouchableOpacity>
+                </TouchableOpacity> */}
+                <Text  style={Empty1.text2}>Your account will be verified based on your first submitted report of illegal dumps. If it is real or eligible, your account can be verified.</Text>
             </View>
 
             <View style={{ flex: 1 }}>

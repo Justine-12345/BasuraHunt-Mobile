@@ -215,26 +215,28 @@ const Feedback = ({ navigation }) => {
                     <TextInput style={[RandomStyle.searchInput, { width: '100%' }]} placeholder="Search" onChangeText={(text) => search(text)} />
                 </VStack>
             </View>
-            {feedback && feedback.length > 0 ?
+            {feedback && feedback.length >= 0 ?
                 feedback.map(item => {
                     let img = item.images.map(img => img.url)[0]
                     const date = new Date(item.createdAt).toLocaleDateString()
-                    return (
-                        <TouchableOpacity key={item._id} onPress={() => navigation.navigate("FeedbackView", { item })} activeOpacity={.8}>
-                            <View style={RandomStyle.lContainer2}>
-                                <HStack>
-                                    <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
-                                    <VStack>
-                                        <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.subject}</Text>
-                                        <Text numberOfLines={2} style={RandomStyle.lContent}>{item.feedback}</Text>
-                                        <View style={{ flex: 1, justifyContent: "flex-end", }}>
-                                            <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
-                                        </View>
-                                    </VStack>
-                                </HStack>
-                            </View>
-                        </TouchableOpacity>
-                    )
+                    if (img) {
+                        return (
+                            <TouchableOpacity key={item._id} onPress={() => navigation.navigate("FeedbackView", { item })} activeOpacity={.8}>
+                                <View style={RandomStyle.lContainer2}>
+                                    <HStack>
+                                        <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
+                                        <VStack>
+                                            <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.subject}</Text>
+                                            <Text numberOfLines={2} style={RandomStyle.lContent}>{item.feedback}</Text>
+                                            <View style={{ flex: 1, justifyContent: "flex-end", }}>
+                                                <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
+                                            </View>
+                                        </VStack>
+                                    </HStack>
+                                </View>
+                            </TouchableOpacity>
+                        )
+                    }
                 })
                 :
                 <View style={Empty1.container}>

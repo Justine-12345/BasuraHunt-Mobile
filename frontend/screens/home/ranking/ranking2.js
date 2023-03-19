@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from "react";
-import { Text, View, FlatList, ScrollView, ActivityIndicator, RefreshControl } from "react-native";
+import { Text, View, FlatList, ScrollView, ActivityIndicator, RefreshControl, Modal, TouchableOpacity } from "react-native";
 import { HStack, VStack } from 'native-base';
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -16,7 +16,10 @@ const Ranking2 = () => {
 
     const { loading, error, mostReportedBrgyDone, mostReportedBrgyUndone, topBrgyUser, topCityUser } = useSelector(state => state.ranking)
     const [refreshing, setRefreshing] = useState(false);
-    
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState();
+    const [modalContentTotal, setModalContentTotal] = useState();
+
     useFocusEffect(
         useCallback(() => {
             dispatch(rankings())
@@ -33,34 +36,96 @@ const Ranking2 = () => {
     }, []);
 
     const purok = (purokList) => {
-		let count = 1
-		let list1 = ""
-		let list2 = ""
-		console.log(purokList)
+        let count = 1
+        let list1 = ""
+        let list2 = ""
+        // console.log(purokList)
 
-		purokList.forEach(purok => {
-			if (count <= 3) {
-				list1 = list1 + "Purok " + purok.purok;
+        purokList.forEach(purok => {
+            if (count <= 3) {
 
-				if (count < purokList.length) {
-					list1 = list1 + ", ";
-				}
-				count++
-			}
-			else if (count > 3 && count < purokList.length) {
-				list2 = list2 + "Purok " + purok.purok + ", ";
-				count++
-			}
-			else if (count === purokList.length) {
-				list2 = list2 + "Purok " + purok.purok;
-			}
+                if (purok.purok) {
+                    list1 = list1 + "Purok " + purok.purok + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)");
 
-		});
+                    if (count < purokList.length) {
+                        list1 = list1 + ", ";
+                    }
+                    count++
 
-		return (
-			list1 + " " + list2
-		);
-	}
+                } else {
+                    list1 = list1 + "Purok " + "unknown" + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)");
+
+                    if (count < purokList.length) {
+                        list1 = list1 + ", ";
+                    }
+                    count++
+                }
+            }
+            else if (count > 3 && count < purokList.length) {
+
+                if (purok.purok) {
+                    list2 = list2 + "Purok " + purok.purok + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)") + "\n";
+                    count++
+                } else {
+                    list2 = list2 + "Purok " + "unknown" + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)") + "\n";
+                }
+
+            }
+            else if (count === purokList.length) {
+                if (purok.purok) {
+                    list2 = list2 + "Purok " + purok.purok + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)");
+                } else {
+                    list2 = list2 + "Purok " + "unkown" + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)");
+                }
+            }
+
+        });
+
+        return (
+            list1 + " " + list2
+        );
+    }
+
+    const purokModal = (purokList) => {
+        let count = 1
+        let list1 = ""
+        let list2 = ""
+        // console.log(purokList)
+
+
+        purokList.forEach(purok => {
+
+
+            if (purok.purok) {
+                list1 = list1 + "- Purok " + purok.purok + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)") + "\n";
+
+                // if (count < purokList.length) {
+                //     list1 = list1 + ", ";
+                // }
+                count++
+
+            } else {
+                list1 = list1 + "- Purok " + "unknown" + " (" + purok.purokCount + " " + (purok.purokCount >= 2 ? "reports)" : "report)") + "\n";
+
+                // if (count < purokList.length) {
+                //     list1 = list1 + ", ";
+                // }
+                count++
+            }
+
+
+        });
+
+        return (
+            list1 + " " + list2
+        );
+    }
+
+
+    const showRankDeatils = (item) => {
+        setModalVisible(true);
+        setModalContent(item)
+    }
 
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}
@@ -70,17 +135,46 @@ const Ranking2 = () => {
             {/* most cleaned */}
             <View style={RandomStyle.rContainer}>
                 <Text style={RandomStyle.rText1}>Barangays with Most Cleaned Illegal Dumps</Text>
+
+
+
+                <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
+                    <View style={[RandomStyle.usModal, {  flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+                        <View style={[RandomStyle.usPoints,{backgroundColor:"#1e5128"}]}>
+                            <VStack>
+                                <VStack>
+                                    <Text style={{ fontWeight: "bold",color:"white" }}>{modalContent && modalContent.barangay} ({modalContentTotal})</Text>
+                                    <Text style={{color:"white"}}>{modalContent && modalContent.puroks && purokModal(modalContent.puroks)}</Text>
+                                </VStack>
+                                <TouchableOpacity style={[RandomStyle.usClosec,{backgroundColor:"darkgreen"}]} onPress={() => setModalVisible(false)}>
+                                    <Text style={RandomStyle.usClose}>
+                                        CLOSE
+                                    </Text>
+                                </TouchableOpacity>
+                            </VStack>
+                        </View>
+                    </View>
+                </Modal>
+
+
+
+
                 {mostReportedBrgyDone && mostReportedBrgyDone.length > 0 ?
                     mostReportedBrgyDone.map((item, index) => {
                         return (
-                            <HStack key={item._id.barangay} style={RandomStyle.rItems}>
-                                <Text style={RandomStyle.rItem4}>{index + 1}</Text>
-                                <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.rItem1}>{item._id && item._id.barangay}</Text>
-                                    <Text numberOfLines={1} style={RandomStyle.rItem3}>{purok(item._id.puroks)}</Text>
-                                </VStack>
-                                <Text style={RandomStyle.rItem2}>{item.count}</Text>
-                            </HStack>
+                            <TouchableOpacity onPress={() => {
+                                showRankDeatils(item._id, item.count)
+                                setModalContentTotal(item.count)
+                            }} key={item._id.barangay}>
+                                <HStack key={item._id.barangay} style={RandomStyle.rItems}>
+                                    <Text style={RandomStyle.rItem4}>{index + 1}</Text>
+                                    <VStack>
+                                        <Text numberOfLines={1} style={RandomStyle.rItem1}>{item._id && item._id.barangay}</Text>
+                                        <Text numberOfLines={1} style={RandomStyle.rItem3}>{purok(item._id.puroks)}</Text>
+                                    </VStack>
+                                    <Text style={RandomStyle.rItem2}>{item.count}</Text>
+                                </HStack>
+                            </TouchableOpacity>
                         )
                     }
                     ) :
@@ -93,7 +187,7 @@ const Ranking2 = () => {
                         </Text>
                     </View>}
             </View>
-        </ScrollView>
+        </ScrollView >
 
     )
 }

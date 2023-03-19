@@ -22,6 +22,8 @@ import NotificationSender from "../../extras/notificationSender";
 import RandomStringGenerator from "../../extras/randomStringGenerator";
 import LoadingPublicReportsView from "../../extras/loadingPages/loading-reports-view";
 import moment from 'moment'
+import Empty1 from "../../../stylesheets/empty1";
+import { SimpleLineIcons } from "@expo/vector-icons";
 const socket = io.connect(SOCKET_PORT);
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
@@ -33,7 +35,7 @@ const PublicReportsView = (props) => {
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
     const { loading: commentLoading, comments, error: commentError } = useSelector(state => state.dumpComment)
     const { dump: dumpDetail, loading: dumpDetailLoading } = useSelector(state => state.dumpDetails)
-
+    const { user: authUser } = useSelector(state => state.auth)
     const [openImages, setOpenImages] = useState(false);
     const [openImagesCleaned, setOpenImagesCleaned] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
@@ -219,17 +221,17 @@ const PublicReportsView = (props) => {
         // const d = dif / (1000 * 3600 * 24)
         // return Math.ceil(d)
         const minute = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "minutes")
-	    const hour = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "hours")
-		const day = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "days") 
-		
-		if(day === 0 && hour >= 1){
-			return hour +` hour${hour>=2? "s": ""}`
-		}
-		else if(day === 0 && hour === 0){
-			return minute +` minute${minute>=2? "s": ""}`
-		}else{
-			return day +` day${day>=2? "s": ""}`
-		}	
+        const hour = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "hours")
+        const day = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "days")
+
+        if (day === 0 && hour >= 1) {
+            return hour + ` hour${hour >= 2 ? "s" : ""}`
+        }
+        else if (day === 0 && hour === 0) {
+            return minute + ` minute${minute >= 2 ? "s" : ""}`
+        } else {
+            return day + ` day${day >= 2 ? "s" : ""}`
+        }
     }
 
 
@@ -250,8 +252,8 @@ const PublicReportsView = (props) => {
                                         <Text style={RandomStyle.vText2}>Status: </Text>
 
                                         {dump && dump.date_cleaned ?
-                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump&&dump.score/10}/></Text> :
-                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "":`approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "":dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "":"to clean"}</Text>
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump && dump.score / 10} /></Text> :
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "" : `approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "" : dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "" : "to clean"}</Text>
                                         }
 
 
@@ -448,16 +450,24 @@ const PublicReportsView = (props) => {
                             : ""
                         }
 
-                        <Text style={RandomStyle.vText2}>Category of Violation</Text>
-                        <View style={RandomStyle.vContainer2}>
-                            <Text>{dump && dump.category_violation}</Text>
-                        </View>
+                        {dump && dump.accessible_by ?
+                            <>
+                                <Text style={RandomStyle.vText2}>Category of Violation</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <Text>{dump && dump.category_violation}</Text>
+                                </View>
+                            </>
+                            : ""
+                        }
 
-                        <Text style={RandomStyle.vText2}>Additional Details</Text>
-                        <View style={RandomStyle.vContainer2}>
-                            <Text>{dump && dump.additional_desciption}</Text>
-                        </View>
-
+                        {dump && dump.additional_desciption !== "null" ?
+                            <>
+                                <Text style={RandomStyle.vText2}>Additional Details</Text>
+                                <View style={RandomStyle.vContainer2}>
+                                    <Text>{dump && dump.additional_desciption}</Text>
+                                </View>
+                            </> : ""
+                        }
                         <Text style={RandomStyle.vText2}>Reported by</Text>
                         <View style={RandomStyle.vContainer2}>
                             <Text>{dump && dump.report_using}</Text>
@@ -465,37 +475,61 @@ const PublicReportsView = (props) => {
 
                         <Text style={RandomStyle.vText2}>Comment Section</Text>
 
-                        <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={author} onValueChange={item => setAuthor(item)}>
-                            <Select.Item label="Anonymous" value="Anonymous" />
-                            <Select.Item label="Real Name" value="Real Name" />
-                            <Select.Item label="Alias/Username" value="Alias" />
-                        </Select>
-                        <TextInput
-                            placeholder="Type your comment here..."
-                            style={RandomStyle.vMultiline}
-                            multiline={true}
-                            value={comment}
-                            numberOfLines={5}
-                            onChangeText={e => setComment(e)}
-                        />
-                        <BhButton right onPress={commentSubmit}>
-                            <Text style={RandomStyle.vText4}>Post</Text>
-                        </BhButton>
 
-                        {allComments && allComments.length > 0 ?
-                            allComments.map((item) =>
-                                <View key={Math.random()} style={RandomStyle.vComment}>
-                                    <Text style={RandomStyle.vText2}>{item.author}</Text>
-                                    <Text>{item.comment}</Text>
-                                    <Text style={RandomStyle.vCommentDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                        {authUser && authUser.role === "user" ?
+                            <>
+                                <Select backgroundColor={"white"} marginY={1} placeholder="Select Identity" selectedValue={author} onValueChange={item => setAuthor(item)}>
+                                    <Select.Item label="Anonymous" value="Anonymous" />
+                                    <Select.Item label="Real Name" value="Real Name" />
+                                    <Select.Item label="Alias/Username" value="Alias" />
+                                </Select>
+                                <TextInput
+                                    placeholder="Type your comment here..."
+                                    style={RandomStyle.vMultiline}
+                                    multiline={true}
+                                    value={comment}
+                                    numberOfLines={5}
+                                    onChangeText={e => setComment(e)}
+                                />
+                                <BhButton right onPress={commentSubmit}>
+                                    <Text style={RandomStyle.vText4}>Post</Text>
+                                </BhButton>
+
+                                {allComments && allComments.length > 0 ?
+                                    allComments.map((item) =>
+                                        <View key={Math.random()} style={RandomStyle.vComment}>
+                                            <Text style={RandomStyle.vText2}>{item.author}</Text>
+                                            <Text>{item.comment}</Text>
+                                            <Text style={RandomStyle.vCommentDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
+                                        </View>
+                                    ).reverse()
+                                    :
+                                    <Text>No comments yet.</Text>
+                                }
+
+
+                            </> :
+                            <>
+                                <Text style={Empty1.text1}>
+                                    You cannot add comments yet!
+                                </Text>
+                                <Text style={Empty1.text2}>
+                                    Please wait until your account has been verified. Thank you!
+                                </Text>
+                                <View style={{ marginVertical: 12 }}>
+
+                                    <Text style={Empty1.text2}>Your account will be verified based on your first submitted report of illegal dumps. If it is real or eligible, your account can be verified.</Text>
                                 </View>
-                            ).reverse()
-                            :
-                            <Text>No comments yet.</Text>
+                            </>
+
                         }
 
+
+
+
+
                     </View>
-                </ScrollView>
+                </ScrollView >
             }
         </>
     )

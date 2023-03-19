@@ -40,7 +40,7 @@ const ResetPassword = (props) => {
                 if (userInfo.isAuthenticated) {
                     if (JSON.parse(userInfo.user).otp_status === "Verified") {
                         if (JSON.parse(userInfo.user).role === "user" || JSON.parse(userInfo.user).role === "newUser") {
-                            navigation.dispatch(
+                            props.navigation.dispatch(
                                 CommonActions.reset({
                                     index: 1,
                                     routes: [
@@ -48,9 +48,9 @@ const ResetPassword = (props) => {
                                     ],
                                 })
                             );
-                            navigation.navigate('Main')
+                            props.navigation.navigate('Main')
                         } else if (JSON.parse(userInfo.user).role === "garbageCollector") {
-                            navigation.dispatch(
+                            props.navigation.dispatch(
                                 CommonActions.reset({
                                     index: 1,
                                     routes: [
@@ -58,7 +58,7 @@ const ResetPassword = (props) => {
                                     ],
                                 })
                             );
-                            navigation.navigate('HomeCollectorNav')
+                            props.navigation.navigate('HomeCollectorNav')
                         } else {
                             AsyncStorage.clear()
                             Toast.show({
@@ -66,7 +66,7 @@ const ResetPassword = (props) => {
                                 text1: 'Denied',
                                 text2: 'Access has been denied to this account'
                             });
-                            navigation.dispatch(
+                            props.navigation.dispatch(
                                 CommonActions.reset({
                                     index: 1,
                                     routes: [
@@ -74,10 +74,10 @@ const ResetPassword = (props) => {
                                     ],
                                 })
                             );
-                            navigation.navigate('Login')
+                            props.navigation.navigate('Login')
                         }
                     } else if (JSON.parse(userInfo.user).otp_status === "Fresh") {
-                        navigation.navigate('OTP')
+                        props.navigation.navigate('OTP')
                     }
                 }
 

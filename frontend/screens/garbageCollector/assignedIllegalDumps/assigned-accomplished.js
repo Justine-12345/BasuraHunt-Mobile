@@ -134,7 +134,7 @@ const AssignedAccomplished = (props) => {
             NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
 
             if (role === "newUser") {
-                const notifTitle1 = "Congratulation you are now a verified user."
+                const notifTitle1 = "Congratulations you are now a verified user."
                 NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
 
             }

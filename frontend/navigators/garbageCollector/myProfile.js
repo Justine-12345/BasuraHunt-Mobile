@@ -4,6 +4,7 @@ import { createStackNavigator } from "@react-navigation/stack";
 import Profile from "../../screens/garbageCollector/profile/profile";
 import ProfileUpdate from "../../screens/garbageCollector/profile/profile-update-collector";
 import ProfileUpdatePasswordCollector from "../../screens/garbageCollector/profile/profile-update-password-collector";
+import FeedbackNav from "../feedbackNav";
 const Stack = createStackNavigator();
 
 function MyStack() {
@@ -14,6 +15,13 @@ function MyStack() {
             <Stack.Screen
                 name="Profile"
                 component={Profile}
+                options={{
+                    headerShown:false
+                }}
+            />
+            <Stack.Screen
+                name="FeedbackNavCollector"
+                component={FeedbackNav}
                 options={{
                     headerShown:false
                 }}

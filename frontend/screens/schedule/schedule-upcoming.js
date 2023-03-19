@@ -147,7 +147,7 @@ const ScheduleUpcoming = () => {
         const getPoints = (schedpoint) => {
             let points = [];
             schedpoint.collectionPoints.forEach((cp)=>{
-                console.log(cp);
+                // console.log(cp);
                 points.push(cp.collectionPoint);
             })
             return points.join(", ");
@@ -206,8 +206,8 @@ const ScheduleUpcoming = () => {
 
         return (
             <>
-                <Modal animationType="none" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
-                    <View style={RandomStyle.usModal}>
+                <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
+                    <View style={[RandomStyle.usModal,{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }]}>
                         <View style={RandomStyle.usPoints}>
                             <VStack>
                                 <VStack>

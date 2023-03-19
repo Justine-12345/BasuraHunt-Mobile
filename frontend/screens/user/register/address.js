@@ -64,12 +64,6 @@ const Address = ({ navigation }) => {
                 text1: 'Invalid House Number',
                 text2: 'Please enter a valid value for house Number'
             });
-        } else if (!street) {
-            Toast.show({
-                type: 'error',
-                text1: 'Invalid Street',
-                text2: 'Please enter a valid value for street'
-            });
         } else if (!barangay) {
             Toast.show({
                 type: 'error',
@@ -89,7 +83,7 @@ const Address = ({ navigation }) => {
             <VStack style={Form1.formContainer}>
 
                 {/* house number */}
-                <Text style={Form1.label}>House Number</Text>
+                <Text style={Form1.label}>House Number<Text style={{color:"red"}}>*</Text></Text>
                 <TextInput onChangeText={(house_number_value) => setUser({ ...user, ["house_number"]: house_number_value })} style={Form1.textInput} />
 
                 {/* street */}
@@ -97,7 +91,7 @@ const Address = ({ navigation }) => {
                 <TextInput onChangeText={(street_value) => setUser({ ...user, ["street"]: street_value })} style={Form1.textInput} />
 
                 {/* barangay */}
-                <Text style={Form1.label}>Barangay</Text>
+                <Text style={Form1.label}>Barangay<Text style={{color:"red"}}>*</Text></Text>
                 <SelectList setSelected={setBarangaySelect} data={barangayList} onSelect={() => setUser({ ...user, ["barangay"]: barangaySelect })} />
 
             </VStack>

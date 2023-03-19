@@ -250,7 +250,7 @@ const PublicDonationsView = (props) => {
         //     images.push({ uri: img.url })
         // });
     }, [itemDetail, images, item, item_id])
-
+    
     return (
         <>{itemLoading ?
             <LoadingPublicDonationsView /> :

@@ -147,22 +147,22 @@ exports.newDump = catchAsyncErrors(async (req, res, next) => {
 	});
 
 
-	const bulk1 = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: "barangayAdministrator" }).updateMany({
-		$push: {
-			notifications: {
-				room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
-				title: NotifTitle,
-				sender_id: req.user.id,
-				receiver_id: null,
-				time: new Date(Date.now()),
-				barangay: req.body.barangay,
-				link: `/report/${dump._id}/${dump.coordinates.longtitude}/${dump.coordinates.latitude}`,
-				notifCode: req.body.notifCode,
-				status: 'unread',
-				category: 'illegalDump-new'
-			}
-		}
-	});
+	// const bulk1 = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: "barangayAdministrator" }).updateMany({
+	// 	$push: {
+	// 		notifications: {
+	// 			room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
+	// 			title: NotifTitle,
+	// 			sender_id: req.user.id,
+	// 			receiver_id: null,
+	// 			time: new Date(Date.now()),
+	// 			barangay: req.body.barangay,
+	// 			link: `/report/${dump._id}/${dump.coordinates.longtitude}/${dump.coordinates.latitude}`,
+	// 			notifCode: req.body.notifCode,
+	// 			status: 'unread',
+	// 			category: 'illegalDump-new'
+	// 		}
+	// 	}
+	// });
 
 
 	res.status(201).json({
@@ -182,7 +182,7 @@ exports.getDumps = catchAsyncErrors(async (req, res, next) => {
 	// const apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).populate('chat_id').populate('user_id'), req.query).search().filter();
 	let apiFeatures
 	if (req.query.ismobile == "true") {
-		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("complete_address additional_desciption images createdAt status"), req.query).search().filter();
+		apiFeatures = new APIFeatures(Dump.find().sort({ _id: -1 }).select("complete_address additional_desciption images createdAt status waste_type"), req.query).search().filter();
 		if (!req.query.keyword) {
 			apiFeatures.pagination(resPerPage);
 		}
@@ -230,7 +230,10 @@ exports.getDumpList = catchAsyncErrors(async (req, res, next) => {
 
 
 
-	} else {
+	}else if (req.user.role == 'barangayAdministrator'){
+		dumps = await Dump.find({barangayAssigned: req.user.barangay}).populate("user_id").populate("chat_id").sort({ _id: -1 });
+	}
+	else {
 		dumps = await Dump.find().populate("user_id").populate("chat_id").sort({ _id: -1 });
 	}
 	res.status(200).json({
@@ -454,6 +457,7 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 	const NotifTitle = `Your Reported Illegal Dump Details Has Been Updated`
 	const NotifTitleForCollector = `An Illegal Dump Has Assigned To You Has Been Updated`
 
+	
 	//For User
 	const bulk = await User.find({ _id: dump.user_id._id }).updateMany({
 		$push: {
@@ -473,6 +477,25 @@ exports.updateDump = catchAsyncErrors(async (req, res, next) => {
 	});
 	const userForPushNotification = await User.find({ _id: dump.user_id._id }).select('push_tokens activeChat')
 	expoSendNotification(userForPushNotification, NotifTitle, 'MyPublicReportsView', dump._id, req.body.notifCode)
+
+
+// for barangayAdmin
+	const bulk1 = await User.find({ barangay: req.body.barangay, _id: { $ne: req.user.id }, role: "barangayAdministrator" }).updateMany({
+		$push: {
+			notifications: {
+				room: 'basurahunt-notification-3DEA5E28CE9B6E926F52AF75AC5F7-94687284AF4DF8664C573E773CF31',
+				title: NotifTitleForCollector,
+				sender_id: req.user.id,
+				receiver_id: null,
+				time: new Date(Date.now()),
+				barangay: req.body.barangay,
+				link: `/report/${dump._id}/${dump.coordinates.longtitude}/${dump.coordinates.latitude}`,
+				notifCode: req.body.notifCode,
+				status: 'unread',
+				category: 'illegalDump-update'
+			}
+		}
+	});
 
 
 	if (typeof req.body.collectors == "string") {
@@ -670,7 +693,7 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 		userReporter.role = "user"
 		await userReporter.save();
 		console.log("notifCode1", req.body.notifCode1)
-		const notifTitle1 = "Congratulation you are now a verified user."
+		const notifTitle1 = "Congratulations you are now a verified user."
 		const bulk1 = await User.find({ _id: updatedDump.user_id._id }).updateMany({
 			$push: {
 				notifications: {
@@ -697,9 +720,9 @@ exports.updateDumpStatus = catchAsyncErrors(async (req, res, next) => {
 	if (req.body.new_status === "Confirmed") {
 		NotifTitle = "Your Reported Illegal Dump Has Been Confirmed By The Admin"
 	} if (req.body.new_status === "Unfinish") {
-		NotifTitle = "Your Reported Illegal Dump Is Unfinish"
+		NotifTitle = "Your Reported Illegal Dump Is Unfinished"
 	} if (req.body.new_status === "Cleaned") {
-		NotifTitle = "Congratulation Your Reported Illegal Dump Is Already Cleaned"
+		NotifTitle = "Congratulations Your Reported Illegal Dump Is Already Cleaned"
 	} if (req.body.new_status === "newReport") {
 		NotifTitle = "Your Reported Illegal Dumps is Pending"
 	}

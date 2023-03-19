@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Platform, ImagePickerIOS, StyleSheet, Dimensions, Switch, ActivityIndicator, Modal } from "react-native";
+import { Text, View, ScrollView, Image, TouchableOpacity, FlatList, TextInput, Platform, ImagePickerIOS, StyleSheet, Dimensions, Switch, ActivityIndicator, Modal } from "react-native";
 import { HStack, VStack, Select } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
@@ -20,7 +20,7 @@ import NotificationSender from "../../extras/notificationSender";
 import { reportedDumps } from "../../../Redux/Actions/userActions";
 import { USER_DUMP_PAGE_RESET } from "../../../Redux/Constants/userConstants";
 import { Skeleton } from "native-base";
-import { AutocompleteDropdown } from 'react-native-autocomplete-dropdown';
+import SearchableDropdown from 'react-native-searchable-dropdown';
 import { Ionicons } from "@expo/vector-icons";
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
@@ -58,8 +58,9 @@ const PublicReportsAdd = ({ navigation }) => {
     const [user, setUser] = useState();
     const [selectedItemForAdditionalDesc, setSelectedItemForAdditionalDesc] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [addDetFocus, setAddDetFocus] = useState(false)
     const [modalContentIndex, setModalContentIndex] = useState(0);
-   
+
     // const setLongitude = (longitudeValue) =>{
     //     longitude =
     // }
@@ -119,7 +120,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
         if (success) {
 
-          
+
             console.log("notifCode", notifCode)
             NotificationSender(`New illegal dump report in ${dump && dump.complete_address} Brgy.${dump && dump.barangay}`, user._id, null, barangay, 'illegalDump-new', notifCode, dump && dump)
 
@@ -251,7 +252,14 @@ const PublicReportsAdd = ({ navigation }) => {
             formData.append("category_violation", category_violation);
         }
         // console.log("selectedItemForAdditionalDesc", selectedItemForAdditionalDesc)
-        formData.append("additional_desciption", selectedItemForAdditionalDesc);
+
+
+        swearjarEng.setLang("en");
+        const cleanAddDescEng = swearjarEng.censor(additional_desciption);
+        swearjarFil.setLang("ph");
+        const cleanAddDescFil = swearjarEng.censor(cleanAddDescEng);
+
+        formData.append("additional_desciption", cleanAddDescFil);
 
 
         images.forEach(images => {
@@ -272,15 +280,6 @@ const PublicReportsAdd = ({ navigation }) => {
     }
 
 
-    const additional_detail_handler = (addDescVal) => {
-        swearjarEng.setLang("en");
-        const cleanAddDescEng = swearjarEng.censor(addDescVal);
-        swearjarFil.setLang("ph");
-        const cleanAddDescFil = swearjarEng.censor(cleanAddDescEng);
-        // console.log("cleanAddDescFil",cleanAddDescFil)
-        setSelectedItemForAdditionalDesc(cleanAddDescFil)
-
-    }
 
 
     const ModalContent = () => {
@@ -439,6 +438,37 @@ const PublicReportsAdd = ({ navigation }) => {
 
     }
 
+    const suggestionsValues = [
+        {
+            title: 'Harmful to the health.',
+            id: 'Harmful to the health.'
+        },
+        {
+            title: 'Can Be Fire Hazards',
+            id: 'Can Be Fire Hazards'
+        },
+        {
+            title: 'Has bad effects on birds, animals, and plants.',
+            id: 'Has bad effects on birds, animals, and plants.'
+        },
+        {
+            title: 'Bad smell.',
+            id: 'Bad smell.'
+        },
+        {
+            title: 'Blocking the street or road.',
+            id: 'Blocking the street or road.'
+        },
+        {
+            title: 'Blocking the waterways.',
+            id: 'Blocking the waterways.'
+        }
+    ];
+
+
+
+
+
     return (
         <>
 
@@ -449,6 +479,7 @@ const PublicReportsAdd = ({ navigation }) => {
                 </View> :
 
                 <ScrollView
+                   
                     nestedScrollEnabled
                     keyboardDismissMode="on-drag"
                     keyboardShouldPersistTaps="handled"
@@ -458,8 +489,16 @@ const PublicReportsAdd = ({ navigation }) => {
 
 
 
+                    
+                    <View  onTouchStart={(e)=>{
+                        const purpose =  e.target._internalFiberInstanceHandleDEV.memoizedProps.purpose
+                        if(purpose === undefined){
+                            setAddDetFocus(false)
+                        }else{
+                            setAddDetFocus(true)
+                        }
 
-                    <View style={RandomStyle.vContainer}>
+                    }} style={RandomStyle.vContainer}>
 
                         <Modal
                             animationType="slide"
@@ -536,12 +575,12 @@ const PublicReportsAdd = ({ navigation }) => {
                                 <VStack justifyContent={"center"} alignItems={'center'}>
                                     <BhButton large onPress={capImage}>
                                         <VStack alignItems={"center"}>
-                                            <MaterialCommunityIcons color={"white"} size={30} name="camera"/>
+                                            <MaterialCommunityIcons color={"white"} size={30} name="camera" />
                                             <Text style={{ color: "white" }}>Capture Image</Text>
                                         </VStack>
                                     </BhButton>
                                     <BhButton large onPress={pickImage}>
-                                        <Text style={{ color: "white" }}><MaterialCommunityIcons size={15} name="upload"/> Upload Image</Text>
+                                        <Text style={{ color: "white" }}><MaterialCommunityIcons size={15} name="upload" /> Upload Image</Text>
                                     </BhButton>
                                 </VStack>
 
@@ -569,15 +608,16 @@ const PublicReportsAdd = ({ navigation }) => {
 
                                 <VStack>
                                     <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
-                                    <TextInput value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
+                                    <TextInput keyboardShouldPersistTaps="true" value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
                                 <VStack>
                                     <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
-                                    <TextInput value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
+                                    <TextInput keyboardShouldPersistTaps="true" value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
                                 <Text style={RandomStyle.vText2}>Barangay</Text>
                                 <Select
+                                keyboardShouldPersistTaps="true"
                                     selectedValue={barangay}
                                     onValueChange={(barangay_value) => setBarangay(barangay_value)}>
                                     {barangays.map((barangay) =>
@@ -590,7 +630,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
                                 <VStack>
                                     <Text style={RandomStyle.vText2}>Purok (optional): </Text>
-                                    <TextInput keyboardType="numeric" value={purok} onChangeText={(purok_value) => { purok_value>=0?setPurok(purok_value):null }} placeholder="..." style={Form1.textInput2} />
+                                    <TextInput  keyboardShouldPersistTaps="true" keyboardType="numeric" value={purok} onChangeText={(purok_value) => { purok_value >= 0 ? setPurok(purok_value) : null }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
 
@@ -706,49 +746,32 @@ const PublicReportsAdd = ({ navigation }) => {
 
                                 <Text style={RandomStyle.vText2}>Additional Details</Text>
 
-                                {/* <TextInput value={additional_desciption} onChangeText={(additional_desciption_value) => { setAdditional_desciption(additional_desciption_value) }} textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} /> */}
-                                <View>
-                                    <AutocompleteDropdown
-                                        onChangeText={(addDescVal) => additional_detail_handler(addDescVal && addDescVal)}
-                                        direction="up"
-                                        clearOnFocus={false}
-                                        closeOnBlur={true}
-                                        closeOnSubmit={false}
-                                        // initialValue={{ id: '2' }} // or just '2'
-                                        onSelectItem={e => setSelectedItemForAdditionalDesc(e && e.title)}
-                                        dataSet={[
-                                            { id: '1', title: 'Harmful to the health.' },
-                                            { id: '2', title: 'Can Be Fire Hazards' },
-                                            { id: '3', title: 'Has bad effects on birds, animals, and plants.' },
-                                            { id: '4', title: 'Bad smell.' },
-                                            { id: '5', title: 'Blocking the street or road.' },
-                                            { id: '6', title: 'Blocking the waterways.' },
-                                            { id: selectedItemForAdditionalDesc, title: selectedItemForAdditionalDesc },
-                                        ]}
-                                        textInputProps={{
-                                            // placeholder: 'Type 3+ letters (dolo...)',
-                                            autoCorrect: false,
-                                            autoCapitalize: 'none',
-                                            style: {
-                                                backgroundColor: "'#ffffff'",
-                                                color: '#000',
-                                                paddingLeft: 18,
-                                                border: "1px solid gray"
-                                            },
-                                        }}
-                                        rightButtonsContainerStyle={{
-                                            right: 8,
-                                            height: 30,
-                                            backgroundColor: '#ffffff',
-                                            alignSelf: 'center',
-                                        }}
-                                        inputContainerStyle={{
-                                            backgroundColor: '#ffffff',
-                                            border: "1px solid gray"
-                                        }}
-                                        containerStyle={Form1.textInput2AdditionalDetails}
-                                    />
-                                </View>
+
+                                {addDetFocus && suggestionsValues.filter(obj => Object.values(obj).some(val => val.includes(additional_desciption))).length >= 1 ?
+                                    <View purpose={"Text"}  style={{ maxHeight: 200,borderWidth: 1, borderColor: "#c7c7c7", borderRadius:10 }}  onPress={()=>setAddDetFocus(true)}>
+
+
+                                        <ScrollView keyboardShouldPersistTaps='always' nestedScrollEnabled={true}>
+                                            {suggestionsValues.filter(obj => Object.values(obj).some(val => val.includes(additional_desciption))).map((item) => {
+                                                return (
+                                                    <TouchableOpacity onPress={()=>{
+                                                        setAdditional_desciption(item.title)
+                                                        setAddDetFocus(false)
+                                                        }} key={item.id} style={{paddingHorizontal:5 , paddingVertical: 10, borderBottomWidth: 1, borderColor: "#c7c7c7" }}>
+                                                        <Text purpose={"Text"} >{item.title}</Text>
+                                                    </TouchableOpacity>
+                                                )
+                                            })}
+                                        </ScrollView>
+
+
+                                    </View> : ""
+                                }
+                                <TextInput value={additional_desciption} purpose={"Text"} onFocus={() => setAddDetFocus(true)} onChangeText={(additional_desciption_value) => { setAdditional_desciption(additional_desciption_value) }} textAlignVertical="top" numberOfLines={1} style={Form1.textInput2} />
+
+
+
+
 
                                 <View style={RandomStyle.vContainer3}>
                                     <BhButton gray={!btnAdd} center large onPress={() => setBtnAdd(!btnAdd)}>
@@ -809,7 +832,10 @@ const PublicReportsAdd = ({ navigation }) => {
                         {/* ===== */}
 
                     </View>
-                </ScrollView>
+
+
+
+                </ScrollView >
             }
         </>
     )
