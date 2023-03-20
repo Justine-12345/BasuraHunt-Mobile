@@ -1,8 +1,8 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import { View, Text, TouchableOpacity, ScrollView } from "react-native";
 import OtpInput from "../../stylesheets/otpInput";
 import Form1 from "../../stylesheets/form1";
-import { VStack } from "native-base";
+import { VStack, Input } from "native-base";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
@@ -57,6 +57,9 @@ const OTP = ({ navigation }) => {
         registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
     }, []))
 
+    useEffect(()=>{
+        console.log(otp);
+    }, [otp])
 
 
     useFocusEffect(
@@ -185,10 +188,11 @@ const OTP = ({ navigation }) => {
                 <Text style={Form1.title}>Enter 6-digit code</Text>
                 <Text style={[Form1.sub, { marginVertical: 20 }]}>Your code was sent to {authUser && authUser.email}</Text>
                 <View style={Form1.otpContainer}>
-                    <OtpInput
+                    <Input style={{fontSize: 50, textAlign: "center"}} keyboardType="number-pad" maxLength={6} onChangeText={(value)=>setOtp(value)}/>
+                    {/* <OtpInput
                         numberOfInput={6}
                         setOtpCode={setOtp}
-                    />
+                    /> */}
                 </View>
                 {/* refresh OTP */}
                 <TouchableOpacity style={{ alignSelf: "flex-end" }}>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { Text, View, Image, Dimensions, TextInput, TouchableOpacity, ActivityIndicator } from "react-native";
 import { HStack } from 'native-base';
-import { SimpleLineIcons } from "@expo/vector-icons";
+import { Ionicons, SimpleLineIcons } from "@expo/vector-icons";
 
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { findEmail } from "../../Redux/Actions/userActions";
@@ -22,6 +22,7 @@ const Login = ({ navigation }) => {
     const [password, setPassword] = useState('')
     const [expoPushToken, setExpoPushToken] = useState('');
     const { loading: authLoading, isAuthenticated, error: authError, user: authUser } = useSelector(state => state.auth);
+	const [showPass, setShowPass] = useState(false);
 
 
     async function registerForPushNotificationsAsync() {
@@ -168,7 +169,13 @@ const Login = ({ navigation }) => {
             <Text style={[Styles.text0, Styles.text1]}>Login</Text>
 
             <TextInput editable={!authLoading} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
-            <TextInput editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={true} style={Styles.textInput} />
+            {/* <TextInput editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={true} style={Styles.textInput} /> */}
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={!showPass}/>
+                <TouchableOpacity onPress={()=>setShowPass(!showPass)}>
+                    <Ionicons name={showPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
 
             <TouchableOpacity onPress={() => navigation.navigate('ForgotPassword')} style={Styles.touchable}>
                 <Text style={Styles.text0}>Forgot Password?</Text>

@@ -49,10 +49,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 		count_otp = user_find_otp.length
 	}
 	while (count_otp > 0);
-
+	
+	req.body.email = req.body.email.toLowerCase();
 
 	const { first_name, middle_name, last_name, suffix, birthday, phone_number, gender, house_number, street, barangay, email, alias, password, jobDesc } = req.body;
-
 
 	let user
 
@@ -612,7 +612,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
 //******User Fogot Password******
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
-	const user = await User.findOne({ email: req.body.email });
+	const user = await User.findOne({ email: req.body.email.toLowerCase() });
 
 	if (!user) {
 		return next(new ErrorHandler('User not found with this email', 404));
