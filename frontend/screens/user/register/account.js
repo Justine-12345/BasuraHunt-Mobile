@@ -162,7 +162,7 @@ const Account = ({ navigation }) => {
                     {availableEmail === false ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Already Used <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
                     {availableEmail === "invalid" ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Invalid Format <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
                 </Text>
-                <TextInput onChangeText={(email_value) => { setUser({ ...user, ["email"]: email_value }) }} style={Form1.textInput} />
+                <TextInput autoCapitalize={"none"} onChangeText={(email_value) => { setUser({ ...user, ["email"]: email_value }) }} style={Form1.textInput} />
 
                 {/* alias/nickname */}
                 <Text style={Form1.label}>Alias/Nickname<Text style={{color:"red"}}>*</Text></Text>
@@ -175,7 +175,7 @@ const Account = ({ navigation }) => {
                 </Text>
                 {/* <TextInput onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={true} style={Form1.textInput} /> */}
                 <HStack alignItems={"center"} style={Form1.textInput}>
-                    <TextInput style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={!showPass}/>
+                    <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={!showPass}/>
                     <TouchableOpacity onPress={()=>setShowPass(!showPass)}>
                         <Ionicons name={showPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                     </TouchableOpacity>
@@ -187,7 +187,7 @@ const Account = ({ navigation }) => {
                 </Text>
                 {/* <TextInput onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={true} style={Form1.textInput} /> */}
                 <HStack alignItems={"center"} style={Form1.textInput}>
-                    <TextInput style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={!showCPass}/>
+                    <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={!showCPass}/>
                     <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
                         <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                     </TouchableOpacity>

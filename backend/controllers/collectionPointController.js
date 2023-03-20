@@ -321,8 +321,8 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	
 
 
-	const NotifTitle = `New Trash Collection Schedule Has Added To Your Barangay | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
-	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assign To You | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
+	const NotifTitle = `New Trash Collection Schedule Has Been Added To Your Barangay | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
+	const NotifTitleForCollector = `The New Trash Collection Schedule Has Been Assigned To You | Time: ${collectionPointTime({ startTime:req.body.startTime, endTime:req.body.endTime })} ${typeof req.body.repeats == "string" ? req.body.repeats : req.body.repeats.join()} | Collection Point: ${scheduleCollectionPointsList(req.body.collectionPoints)} | Type: ${type}`
 
 
 	const bulk = await User.find({ barangay: barangay, _id: { $ne: req.user.id }, role: { $ne: "garbageCollector" } }).updateMany({

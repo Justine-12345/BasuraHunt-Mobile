@@ -313,6 +313,7 @@ exports.findEmail = catchAsyncErrors(async (req, res, next) => {
 
 //******Login (Slide 15)******
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+	req.body.email = req.body.email.toLowerCase();
 	const { email, password } = req.body;
 
 	if (!email || !password) {
@@ -819,7 +820,7 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
 		house_number: req.body.house_number,
 		street: req.body.street,
 		barangay: req.body.barangay,
-		email: req.body.email,
+		email: req.body.email.toLowerCase(),
 		alias: req.body.alias,
 		password: req.body.password,
 		role: req.body.role,

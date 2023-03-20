@@ -168,10 +168,10 @@ const Login = ({ navigation }) => {
             </View>
             <Text style={[Styles.text0, Styles.text1]}>Login</Text>
 
-            <TextInput editable={!authLoading} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
+            <TextInput editable={!authLoading} autoCapitalize={"none"} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
             {/* <TextInput editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={true} style={Styles.textInput} /> */}
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={!showPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} editable={!authLoading} onChangeText={(password_value) => setPassword(password_value)} placeholder="Password" secureTextEntry={!showPass}/>
                 <TouchableOpacity onPress={()=>setShowPass(!showPass)}>
                     <Ionicons name={showPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>

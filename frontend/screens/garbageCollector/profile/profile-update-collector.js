@@ -36,7 +36,7 @@ const ProfileUpdate = (props) => {
     const [passwordError, setPasswordError] = useState(null)
     const [passwordMatchError, setPasswordMatchError]= useState(null)
     const [user, setUser] = useState({
-        email: userDetail.email,
+        email: userDetail.email.toLowerCase(),
         alias:  userDetail.alias,
         password: '',
         confirm_password: '',

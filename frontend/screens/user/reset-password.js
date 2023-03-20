@@ -169,7 +169,7 @@ const ResetPassword = (props) => {
 
             {/* <TextInput value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={true} style={Styles.textInput} /> */}
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
                 <TouchableOpacity onPress={()=>setShowNPass(!showNPass)}>
                     <Ionicons name={showNPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>
@@ -183,7 +183,7 @@ const ResetPassword = (props) => {
             }
             {/* <TextInput value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={true} style={Styles.textInput} /> */}
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
                 <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
                     <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>

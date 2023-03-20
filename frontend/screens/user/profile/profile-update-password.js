@@ -79,13 +79,13 @@ const ProfileUpdatePassword = ({ navigation }) => {
         else if (password !== confirmPassword) {
             Toast.show({
                 type: 'error',
-                text1: "Password Dont Match, Please Confirm Again",
+                text1: "Passwords Don't Match, Please Confirm Again",
             });
         }
         else if (passwordError === true || passwordError === null) {
             Toast.show({
                 type: 'error',
-                text1: "Password is to weak",
+                text1: "Password is too weak",
             });
         }
         else {
@@ -105,7 +105,7 @@ const ProfileUpdatePassword = ({ navigation }) => {
         <View style={Styles.container2}>
             <Text style={[Styles.text0, Styles.text1]}>Update Password</Text>
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} value={oldPassword} onChangeText={(password_value) => setOldPassword(password_value)} placeholder="Current Password" secureTextEntry={!showOPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={oldPassword} onChangeText={(password_value) => setOldPassword(password_value)} placeholder="Current Password" secureTextEntry={!showOPass}/>
                 <TouchableOpacity onPress={()=>setShowOPass(!showOPass)}>
                     <Ionicons name={showOPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>
@@ -116,7 +116,7 @@ const ProfileUpdatePassword = ({ navigation }) => {
             </View>
             {/* <TextInput value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={true} style={Styles.textInput} /> */}
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
                 <TouchableOpacity onPress={()=>setShowNPass(!showNPass)}>
                     <Ionicons name={showNPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>
@@ -129,7 +129,7 @@ const ProfileUpdatePassword = ({ navigation }) => {
             }
             {/* <TextInput value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={true} style={Styles.textInput} /> */}
             <HStack alignItems={"center"} style={Styles.textInput}>
-                <TextInput style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
                 <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
                     <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
                 </TouchableOpacity>
