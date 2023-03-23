@@ -126,6 +126,13 @@ exports.getCollectors = catchAsyncErrors(async (req, res, next) => {
 	} else {
 		users = await User.find({ role: "garbageCollector", barangay: req.user.barangay }).select('first_name last_name jobDesc barangay');
 	}
+
+	if (req.user.role == 'barangayAdministrator') {
+		users = await User.find({ role: "garbageCollector" }).select('first_name last_name jobDesc barangay');
+	} else {
+		users = await User.find({ role: "garbageCollector", barangay: req.user.barangay }).select('first_name last_name jobDesc barangay');
+	}
+
 	let collectors = [];
 
 	users.forEach(user => {
@@ -145,26 +152,50 @@ exports.getCollectors = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
+	
+	if(req.user.role == "administrator") {
+		const collectionPoints = await CollectionPoint.find({"user_role": {$ne: "barangayAdministrator"}}).sort({ _id: -1 }).select('-collectors -repeats -district -collectionPerTruck');
+		const collectionPointsCount = await CollectionPoint.countDocuments();
 
-	const collectionPoints = await CollectionPoint.find().sort({ _id: -1 }).select('-collectors -repeats -district -collectionPerTruck');
-	const collectionPointsCount = await CollectionPoint.countDocuments();
+		const scheduleForCP = await CollectionPoint.find({},{"collectionPoints.collectionPoint":1, "user_role": {$ne: "barangayAdministrator"}}).distinct("collectionPoints.collectionPoint")
+		let collectionPointsList = []
 
-	const scheduleForCP = await CollectionPoint.find({},{"collectionPoints.collectionPoint":1}).distinct("collectionPoints.collectionPoint")
-	let collectionPointsList = []
-
-	scheduleForCP.forEach((collectionPoint)=>{
-		collectionPointsList.push({
-			value: collectionPoint,
-			label: collectionPoint
+		scheduleForCP.forEach((collectionPoint)=>{
+			collectionPointsList.push({
+				value: collectionPoint,
+				label: collectionPoint
+			})
 		})
-	})
 
-	res.status(200).json({
-		success: true,
-		collectionPoints,
-		collectionPointsList,
-		collectionPointsCount
-	})
+		res.status(200).json({
+			success: true,
+			collectionPoints,
+			collectionPointsList,
+			collectionPointsCount
+		})
+	}
+
+	if(req.user.role == "barangayAdministrator") {
+		const collectionPoints = await CollectionPoint.find({"user_id": req.user.id}).sort({ _id: -1 }).select('-collectors -repeats -district -collectionPerTruck');
+		const collectionPointsCount = await CollectionPoint.countDocuments();
+
+		const scheduleForCP = await CollectionPoint.find({},{"collectionPoints.collectionPoint":1, "user_id": req.user.id}).distinct("collectionPoints.collectionPoint")
+		let collectionPointsList = []
+
+		scheduleForCP.forEach((collectionPoint)=>{
+			collectionPointsList.push({
+				value: collectionPoint,
+				label: collectionPoint
+			})
+		})
+
+		res.status(200).json({
+			success: true,
+			collectionPoints,
+			collectionPointsList,
+			collectionPointsCount
+		})
+	}
 })
 
 
@@ -298,6 +329,13 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	    }
 	}
 
+	let user_id = "";
+	let user_role = "";
+	if(req.user.role == "barangayAdministrator") {
+		user_id = req.user.id;
+		user_role = "barangayAdministrator";
+	}
+
 	const { name, startTime, endTime, barangay, type, status } = req.body;
 	const collectionPoints = await CollectionPoint.create({
 		name,
@@ -309,6 +347,8 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 		district,
 		type,
 		status,
+		user_id,
+		user_role,
 		collectionPoints: collectionPointsList
 	})
 

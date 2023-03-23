@@ -117,6 +117,15 @@ const collectionPointSchema = new mongoose.Schema({
         trim: true    
     },
 
+    user_id: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'user'
+    },
+
+    user_role: {
+        type: String
+    },
+
     createdAt: {
         type: Date,
         default: Date.now

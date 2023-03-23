@@ -30,6 +30,7 @@ const PublicDonationsView = (props) => {
     const [identity, setIdentity] = useState("");
     const [userID, setUserID] = useState("");
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState();
     const [item, setItem] = useState()
     const [rate, setRate] = useState(0)
     const [rateError, setRateError] = useState(false)
@@ -125,6 +126,12 @@ const PublicDonationsView = (props) => {
     const deleteItemHandler = (id) => {
         dispatch(deleteItem(id));
     }
+
+    const deleteItemModal = (id) => {
+        setModalVisible(true);
+        setModalContent(id);
+    }
+
     useFocusEffect(
         useCallback(() => {
             return () => {
@@ -259,6 +266,30 @@ const PublicDonationsView = (props) => {
                 <View style={RandomStyle.vContainer}>
                     <View style={RandomStyle.vHeader}>
                         <Text style={RandomStyle.vText1}>Donation ({item && item.name})</Text>
+
+                        <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
+                            <View style={[RandomStyle.usModal, {  flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+                                <View style={[RandomStyle.usPoints,{backgroundColor:"#1e5128"}]}>
+                                    <VStack>
+                                        <VStack>
+                                            <Text style={{ fontWeight: "bold",color:"white" }}>Are you sure?</Text>
+                                            <Text style={{color:"white"}}>Do you want to delete this item?</Text>
+                                        </VStack>
+                                        <TouchableOpacity style={[RandomStyle.usClosec,{backgroundColor:"darkgreen"}]} onPress={() => deleteItemHandler(modalContent)}>
+                                            <Text style={RandomStyle.usClose}>
+                                                DELETE
+                                            </Text>
+                                        </TouchableOpacity>
+                                        <TouchableOpacity style={[RandomStyle.usClosec,{backgroundColor:"darkgreen"}]} onPress={() => setModalVisible(false)}>
+                                            <Text style={RandomStyle.usClose}>
+                                                CANCEL
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </VStack>
+                                </View>
+                            </View>
+                        </Modal>
+
                         <HStack justifyContent={"space-between"}>
                             <VStack>
                                 <HStack>
@@ -292,7 +323,7 @@ const PublicDonationsView = (props) => {
                                         (item && item.user_id && item.user_id._id) === (userID && userID._id) && (
                                             item && item.status === "Unclaimed" && (
                                                 <TouchableOpacity>
-                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { deleteItemHandler(item._id) }}>Delete</Text>
+                                                    <Text style={RandomStyle.vDonationBtn} onPress={() => { deleteItemModal(item._id) }}>Delete</Text>
                                                 </TouchableOpacity>
                                             )
                                         )
