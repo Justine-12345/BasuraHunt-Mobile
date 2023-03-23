@@ -100,7 +100,7 @@ const Profile = ({ navigation }) => {
         var diff = d2.getTime() - d1.getTime();
         return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
     }
-
+// get level
     const getLvlTotalExp = (level) => {
         let lvlTotalExp = 0
 

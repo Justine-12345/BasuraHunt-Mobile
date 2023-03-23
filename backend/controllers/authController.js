@@ -860,7 +860,7 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
 
 
-//******Reported Dumps By User******
+//******Reported Dumps By Auth User******
 exports.reportedDumps = catchAsyncErrors(async (req, res, next) => {
 
 
