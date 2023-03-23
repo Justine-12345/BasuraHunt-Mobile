@@ -26,7 +26,7 @@ router.route('/collectionPoint/live-notification/:id').put(isAuthenticatedUser, 
 
 router.route('/collectionPoint/num-of-truck/:id').put(isAuthenticatedUser, authorizeRoles('administrator', 'garbageCollector'), addCollectionnumOfTruck);
 
-// Admin
+// Administrator
 router.route('/admin/collectionPoint/collectors').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), getCollectors);
 router.route('/admin/collectionPoints').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), getCollectionPoints);
 router.route('/admin/collectionPoint/new').post(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), newCollectionPoint);

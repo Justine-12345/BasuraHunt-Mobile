@@ -201,7 +201,7 @@ const PublicReportsAdd = ({ navigation }) => {
             }
         }
 
-        return("(" + message + "....)");
+        return("(" + message + "...)");
     }
 
     const additionalDetailsModal = (additionalDescriptionMessage) => {
