@@ -226,7 +226,7 @@ const Profile = ({ navigation }) => {
 
     const modalImgs = [
         "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb3_tqsuge.png",
-        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb4_toljjp.png"
+        "https://res.cloudinary.com/basurahunt/image/upload/v1679216415/BasuraHunt/Static/ranks-updated_rkhjii.png"
     ]
     const getModalImg = (index) => {
         setModalImg(modalImgs[index]);
@@ -418,7 +418,7 @@ async function registerForPushNotificationsAsync() {
             finalStatus = status;
         }
         if (finalStatus !== 'granted') {
-            alert('Failed to get push token for push notification!');
+            alert('To enable Notification, please make sure Notification (BasuraHunt) is enabled under Settings');
             return;
         }
         token = (await Notifications.getExpoPushTokenAsync()).data;

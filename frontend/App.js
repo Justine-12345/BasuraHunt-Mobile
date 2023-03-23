@@ -246,7 +246,7 @@ const slides = [
   },
   {
     key: 's4',
-    title: 'BashuraHunt',
+    title: 'BasuraHunt',
     text: ' BasuraHunt aims to reduce and improve the environmental status, particularly in managing illegal dumps and providing self-awareness to the residents of Taguig City.',
     image: require('./assets/icon.png'),
     backgroundColor: '#1e5128',

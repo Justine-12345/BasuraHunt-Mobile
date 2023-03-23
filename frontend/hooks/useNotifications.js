@@ -16,7 +16,7 @@ export const useNotifications = () => {
             finalStatus = status;
           }
           if (finalStatus !== 'granted') {
-            alert('Failed to get push token for push notification!');
+            alert('To enable Notification, please make sure Notification (BasuraHunt) is enabled under Settings');
             return;
           }
           const token = (await Notifications.getExpoPushTokenAsync()).data;

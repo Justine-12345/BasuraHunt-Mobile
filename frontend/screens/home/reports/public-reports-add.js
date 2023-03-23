@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { Text, View, ScrollView, Image, TouchableOpacity, FlatList, TextInput, Platform, ImagePickerIOS, StyleSheet, Dimensions, Switch, ActivityIndicator, Modal } from "react-native";
-import { HStack, VStack, Select } from "native-base";
+import { HStack, VStack, Select, Checkbox } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -21,7 +22,7 @@ import { reportedDumps } from "../../../Redux/Actions/userActions";
 import { USER_DUMP_PAGE_RESET } from "../../../Redux/Constants/userConstants";
 import { Skeleton } from "native-base";
 import SearchableDropdown from 'react-native-searchable-dropdown';
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, AntDesign } from "@expo/vector-icons";
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 const swearjarEng = require('swearjar-extended2');
@@ -32,9 +33,11 @@ const PublicReportsAdd = ({ navigation }) => {
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
     const { loading, success, dump, error } = useSelector(state => state.newDump)
     const { initializing } = useSelector(state => state.mapLoading)
+    const { address } = useSelector(state => state.address)
     let longitude = 0
     let latitude = 0
     const [notifCode, setNotifCode] = useState('')
+    const [isDontShow, setIsDontShow] = useState(false);
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
     const [images, setImages] = useState([]);
@@ -58,6 +61,7 @@ const PublicReportsAdd = ({ navigation }) => {
     const [user, setUser] = useState();
     const [selectedItemForAdditionalDesc, setSelectedItemForAdditionalDesc] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
+    const [modalVisibleDontsAndDos, setModalVisibleDontsAndDos] = useState(false);
     const [addDetFocus, setAddDetFocus] = useState(false)
     const [modalContentIndex, setModalContentIndex] = useState(0);
 
@@ -108,6 +112,10 @@ const PublicReportsAdd = ({ navigation }) => {
         "Upper Bicutan",
         "Western Bicutan",
     ]
+
+    useEffect(()=>{
+        setComplete_address(address)
+    },[address])
 
     useEffect(() => {
         setNotifCode(RandomStringGenerator(40))
@@ -319,7 +327,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         }}
                             source={require("../../../assets/report3.jpg")}
                         />
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>6. Choose whether to stay anonymous or use real name when reporting to protect/hide your identity</Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>6. Choose whether to use alias (default) or anonymous when reporting to protect/hide your identity.</Text>
                         <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>7. Include as much information about the scene and location of the illegal dump as possible.(Optional)</Text>
                         <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>8. Select the possible size of garbage that will be collected by the trash collector.(Optional)</Text>
                         <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>9. Choose from the options which can access the illegal dump based on its location.(Optional)</Text>
@@ -332,64 +340,22 @@ const PublicReportsAdd = ({ navigation }) => {
             return (
                 <ScrollView>
                     <View>
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>1. Animal Corpse</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any dead or slaughtered animal, usually seen on the road because of an accident. <Text style={{ fontStyle: 'italic' }}>Examples: animal bones, dead rat</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>1. <View style={{ backgroundColor: "#5b9f2e", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View> Biodegradable Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste can be decomposed easily by microorganisms and can be used as fertilizer if handled properly. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> food waste, animal entrails, eggshell (any soft shells), seeds, leaves, small animal carcasses.</Text></Text>
 
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>2. <View style={{ backgroundColor: "#2b71a4", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Non-Biodegradable Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste is free from contamination and can be recycled to produce a beneficial use. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> aluminum, tin cans, boxes, plastic, plastic bottles, glass, newspapers.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>2. Automotive</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any automobile or vehicle waste that was part of an automobile, usually damaged or not functioning component of vehicles. <Text style={{ fontStyle: 'italic' }}>Examples: wheels, automotive battery</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>3. <View style={{ backgroundColor: "#c90421", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Special Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Applies to harmful household wastes. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> batteries, thinner, paints, light bulbs, pesticides, gas tanks, household cleaners, worn-out electrical wires.</Text></Text>
 
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>4. <View style={{ backgroundColor: "#181818", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Residual Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Pertains to waste that cannot be recycled or composted. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> sanitary napkin, disposable diapers, tampon, sachet of chips, plastic-lined cartons (milk, juice), rugs, tissue, cigarette butts.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>3. Construction</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that was generated or produced by any construction activities and materials that are damaged. <Text style={{ fontStyle: 'italic' }}>Examples: hollow blocks, broken ply woods, steel rod
-                        </Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>5. <View style={{ backgroundColor: "#ffe200", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Hazardous Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Type of waste that is most commonly produced by hospitals, clinics, or companies that produce chemicals. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> hospital waste, disposable syringe, PPE, bandages, mercury thermometer.</Text></Text>
 
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>4. Electronics</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any electronic waste or part of electronic devices that are not functioning or not working properly. <Text style={{ fontStyle: 'italic' }}>Examples: light bulb, wires, broken televisions</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>5. Hazardous</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is potentially dangerous or harmful to the environment and any human once inhaled or touched when disposed improperly. <Text style={{ fontStyle: 'italic' }}>Examples: pesticides, ammonia, paint/solvent</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>6. Household</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that may be solid or liquid materials that any family produced in a household. <Text style={{ fontStyle: 'italic' }}>Examples: broken table, broken cabinet, broken appliances</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>7. Liquid Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is formed in any liquid substances and may be produced by any household or industrial activity. <Text style={{ fontStyle: 'italic' }}>Examples: chemicals, used oils, acids
-                        </Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>8. Metal/Can</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is formed in any metal materials that may be in form of any ferrous and non-ferrous metals. <Text style={{ fontStyle: 'italic' }}>Examples: tin can, canned goods, steel</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>9. Paper</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is formed in any paper and can be recycled, usually produced by work or industries. <Text style={{ fontStyle: 'italic' }}>Examples: magazine, newspaper, cardboard</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>10. Plastic</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that forms in any plastic and is usually hard to decompose. <Text style={{ fontStyle: 'italic' }}>Examples: plastic bottles, plastic bags</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>11. Glass Bottle</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that forms in any glass bottle usually contains a liquid. <Text style={{ fontStyle: 'italic' }}>Examples: wine bottle, broken glass</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>12. Organic/Food</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is from plants or animals and food that is discarded and usually biodegradable and may use as a fertilizer. <Text style={{ fontStyle: 'italic' }}>Examples: leftover food, expired food, rotten plant
-                        </Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>13. Burned</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is currently burning or burned that is usually emits harmful and toxic gases or chemicals that can harm or pollute the environment. <Text style={{ fontStyle: 'italic' }}>Examples: Burned plastics, Treated Woods, Burned Paper</Text></Text>
-
-
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>14. Other</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Any waste that is not specified in the categories.</Text>
-
+                       
 
                     </View>
                 </ScrollView>
@@ -464,10 +430,32 @@ const PublicReportsAdd = ({ navigation }) => {
             id: 'Blocking the waterways.'
         }
     ];
+    useFocusEffect(
+        useCallback(() => {
+
+            AsyncStorage.getItem("iUnderstand")
+                .then((res) => {
+                    console.log("res", res)
+                    if (res === "false" || !res) {
+                        setModalVisibleDontsAndDos(true)
+                    }
+                })
+                .catch((error) => console.log(error))
+
+            return () => {
+                setModalVisibleDontsAndDos(false)
+            }
+        }, [])
+    )
 
 
-
-
+    const dontShowHandler = (value) => {
+        if (value) {
+            AsyncStorage.setItem("iUnderstand", "true");
+        } else {
+            AsyncStorage.setItem("iUnderstand", "false");
+        }
+    }
 
     return (
         <>
@@ -479,7 +467,7 @@ const PublicReportsAdd = ({ navigation }) => {
                 </View> :
 
                 <ScrollView
-                   
+
                     nestedScrollEnabled
                     keyboardDismissMode="on-drag"
                     keyboardShouldPersistTaps="handled"
@@ -487,14 +475,32 @@ const PublicReportsAdd = ({ navigation }) => {
                     contentContainerStyle={{ paddingBottom: 200 }}
                 >
 
+                    <Modal animationType="slide" transparent={true} visible={modalVisibleDontsAndDos} onRequestClose={() => setModalVisibleDontsAndDos(!modalVisibleDontsAndDos)}>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                            <ScrollView contentContainerStyle={RandomStyle.nfAddInfoModal}>
+                                <View style={RandomStyle.nfAddInfoModalView}>
+                                    <Image source={require('../../../assets/report_dos_donts_mobile_swatjs.png')} style={RandomStyle.nfAddInfoImg} />
+
+                                    <View style={{ position: "absolute", bottom: 20, width: windowWidth, alignItems: "center" }}>
+                                        <Checkbox size="sm" onChange={dontShowHandler} colorScheme="green" value="test">
+                                            <Text style={{ fontSize: 12 }}> Don't show it again</Text>
+                                        </Checkbox>
+
+                                        <BhButton medium onPress={() => setModalVisibleDontsAndDos(false)}>
+                                            <Text style={{ color: "white", fontSize: 10 }}>I Understand</Text>
+                                        </BhButton>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </View>
+                    </Modal>
 
 
-                    
-                    <View  onTouchStart={(e)=>{
-                        const purpose =  e.target._internalFiberInstanceHandleDEV.memoizedProps.purpose
-                        if(purpose === undefined){
+                    <View onTouchStart={(e) => {
+                        const purpose = e.target._internalFiberInstanceHandleDEV.memoizedProps.purpose
+                        if (purpose === undefined) {
                             setAddDetFocus(false)
-                        }else{
+                        } else {
                             setAddDetFocus(true)
                         }
 
@@ -607,17 +613,18 @@ const PublicReportsAdd = ({ navigation }) => {
                                 </View>
 
                                 <VStack>
-                                    <Text style={RandomStyle.vText2}>Complete Location Address: </Text>
+                                    <Text style={RandomStyle.vText2}>Complete Location Address<Text style={{color:"red"}}>*</Text></Text>
+                                    <Text style={{fontStyle:"italic", color:"gray", fontSize:10}}>(You can manually type the address if it is not accurate)</Text>
                                     <TextInput keyboardShouldPersistTaps="true" value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
                                 <VStack>
-                                    <Text style={RandomStyle.vText2}>Nearest Landmark: </Text>
+                                    <Text style={RandomStyle.vText2}>Nearest Landmark<Text style={{color:"red"}}>*</Text> </Text>
                                     <TextInput keyboardShouldPersistTaps="true" value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
-                                <Text style={RandomStyle.vText2}>Barangay</Text>
+                                <Text style={RandomStyle.vText2}>Barangay<Text style={{color:"red"}}>*</Text></Text>
                                 <Select
-                                keyboardShouldPersistTaps="true"
+                                    keyboardShouldPersistTaps="true"
                                     selectedValue={barangay}
                                     onValueChange={(barangay_value) => setBarangay(barangay_value)}>
                                     {barangays.map((barangay) =>
@@ -629,8 +636,8 @@ const PublicReportsAdd = ({ navigation }) => {
                                 </Select>
 
                                 <VStack>
-                                    <Text style={RandomStyle.vText2}>Purok (optional): </Text>
-                                    <TextInput  keyboardShouldPersistTaps="true" keyboardType="numeric" value={purok} onChangeText={(purok_value) => { purok_value >= 0 ? setPurok(purok_value) : null }} placeholder="..." style={Form1.textInput2} />
+                                    <Text style={RandomStyle.vText2}>Purok (optional) </Text>
+                                    <TextInput keyboardShouldPersistTaps="true" keyboardType="numeric" value={purok} onChangeText={(purok_value) => { purok_value >= 0 ? setPurok(purok_value) : null }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
 
@@ -674,7 +681,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         </> :
                             <>
                                 <HStack style={{ marginVertical: 8 }} >
-                                    <Text style={RandomStyle.vText2}>Type of Waste</Text>
+                                    <Text style={RandomStyle.vText2}>Type of Waste<Text style={{color:"red"}}>*</Text></Text>
                                     <TouchableOpacity style={{ position: "relative", top: 0 }} onPress={() => {
                                         setModalContentIndex(1);
                                         setModalVisible(true)
@@ -683,48 +690,52 @@ const PublicReportsAdd = ({ navigation }) => {
                                     </TouchableOpacity>
                                 </HStack>
                                 <View style={RandomStyle.vContainer2}>
-                                    <CheckboxBtn isChecked={waste_type.includes("Animal Corpse")} /*onPress={()=>setTypeAC(!typeAC)}*/ onPress={(e) => { !waste_type.includes("Animal Corpse") ? setWaste_type(oldArray => [...oldArray, "Animal Corpse"]) : setWaste_type(waste_type.filter(type => type !== "Animal Corpse")) }} >
-                                        <Text style={{ color: "white" }}>Animal Corpse</Text>
+                                    <CheckboxBtn bio value="Biodegradable Waste" style={{ width: windowWidth / 1.3 }} isChecked={waste_type.includes("Biodegradable Waste")} onPress={(e) => { !waste_type.includes("Biodegradable Waste") ? setWaste_type(oldArray => [...oldArray, "Biodegradable Waste"]) : setWaste_type(waste_type.filter(type => type !== "Biodegradable Waste")) }} >
+                                        <Text style={{ color: "white" }}>Biodegradable Waste</Text>
                                     </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Automotive")} /*onPress={()=>setTypeAU(!typeAU)}*/ onPress={(e) => { !waste_type.includes("Automotive") ? setWaste_type(oldArray => [...oldArray, "Automotive"]) : setWaste_type(waste_type.filter(type => type !== "Automotive")) }}>
-                                        <Text style={{ color: "white" }}>Automotive</Text>
+                                    <Text style={{ width: windowWidth / 1.3, textAlign: "center", fontStyle: "italic", fontSize: 12, marginBottom: 12 }}>
+                                        Food waste, animal entrails, eggshell (any soft shells), seeds, etc.
+                                    </Text>
+
+
+
+                                    <CheckboxBtn non style={{ width: windowWidth / 1.3 }} isChecked={waste_type.includes("Non-Biodegradable Waste")} onPress={(e) => { !waste_type.includes("Non-Biodegradable Waste") ? setWaste_type(oldArray => [...oldArray, "Non-Biodegradable Waste"]) : setWaste_type(waste_type.filter(type => type !== "Non-Biodegradable Waste")) }}>
+                                        <Text style={{ color: "white" }}>Non-Biodegradable Waste</Text>
                                     </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Burned")} /*onPress={()=>setTypeBU(!typeBU)}*/ onPress={(e) => { !waste_type.includes("Burned") ? setWaste_type(oldArray => [...oldArray, "Burned"]) : setWaste_type(waste_type.filter(type => type !== "Burned")) }}>
-                                        <Text style={{ color: "white" }}>Burned</Text>
+                                    <Text style={{ width: windowWidth / 1.3, textAlign: "center", fontStyle: "italic", fontSize: 12, marginBottom: 12 }}>
+                                        Aluminum, tin cans, boxes, plastic, plastic bottles, etc.
+                                    </Text>
+
+
+                                    <CheckboxBtn spe style={{ width: windowWidth / 1.3 }} isChecked={waste_type.includes("Special Waste")} onPress={(e) => { !waste_type.includes("Special Waste") ? setWaste_type(oldArray => [...oldArray, "Special Waste"]) : setWaste_type(waste_type.filter(type => type !== "Special Waste")) }}>
+                                        <Text style={{ color: "white" }}>Special Waste</Text>
                                     </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Construction")} /*onPress={()=>setTypeCO(!typeCO)}*/ onPress={(e) => { !waste_type.includes("Construction") ? setWaste_type(oldArray => [...oldArray, "Construction"]) : setWaste_type(waste_type.filter(type => type !== "Construction")) }}>
-                                        <Text style={{ color: "white" }}>Construction</Text>
+                                    <Text style={{ width: windowWidth / 1.3, textAlign: "center", fontStyle: "italic", fontSize: 12, marginBottom: 12 }}>
+                                        Batteries, thinner, paints, light bulbs, pesticides, etc.
+                                    </Text>
+
+
+                                    <CheckboxBtn res style={{ width: windowWidth / 1.3 }} isChecked={waste_type.includes("Residual Waste")} onPress={(e) => { !waste_type.includes("Residual Waste") ? setWaste_type(oldArray => [...oldArray, "Residual Waste"]) : setWaste_type(waste_type.filter(type => type !== "Residual Waste")) }}>
+                                        <Text style={{ color: "white" }}>Residual Waste</Text>
                                     </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Electronics")} /*onPress={()=>setTypeEL(!typeEL)}*/ onPress={(e) => { !waste_type.includes("Electronics") ? setWaste_type(oldArray => [...oldArray, "Electronics"]) : setWaste_type(waste_type.filter(type => type !== "Electronics")) }}>
-                                        <Text style={{ color: "white" }}>Electronics</Text>
+                                    <Text style={{ width: windowWidth / 1.3, textAlign: "center", fontStyle: "italic", fontSize: 12, marginBottom: 12 }}>
+                                        Sanitary napkin, disposable diapers, tampon, sachet of chips, plastic-lined cartons, etc.
+                                    </Text>
+
+
+                                    <CheckboxBtn haz style={{ width: windowWidth / 1.3 }} isChecked={waste_type.includes("Hazardous Waste")} onPress={(e) => { !waste_type.includes("Hazardous Waste") ? setWaste_type(oldArray => [...oldArray, "Hazardous Waste"]) : setWaste_type(waste_type.filter(type => type !== "Hazardous Waste")) }}>
+                                        <Text style={{ color: "white" }}>Hazardous Waste</Text>
                                     </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Hazardous")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Hazardous") ? setWaste_type(oldArray => [...oldArray, "Hazardous"]) : setWaste_type(waste_type.filter(type => type !== "Hazardous")) }}>
-                                        <Text style={{ color: "white" }}>Hazardous</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Household")} /*onPress={()=>setTypeHH(!typeHH)}*/ onPress={(e) => { !waste_type.includes("Household") ? setWaste_type(oldArray => [...oldArray, "Household"]) : setWaste_type(waste_type.filter(type => type !== "Household")) }}>
-                                        <Text style={{ color: "white" }}>Household</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Liquid Waste")} /*onPress={()=>setTypeLW(!typeLW)}*/ onPress={(e) => { !waste_type.includes("Liquid Waste") ? setWaste_type(oldArray => [...oldArray, "Liquid Waste"]) : setWaste_type(waste_type.filter(type => type !== "Liquid Waste")) }}>
-                                        <Text style={{ color: "white" }}>Liquid Waste</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Metal/Can")} /*onPress={()=>setTypeMC(!typeMC)}*/ onPress={(e) => { !waste_type.includes("Metal/Can") ? setWaste_type(oldArray => [...oldArray, "Metal/Can"]) : setWaste_type(waste_type.filter(type => type !== "Metal/Can")) }}>
-                                        <Text style={{ color: "white" }}>Metal/Can</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Paper")} /*onPress={()=>setTypePP(!typePP)}*/ onPress={(e) => { !waste_type.includes("Paper") ? setWaste_type(oldArray => [...oldArray, "Paper"]) : setWaste_type(waste_type.filter(type => type !== "Paper")) }}>
-                                        <Text style={{ color: "white" }}>Paper</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Plastic")} /*onPress={()=>setTypePL(!typePL)}*/ onPress={(e) => { !waste_type.includes("Plastic") ? setWaste_type(oldArray => [...oldArray, "Plastic"]) : setWaste_type(waste_type.filter(type => type !== "Plastic")) }}>
-                                        <Text style={{ color: "white" }}>Plastic</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Glass Bottle")} /*onPress={()=>setTypeGB(!typeGB)}*/ onPress={(e) => { !waste_type.includes("Glass Bottle") ? setWaste_type(oldArray => [...oldArray, "Glass Bottle"]) : setWaste_type(waste_type.filter(type => type !== "Glass Bottle")) }}>
-                                        <Text style={{ color: "white" }}>Glass Bottle</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Organic/Food")} /*onPress={()=>setTypeOF(!typeOF)}*/ onPress={(e) => { !waste_type.includes("Organic/Food") ? setWaste_type(oldArray => [...oldArray, "Organic/Food"]) : setWaste_type(waste_type.filter(type => type !== "Organic/Food")) }}>
-                                        <Text style={{ color: "white" }}>Organic/Food</Text>
-                                    </CheckboxBtn>
-                                    <CheckboxBtn isChecked={waste_type.includes("Other")} /*onPress={()=>setTypeOther(!typeOther)}*/ onPress={(e) => { !waste_type.includes("Other") ? setWaste_type(oldArray => [...oldArray, "Other"]) : setWaste_type(waste_type.filter(type => type !== "Other")) }}>
+                                    <Text style={{ width: windowWidth / 1.3, textAlign: "center", fontStyle: "italic", fontSize: 12, marginBottom: 12 }}>
+                                        Hospital waste, disposable syringe, PPE, bandages, mercury thermometer, etc.
+                                    </Text>
+
+
+
+
+                                    {/* <CheckboxBtn isChecked={waste_type.includes("Other")} onPress={(e) => { !waste_type.includes("Other") ? setWaste_type(oldArray => [...oldArray, "Other"]) : setWaste_type(waste_type.filter(type => type !== "Other")) }}>
                                         <Text style={{ color: "white" }}>Other</Text>
-                                    </CheckboxBtn>
+                                    </CheckboxBtn> */}
 
 
                                     {waste_type.includes("Other") ?
@@ -748,16 +759,16 @@ const PublicReportsAdd = ({ navigation }) => {
 
 
                                 {addDetFocus && suggestionsValues.filter(obj => Object.values(obj).some(val => val.includes(additional_desciption))).length >= 1 ?
-                                    <View purpose={"Text"}  style={{ maxHeight: 200,borderWidth: 1, borderColor: "#c7c7c7", borderRadius:10 }}  onPress={()=>setAddDetFocus(true)}>
+                                    <View purpose={"Text"} style={{ maxHeight: 200, borderWidth: 1, borderColor: "#c7c7c7", borderRadius: 10 }} onPress={() => setAddDetFocus(true)}>
 
 
                                         <ScrollView keyboardShouldPersistTaps='always' nestedScrollEnabled={true}>
                                             {suggestionsValues.filter(obj => Object.values(obj).some(val => val.includes(additional_desciption))).map((item) => {
                                                 return (
-                                                    <TouchableOpacity onPress={()=>{
+                                                    <TouchableOpacity onPress={() => {
                                                         setAdditional_desciption(item.title)
                                                         setAddDetFocus(false)
-                                                        }} key={item.id} style={{paddingHorizontal:5 , paddingVertical: 10, borderBottomWidth: 1, borderColor: "#c7c7c7" }}>
+                                                    }} key={item.id} style={{ paddingHorizontal: 5, paddingVertical: 10, borderBottomWidth: 1, borderColor: "#c7c7c7" }}>
                                                         <Text purpose={"Text"} >{item.title}</Text>
                                                     </TouchableOpacity>
                                                 )

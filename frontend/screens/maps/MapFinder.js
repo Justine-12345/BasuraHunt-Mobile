@@ -7,9 +7,10 @@ import * as Location from 'expo-location';
 import { SET_COORDINATE } from '../../Redux/Constants/mapConstants';
 import { useDispatch, useSelector } from 'react-redux';
 import { SET_MAP_INITIALIZING, RESET_MAP_INITIALIZING } from '../../Redux/Constants/mapConstants';
-
+import axios from 'axios'
+import { SET_ADDRESS } from '../../Redux/Constants/mapConstants';
 const MapFinder = () => {
-    
+
     // (async () => {
     //     if (Platform.OS !== "web") {
 
@@ -34,7 +35,9 @@ const MapFinder = () => {
                 setLatMarker(0)
                 setLngMarker(0)
             }
-            getUserLocation()
+            if (latInit === 0 && lngInit === 0) {
+                getUserLocation()
+            }
         }, [mapLatitude, mapLongtitude])
     )
 
@@ -43,7 +46,9 @@ const MapFinder = () => {
             type: SET_MAP_INITIALIZING,
             payload: { initializing: true }
         })
-        getUserLocation()
+        if (latInit === 0 && lngInit === 0) {
+            getUserLocation()
+        }
     }, [latUser])
     const dispatch = useDispatch()
 
@@ -67,7 +72,7 @@ const MapFinder = () => {
         }
 
         console.log("!!!")
-        let location = await Location.getCurrentPositionAsync({accuracy:Location.Accuracy.Balanced});
+        let location = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
         // // console.log("i",location.coords.latitude);
         // // console.log(location.coords.longitude);
         setLatUser(location.coords.latitude)
@@ -82,6 +87,23 @@ const MapFinder = () => {
             type: SET_COORDINATE,
             payload: data
         })
+
+        axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${location.coords.longitude},${location.coords.latitude}.json?types=poi&access_token=pk.eyJ1IjoianVzdGluZS0iLCJhIjoiY2wzZnl6NHJsMDRudjNmbHZvOGgwNGx4bSJ9.mwFsZ1bz00QuUmMr_MMOxg`)
+            .then(function (response) {
+                const address = response.data.features[0].properties.address
+                console.log("address",address)
+                dispatch({
+                    type: SET_ADDRESS,
+                    payload: address
+                })
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .finally(function () {
+                // always executed
+            });
     }
 
     const onRegionChange = (region) => {
@@ -92,21 +114,39 @@ const MapFinder = () => {
         setLngMarker(region.longitude)
 
         const data = { latitude: region.latitude, longitude: region.longitude }
-        console.log("change", data);
+        // console.log("change", data);
         dispatch({
             type: SET_COORDINATE,
             payload: data
         })
+
+
+        axios.get(`https://api.mapbox.com/geocoding/v5/mapbox.places/${region.longitude},${region.latitude}.json?types=poi&access_token=pk.eyJ1IjoianVzdGluZS0iLCJhIjoiY2wzZnl6NHJsMDRudjNmbHZvOGgwNGx4bSJ9.mwFsZ1bz00QuUmMr_MMOxg`)
+            .then(function (response) {
+                const address = response.data.features[0].properties.address
+                console.log("address", address)
+                dispatch({
+                    type: SET_ADDRESS,
+                    payload: address
+                })
+            })
+            .catch(function (error) {
+                // handle error
+                console.log(error);
+            })
+            .finally(function () {
+                // always executed
+            });
     }
 
 
 
     return (
         <>
-        {/* {console.log("latInit",latInit)}
+            {/* {console.log("latInit",latInit)}
         {console.log("lngInit",lngInit)} */}
             <View style={styles.container}>
-            {/* <Text>latInit {latInit}</Text>
+                {/* <Text>latInit {latInit}</Text>
             <Text>lngInit {lngInit}</Text> */}
                 {latInit !== 0 && lngInit !== 0 ?
                     <MapView style={[styles.map]}
@@ -119,10 +159,10 @@ const MapFinder = () => {
                         }}
                         // loadingEnabled={true}
                         onMapReady={getUserLocation}
-                        onMapLoaded={()=>{
+                        onMapLoaded={() => {
                             dispatch({
-                            type: RESET_MAP_INITIALIZING
-                        })
+                                type: RESET_MAP_INITIALIZING
+                            })
                         }}
                         onRegionChangeComplete={onRegionChange}
                     >

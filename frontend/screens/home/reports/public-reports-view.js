@@ -1,5 +1,5 @@
 import React, { useState, useCallback, useEffect } from "react";
-import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, ActivityIndicator } from "react-native";
+import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, StyleSheet, Pressable, Dimensions, ActivityIndicator } from "react-native";
 import { HStack, Select, VStack } from "native-base";
 import Star from "../extras/Star";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -25,6 +25,7 @@ import moment from 'moment'
 import Empty1 from "../../../stylesheets/empty1";
 import { SimpleLineIcons } from "@expo/vector-icons";
 const socket = io.connect(SOCKET_PORT);
+const windowWidth = Dimensions.get('window').width;
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
 const PublicReportsView = (props) => {
@@ -69,7 +70,7 @@ const PublicReportsView = (props) => {
                 });
                 setModalVisible(!modalVisible)
                 dispatch({ type: DELETE_DUMP_RESET })
-                props.navigation.navigate('User', { screen: 'MyReports' });
+                props.navigation.navigate('User', { screen: 'MyReports', params: { screen: "UserReportsList" } });
             }
             if (upDelError) {
                 Toast.show({
@@ -253,7 +254,7 @@ const PublicReportsView = (props) => {
 
                                         {dump && dump.date_cleaned ?
                                             <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump && dump.score / 10} /></Text> :
-                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "" : `approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "" : dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "" : "to clean"}</Text>
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "" : `approximately ${dump && dump.approxDayToClean} `}  {status === "newReport" ? "" : "to clean"}</Text>
                                         }
 
 
@@ -269,13 +270,20 @@ const PublicReportsView = (props) => {
                                         <Text style={RandomStyle.vText2}>Date Reported: </Text>
                                         <Text>{new Date(dump && dump.createdAt).toLocaleDateString()}</Text>
                                     </HStack>
-                                    <HStack>
-                                        {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) ?
-                                            <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj: { _id: dump && dump._id, coordinates: { longtitude: dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude }, barangay: dump && dump.barangay } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                                <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
-                                            </TouchableOpacity>
-                                            : null
+                                    <HStack style={{ justifyContent: "space-between", width: windowWidth - 20 }}>
+                                        {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) && status === "newReport" ?
+                                            <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
+                                                <Text style={RandomStyle.vDonationBtn} >Delete</Text>
+                                            </TouchableOpacity> : ""
                                         }
+                                        <View>
+                                            {String(dump && dump.user_id && dump.user_id._id) === String(user && user._id) ?
+                                                <TouchableOpacity onPress={() => { props.navigation.navigate('PublicReportsChat', { chat: dump && dump.chat_id && dump.chat_id.chats, chatDetail: dump && dump.chat_id, chatId: dump && dump.chat_id && dump.chat_id._id, dumpId: dump && dump._id, dumpLocation: dump && dump.complete_address, chatLength: dump && dump.chat_id && dump.chat_id.chats && dump.chat_id.chats.length, dumpObj: { _id: dump && dump._id, coordinates: { longtitude: dump && dump.coordinates && dump.coordinates.longtitude, latitude: dump && dump.coordinates && dump.coordinates.latitude }, barangay: dump && dump.barangay } }) }} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black", position: "relative", top: 7 }}>
+                                                    <MaterialCommunityIcons name="message-reply-text" size={40} style={RandomStyle.vChat} />
+                                                </TouchableOpacity>
+                                                : null
+                                            }
+                                        </View>
                                     </HStack>
                                 </VStack>
                                 <HStack>
@@ -319,7 +327,10 @@ const PublicReportsView = (props) => {
                                                     <>
                                                         <Pressable
                                                             style={[styles.button, styles.buttonClose]}
-                                                            onPress={() => { dispatch(deleteDump(item._id)) }}
+                                                            onPress={() => {
+                                                                dispatch(deleteDump(dump && dump._id))
+
+                                                            }}
                                                         >
                                                             <Text style={styles.textStyle}>Yes, Delete it!</Text>
                                                         </Pressable>
@@ -342,9 +353,7 @@ const PublicReportsView = (props) => {
                                     </Modal>
 
 
-                                    {/* <TouchableOpacity onPress={() => setModalVisible(true)} style={{ alignSelf: "flex-end", borderWidth: 0, borderColor: "black" }}>
-                                <MaterialCommunityIcons name="trash-can" size={40} style={RandomStyle.vChat} />
-                            </TouchableOpacity> */}
+
                                 </HStack>
                             </HStack>
                         </View>
@@ -409,15 +418,6 @@ const PublicReportsView = (props) => {
 
 
 
-
-
-
-
-
-
-
-
-
                         <Text style={RandomStyle.vText2}>Type of Waste</Text>
                         <View style={RandomStyle.vContainer2}>
                             {dump && dump.waste_type && dump.waste_type.forEach(wt => {
@@ -426,8 +426,17 @@ const PublicReportsView = (props) => {
                                 }
                             }
                             )}
-                            {uniqueWt.map(wt =>
-                                <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
+                            {uniqueWt.map(wt => {
+                                const color = {
+                                    "Biodegradable Waste": "#5b9f2e",
+                                    "Non-Biodegradable Waste": "#2b71a4",
+                                    "Special Waste": "#c90421",
+                                    "Residual Waste": "#181818",
+                                    "Hazardous Waste": "#ffe200"
+                                }
+
+                                return (<Text key={wt} style={[RandomStyle.vOption, { backgroundColor: color[wt] }]}>{wt}</Text>)
+                            }
                             )}
                         </View>
                         {dump && dump.waste_size ?

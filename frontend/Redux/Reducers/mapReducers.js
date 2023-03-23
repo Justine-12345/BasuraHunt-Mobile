@@ -2,7 +2,9 @@ import {
     SET_COORDINATE,
     RESET_COORDINATE,
     SET_MAP_INITIALIZING,
-    RESET_MAP_INITIALIZING
+    RESET_MAP_INITIALIZING,
+    SET_ADDRESS,
+    RESET_ADDRESS
 } from "../Constants/mapConstants"
 
 export const coordinateReducer = (state = {}, action) => {
@@ -41,6 +43,26 @@ export const mapLoadingReducer = (state = {}, action) => {
             return {
                 ...state,
                 initializing: null,
+            }
+
+        default:
+            return state
+    }
+}
+
+export const addressReducer = (state = {}, action) => {
+    switch (action.type) {
+
+        case SET_ADDRESS:
+            return {
+                ...state,
+                address: action.payload,
+            }
+
+        case RESET_ADDRESS:
+            return {
+                ...state,
+                address: undefined,
             }
 
         default:

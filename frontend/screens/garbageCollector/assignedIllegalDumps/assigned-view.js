@@ -280,17 +280,17 @@ const AssignedView = (props) => {
         // const d = dif / (1000 * 3600 * 24)
         // return Math.ceil(d)
         const minute = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "minutes")
-	    const hour = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "hours")
-		const day = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "days") 
-		
-		if(day === 0 && hour >= 1){
-			return hour +` hour${hour>=2? "s": ""}`
-		}
-		else if(day === 0 && hour === 0){
-			return minute +` minute${minute>=2? "s": ""}`
-		}else{
-			return day +` day${day>=2? "s": ""}`
-		}	
+        const hour = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "hours")
+        const day = moment(dump && dump.date_cleaned).diff(moment(dump && dump.createdAt), "days")
+
+        if (day === 0 && hour >= 1) {
+            return hour + ` hour${hour >= 2 ? "s" : ""}`
+        }
+        else if (day === 0 && hour === 0) {
+            return minute + ` minute${minute >= 2 ? "s" : ""}`
+        } else {
+            return day + ` day${day >= 2 ? "s" : ""}`
+        }
     }
 
     return (
@@ -419,14 +419,14 @@ const AssignedView = (props) => {
 
 
 
-                                <Text style={[RandomStyle.vText2, { marginVertical: 10 }]}>Status: </Text>
+                                <Text style={[RandomStyle.vText2, { marginVertical: 10, position:"relative", bottom:10 }]}>Status: </Text>
                                 {status === "Cleaned" ?
                                     <>
-                                     {dump && dump.date_cleaned ?
-                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump&&dump.score/10}/></Text> :
-                                        <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "":`approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "":dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "":"to clean"}</Text>
-                                    }
-                                    
+                                        {dump && dump.date_cleaned ?
+                                            <Text style={{borderWidth:1, borderColor:"white"}}>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump && dump.score / 10} /></Text> :
+                                            <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "" : `approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "" : dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "" : "to clean"}</Text>
+                                        }
+
                                     </>
                                     :
                                     <Select
@@ -525,8 +525,17 @@ const AssignedView = (props) => {
                         }
                     }
                     )}
-                    {uniqueWt.map(wt =>
-                        <Text key={wt} style={RandomStyle.vOption}>{wt}</Text>
+                    {uniqueWt.map(wt => {
+                        const color = {
+                            "Biodegradable Waste": "#5b9f2e",
+                            "Non-Biodegradable Waste": "#2b71a4",
+                            "Special Waste": "#c90421",
+                            "Residual Waste": "#181818",
+                            "Hazardous Waste": "#ffe200"
+                        }
+
+                        return (<Text key={wt} style={[RandomStyle.vOption, { backgroundColor: color[wt] }]}>{wt}</Text>)
+                    }
                     )}
                 </View>
                 {dump && dump.waste_size ?

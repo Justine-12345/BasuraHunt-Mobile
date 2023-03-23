@@ -55,7 +55,7 @@ import {
 
 import { pushNotificationReducer } from './Reducers/pushNotificationReducer';
 
-import { coordinateReducer, mapLoadingReducer } from './Reducers/mapReducers';
+import { coordinateReducer, mapLoadingReducer, addressReducer } from './Reducers/mapReducers';
 
 import {
     itemsReducer,
@@ -127,6 +127,7 @@ const reducers = combineReducers({
 
     coordinate: coordinateReducer,
     mapLoading: mapLoadingReducer,
+    address:addressReducer,
     pushNotification: pushNotificationReducer
 })
 

@@ -199,10 +199,10 @@ const Newsfeed = ({ navigation }) => {
     }
 
     const modalImgs = [
-        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb1_xsjwym.png",
+        "https://res.cloudinary.com/basurahunt/image/upload/v1679233252/BasuraHunt/Static/anti_lit_law_-_UPDATED_nevos4.png",
         "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb2_avjdl3.png",
         "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb3_tqsuge.png",
-        "https://res.cloudinary.com/basurahunt/image/upload/v1677245067/BasuraHunt/Static/mb4_toljjp.png"
+        "https://res.cloudinary.com/basurahunt/image/upload/v1679216415/BasuraHunt/Static/ranks-updated_rkhjii.png"
     ]
     const getModalImg = (index) => {
         setModalImg(modalImgs[index]);
