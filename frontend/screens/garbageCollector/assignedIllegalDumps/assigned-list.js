@@ -224,7 +224,7 @@ const AssignedList = ({ navigation }) => {
                     <View style={Empty1.container}>
                         {loading ? <ActivityIndicator size="large" color="#00ff00" /> :
                             <Text style={Empty1.text1}>
-                                No assined reports yet!
+                                No assigned reports yet!
                             </Text>
                         }
                     </View>

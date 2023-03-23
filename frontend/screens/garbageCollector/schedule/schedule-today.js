@@ -20,7 +20,6 @@ const CScheduleToday = ({ navigation }) => {
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
     const { screen, object, message } = useSelector(state => state.pushNotification);
-
     useFocusEffect(
         useCallback(() => {
             let user;
@@ -36,7 +35,6 @@ const CScheduleToday = ({ navigation }) => {
             if (collectionPointsToday.length<=0) {
                 dispatch(getTodayCollectionPointList())
             }
-
             return () => {
 
             }
@@ -59,6 +57,19 @@ const CScheduleToday = ({ navigation }) => {
         }
 
     }, [screen, object, message])
+
+    const getSched = (collection) => {
+        let sched = [];
+        collection.forEach((item)=>{
+            item.collectors.forEach((cp) => {
+                if (String(cp && cp.collector && cp.collector).trim() === String(userID && userID._id).trim()) {
+                    sched.push(item);
+                }
+            })
+        })
+
+        return sched;
+    }
 
     const collectionPointTime = (collectionPoint) => {
         const startTimeArray = collectionPoint.startTime.split(":");
@@ -184,50 +195,40 @@ const CScheduleToday = ({ navigation }) => {
         // const date = new Date(item.createdAt).toLocaleDateString()
         return (
             <>
-                {
-                    item.collectors.map((cp) => {
-                        if (String(cp && cp.collector && cp.collector).trim() === String(userID && userID._id).trim()) {
+                <View key={item._id} style={RandomStyle.lContainer4}>
 
-                            return (
-                                <View key={item._id} style={RandomStyle.lContainer4}>
-
-                                    <HStack>
-                                        {/* <Text style={RandomStyle.vBadgeGrey}>FINISHED</Text> */}
-                                        {/* <Text style={RandomStyle.vBadge}>ONGOING</Text> */}
-                                        <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
-                                            <Text style={RandomStyle.lHeader}>{dateNow()}</Text>
-                                            <HStack paddingY={2} justifyContent={"space-evenly"}>
-                                                <VStack>
-                                                    <Text style={RandomStyle.lHeader1}>Type:</Text>
-                                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{item.type}</Text>
-                                                </VStack>
-                                                <VStack>
-                                                    <Text style={RandomStyle.lHeader1}>Time:</Text>
-                                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{collectionPointTime(item)}</Text>
-                                                </VStack>
-                                            </HStack>
-                                            <VStack>
-                                                <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
-                                                <Text numberOfLines={1} style={[RandomStyle.lItem2, { fontWeight: "700" }]}>{item.barangay}</Text>
-                                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{collectionPointsList(item.collectionPoints)}</Text>
-                                            </VStack>
-                                            {getWatchBtn(item)}
-                                            {/* <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
-                                                onPress={() => navigation.navigate("Start", { collectionPoint: item })}
-                                            >
-                                                <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
-                                            </TouchableOpacity> */}
-                                        </VStack>
-                                    </HStack>
-                                </View>
-                            )
-                        }
-                    })
-                }
+                    <HStack>
+                        {/* <Text style={RandomStyle.vBadgeGrey}>FINISHED</Text> */}
+                        {/* <Text style={RandomStyle.vBadge}>ONGOING</Text> */}
+                        <VStack style={{ width: "100%", paddingHorizontal: 10 }}>
+                            <Text style={RandomStyle.lHeader}>{dateNow()}</Text>
+                            <HStack paddingY={2} justifyContent={"space-evenly"}>
+                                <VStack>
+                                    <Text style={RandomStyle.lHeader1}>Type:</Text>
+                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{item.type}</Text>
+                                </VStack>
+                                <VStack>
+                                    <Text style={RandomStyle.lHeader1}>Time:</Text>
+                                    <Text numberOfLines={1} style={RandomStyle.lItem}>{collectionPointTime(item)}</Text>
+                                </VStack>
+                            </HStack>
+                            <VStack>
+                                <Text style={RandomStyle.lHeader1}>Collection Points:</Text>
+                                <Text numberOfLines={1} style={[RandomStyle.lItem2, { fontWeight: "700" }]}>{item.barangay}</Text>
+                                <Text numberOfLines={1} style={RandomStyle.lItem2}>{collectionPointsList(item.collectionPoints)}</Text>
+                            </VStack>
+                            {getWatchBtn(item)}
+                            {/* <TouchableOpacity activeOpacity={0.8} style={{ width: 250, alignSelf: "center" }}
+                                onPress={() => navigation.navigate("Start", { collectionPoint: item })}
+                            >
+                                <Text style={RandomStyle.pButton2}>START NOW!!!</Text>
+                            </TouchableOpacity> */}
+                        </VStack>
+                    </HStack>
+                </View>
             </>
         )
     }
-
 
     return (
         <>
@@ -237,9 +238,9 @@ const CScheduleToday = ({ navigation }) => {
             </View>
             {loading ? <LoadingSchedule /> :
                 <>
-                    {collectionPointsToday && collectionPointsToday.length > 0 ?
+                    {getSched(collectionPointsToday) && getSched(collectionPointsToday).length > 0 ?
                         <FlatList
-                            data={collectionPointsToday}
+                            data={getSched(collectionPointsToday)}
                             renderItem={schedulesList}
                             keyExtractor={item => item._id}
                         />

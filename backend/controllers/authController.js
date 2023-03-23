@@ -49,10 +49,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 		count_otp = user_find_otp.length
 	}
 	while (count_otp > 0);
-
+	
+	req.body.email = req.body.email.toLowerCase();
 
 	const { first_name, middle_name, last_name, suffix, birthday, phone_number, gender, house_number, street, barangay, email, alias, password, jobDesc } = req.body;
-
 
 	let user
 
@@ -313,6 +313,7 @@ exports.findEmail = catchAsyncErrors(async (req, res, next) => {
 
 //******Login (Slide 15)******
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
+	req.body.email = req.body.email.toLowerCase();
 	const { email, password } = req.body;
 
 	if (!email || !password) {
@@ -612,7 +613,7 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
 
 //******User Fogot Password******
 exports.forgotPassword = catchAsyncErrors(async (req, res, next) => {
-	const user = await User.findOne({ email: req.body.email });
+	const user = await User.findOne({ email: req.body.email.toLowerCase() });
 
 	if (!user) {
 		return next(new ErrorHandler('User not found with this email', 404));
@@ -819,7 +820,7 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
 		house_number: req.body.house_number,
 		street: req.body.street,
 		barangay: req.body.barangay,
-		email: req.body.email,
+		email: req.body.email.toLowerCase(),
 		alias: req.body.alias,
 		password: req.body.password,
 		role: req.body.role,

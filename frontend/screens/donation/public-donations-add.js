@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Platform, ImagePickerIOS, ActivityIndicator, Dimensions } from "react-native";
+import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, Platform, ImagePickerIOS, ActivityIndicator, Dimensions } from "react-native";
 import { HStack, VStack, Select } from "native-base";
 import RandomStyle from "../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
@@ -23,6 +23,9 @@ const PublicReportsAdd = ({ navigation }) => {
 
     const dispatch = useDispatch();
     const { loading, error, success, item } = useSelector(state => state.newItem);
+    const additionalDescriptionMessage = "Important detail such as claiming date, the quantity of the donation, an explanation of your mission, and other relevant details to your donated item."
+    const [modalVisible, setModalVisible] = useState(false);
+    const [modalContent, setModalContent] = useState();
 
     const [name, setName] = useState('');
     const [additionalDescription, setAdditionalDescription] = useState('');
@@ -190,6 +193,22 @@ const PublicReportsAdd = ({ navigation }) => {
         dispatch(addItem(formData))
     }
 
+    const message = () => {
+        let message = "";
+        for (let index = 0; index < additionalDescriptionMessage.length; index++) {
+            if(index < 30) {
+                message += additionalDescriptionMessage[index];
+            }
+        }
+
+        return("(" + message + "...)");
+    }
+
+    const additionalDetailsModal = (additionalDescriptionMessage) => {
+        setModalVisible(true);
+        setModalContent(additionalDescriptionMessage);
+    }
+
     return (
         <>{loading ?
             <View style={{ position: "relative", top: windowHeight / 3 }}>
@@ -201,6 +220,23 @@ const PublicReportsAdd = ({ navigation }) => {
                     <View style={RandomStyle.vHeader}>
                         <Text style={RandomStyle.vText1}>Donate items</Text>
                     </View>
+
+                    <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
+                            <View style={[RandomStyle.usModal, {  flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }]}>
+                                <View style={[RandomStyle.usPoints,{backgroundColor:"#1e5128"}]}>
+                                    <VStack>
+                                        <VStack>
+                                            <Text style={{ fontWeight: "bold",color:"white" }}>{modalContent}</Text>
+                                        </VStack>
+                                        <TouchableOpacity style={[RandomStyle.usClosec,{backgroundColor:"darkgreen"}]} onPress={() => setModalVisible(false)}>
+                                            <Text style={RandomStyle.usClose}>
+                                                CLOSE
+                                            </Text>
+                                        </TouchableOpacity>
+                                    </VStack>
+                                </View>
+                            </View>
+                        </Modal>
 
                     <VStack justifyContent={"center"} alignItems={'center'}>
                         <BhButton large onPress={capImage}>
@@ -241,25 +277,16 @@ const PublicReportsAdd = ({ navigation }) => {
                         <CheckboxBtn isChecked={itemTypes.includes("Food")} onPress={(e) => { !itemTypes.includes("Food") ? setItemTypes(oldArray => [...oldArray, "Food"]) : setItemTypes(itemTypes.filter(type => type !== "Food")) }} >
                             <Text style={{ color: "white" }}>Food</Text>
                         </CheckboxBtn>
-                        <CheckboxBtn isChecked={itemTypes.includes("Clothes")} onPress={(e) => { !itemTypes.includes("Clothes") ? setItemTypes(oldArray => [...oldArray, "Clothes"]) : setItemTypes(itemTypes.filter(type => type !== "Clothes")) }} >
-                            <Text style={{ color: "white" }}>Clothes</Text>
-                        </CheckboxBtn>
                         <CheckboxBtn isChecked={itemTypes.includes("Medical")} onPress={(e) => { !itemTypes.includes("Medical") ? setItemTypes(oldArray => [...oldArray, "Medical"]) : setItemTypes(itemTypes.filter(type => type !== "Medical")) }} >
                             <Text style={{ color: "white" }}>Medical</Text>
-                        </CheckboxBtn>
-                        <CheckboxBtn isChecked={itemTypes.includes("Appliances")} onPress={(e) => { !itemTypes.includes("Appliances") ? setItemTypes(oldArray => [...oldArray, "Appliances"]) : setItemTypes(itemTypes.filter(type => type !== "Appliances")) }} >
-                            <Text style={{ color: "white" }}>Appliances</Text>
-                        </CheckboxBtn>
-                        <CheckboxBtn isChecked={itemTypes.includes("Furnitures")} onPress={(e) => { !itemTypes.includes("Furnitures") ? setItemTypes(oldArray => [...oldArray, "Furnitures"]) : setItemTypes(itemTypes.filter(type => type !== "Furnitures")) }} >
-                            <Text style={{ color: "white" }}>Furnitures</Text>
-                        </CheckboxBtn>
-                        <CheckboxBtn isChecked={itemTypes.includes("Other")} onPress={(e) => { !itemTypes.includes("Other") ? setItemTypes(oldArray => [...oldArray, "Other"]) : setItemTypes(itemTypes.filter(type => type !== "Other")); setTypeOther(!typeOther) }} >
-                            <Text style={{ color: "white" }}>Other</Text>
                         </CheckboxBtn>
                         <CheckboxBtn isChecked={itemTypes.includes("Cleaning Materials")} onPress={(e) => { !itemTypes.includes("Cleaning Materials") ? setItemTypes(oldArray => [...oldArray, "Cleaning Materials"]) : setItemTypes(itemTypes.filter(type => type !== "Cleaning Materials")) }} >
                             <Text style={{ color: "white" }}>Cleaning Materials</Text>
                         </CheckboxBtn>
-
+                        <CheckboxBtn isChecked={itemTypes.includes("Other")} onPress={(e) => { !itemTypes.includes("Other") ? setItemTypes(oldArray => [...oldArray, "Other"]) : setItemTypes(itemTypes.filter(type => type !== "Other")); setTypeOther(!typeOther) }} >
+                            <Text style={{ color: "white" }}>Other</Text>
+                        </CheckboxBtn>
+                        
                         {typeOther === true ?
                             <TextInput style={Form1.textInput2} placeholder="If other, please specify here" value={itemDesc} onChangeText={(value) => { setItemDesc(value) }} />
                             : null
@@ -271,7 +298,10 @@ const PublicReportsAdd = ({ navigation }) => {
                         <TextInput placeholder="..." style={Form1.textInput2} value={name} onChangeText={(value) => { setName(value) }} />
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Additional Details</Text>
+                    <Text style={RandomStyle.vText2}>
+                        Additional Details
+                        <Text style={{color: "#808080"}}  onPress={() => { additionalDetailsModal(additionalDescriptionMessage) }}>{message()}</Text>
+                    </Text>
                     <View style={RandomStyle.vContainer2}>
                         <TextInput textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} value={additionalDescription} onChangeText={(value) => { setAdditionalDescription(value) }} />
                     </View>

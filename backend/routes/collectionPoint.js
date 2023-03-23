@@ -26,12 +26,12 @@ router.route('/collectionPoint/live-notification/:id').put(isAuthenticatedUser, 
 
 router.route('/collectionPoint/num-of-truck/:id').put(isAuthenticatedUser, authorizeRoles('administrator', 'garbageCollector'), addCollectionnumOfTruck);
 
-// Admin
-router.route('/admin/collectionPoint/collectors').get(isAuthenticatedUser, authorizeRoles('administrator','barangayAdministrator'), getCollectors);
-router.route('/admin/collectionPoints').get(isAuthenticatedUser, authorizeRoles('administrator'), getCollectionPoints);
-router.route('/admin/collectionPoint/new').post(isAuthenticatedUser, authorizeRoles('administrator'), newCollectionPoint);
-router.route('/admin/collectionPoint/:id').put(isAuthenticatedUser, authorizeRoles('administrator'), updateCollectionPoint);
-router.route('/admin/collectionPoint/:id').delete(isAuthenticatedUser, authorizeRoles('administrator'), deleteCollectionPoint);
+// Administrator
+router.route('/admin/collectionPoint/collectors').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), getCollectors);
+router.route('/admin/collectionPoints').get(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), getCollectionPoints);
+router.route('/admin/collectionPoint/new').post(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), newCollectionPoint);
+router.route('/admin/collectionPoint/:id').put(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), updateCollectionPoint);
+router.route('/admin/collectionPoint/:id').delete(isAuthenticatedUser, authorizeRoles('administrator', 'barangayAdministrator'), deleteCollectionPoint);
 
 
 module.exports = router;

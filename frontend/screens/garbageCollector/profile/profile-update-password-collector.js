@@ -4,9 +4,10 @@ import Styles from "../../../stylesheets/styles";
 import Form1 from "../../../stylesheets/form1";
 import { updatePassword } from "../../../Redux/Actions/userActions";
 import { useDispatch, useSelector } from 'react-redux'
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { UPDATE_PASSWORD_RESET, CLEAR_ERRORS } from "../../../Redux/Constants/userConstants";
+import { HStack } from "native-base";
 
 const ProfileUpdatePasswordCollector = ({ navigation }) => {
     const dispatch = useDispatch();
@@ -19,6 +20,10 @@ const ProfileUpdatePasswordCollector = ({ navigation }) => {
     const [code, setCode] = useState('')
     const [passwordError, setPasswordError] = useState(null)
     const [passwordMatchError, setPasswordMatchError] = useState(null)
+
+	const [showOPass, setShowOPass] = useState(false);
+	const [showNPass, setShowNPass] = useState(false);
+	const [showCPass, setShowCPass] = useState(false);
 
     useEffect(() => {
 
@@ -75,13 +80,13 @@ const ProfileUpdatePasswordCollector = ({ navigation }) => {
         else if (password !== confirmPassword) {
             Toast.show({
                 type: 'error',
-                text1: "Password Dont Match, Please Confirm Again",
+                text1: "Passwords Don't Match, Please Confirm Again",
             });
         }
         else if (passwordError === true || passwordError === null) {
             Toast.show({
                 type: 'error',
-                text1: "Password is to weak",
+                text1: "Password is too weak",
             });
         }
         else {
@@ -100,19 +105,37 @@ const ProfileUpdatePasswordCollector = ({ navigation }) => {
         <>{loading? <ActivityIndicator size="large" color="#4F7942" />:
         <View style={Styles.container2}>
             <Text style={[Styles.text0, Styles.text1]}>Update Password</Text>
-            <TextInput value={oldPassword} onChangeText={(password_value) => setOldPassword(password_value)} placeholder="Current Password" secureTextEntry={true} style={Styles.textInput} />
-            {/* <Text style={Form1.formContainer}> */}
-            {passwordError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11, paddingHorizontal: 20 }}>Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
-            {passwordError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11, paddingHorizontal: 20 }}>Approved <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
-            {/* </Text> */}
-            <TextInput value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={true} style={Styles.textInput} />
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={oldPassword} onChangeText={(password_value) => setOldPassword(password_value)} placeholder="Current Password" secureTextEntry={!showOPass}/>
+                <TouchableOpacity onPress={()=>setShowOPass(!showOPass)}>
+                    <Ionicons name={showOPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
+            
+            <View style={{paddingHorizontal:20}}>
+                {passwordError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11}}>Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
+                {passwordError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11}}>Approved <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
+            </View>
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
+                <TouchableOpacity onPress={()=>setShowNPass(!showNPass)}>
+                    <Ionicons name={showNPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
+            
             {confirmPassword ?
-                <Text style={Form1.formContainer}>
+                <View style={{paddingHorizontal:20}}>
                     {passwordMatchError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}>Not Match <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordMatchError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}>Match <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
-                </Text> : null
+                </View> : null
             }
-            <TextInput value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={true} style={Styles.textInput} />
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
+                <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
+                    <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
+            
                 <TouchableOpacity onPress={submitHandler} style={Styles.loginBtn} activeOpacity={0.8}>
                     <Text style={Styles.login}>Save</Text>
                 </TouchableOpacity>

@@ -51,7 +51,7 @@ const ForgotPassword = ({ navigation }) => {
             <Text style={[Styles.text0, Styles.text1]}>Forgot Password</Text>
             <Text style={[Styles.textI, { color: "grey", padding: 20, textAlign: "center" }]}>Enter your email address and a link to reset your password will be sent to you.</Text>
 
-            <TextInput value={email} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
+            <TextInput autoCapitalize={"none"} value={email} onChangeText={(email_value) => setEmail(email_value)} placeholder="Email" style={Styles.textInput} />
 
 
             {forgotPasswordLoading ?
