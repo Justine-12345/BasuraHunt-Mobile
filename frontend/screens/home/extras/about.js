@@ -23,23 +23,23 @@ const About = () => {
 
                             </Text>
                             <Text style={styles.headerMeet}>MEET THE TEAM</Text>
-                            <Image style={styles.image} source={require('../../../assets/haicel.jpg')} />
+                            <Image style={styles.image} source={url('https://res.cloudinary.com/basurahunt/image/upload/v1673798105/BasuraHunt/Developers/bh2_fuicli.heic')} />
                             <Text style={styles.name}>Haicel Marie E. Carlos</Text>
                             <Text style={styles.desc}>Web and Mobile Developer</Text>
                             <Text style={styles.line} />
-                            <Image style={styles.image} source={require('../../../assets/justine.jpg')} />
+                            <Image style={styles.image} source={url('https://res.cloudinary.com/basurahunt/image/upload/v1673797158/BasuraHunt/Developers/bh2_r9ujih.heic')} />
                             <Text style={styles.name}>Justine S. Castaneda</Text>
                             <Text style={styles.desc}>Web and Mobile Developer</Text>
                             <Text style={styles.line} />
-                            <Image style={styles.image} source={require('../../../assets/erin.jpg')} />
+                            <Image style={styles.image} source={url('https://res.cloudinary.com/basurahunt/image/upload/v1673797104/BasuraHunt/Developers/bh2_ah7csh.heic')} />
                             <Text style={styles.name}>Erin Jean V. Elpedes</Text>
                             <Text style={styles.desc}>Mobile Developer and Tester</Text>
                             <Text style={styles.line} />
-                            <Image style={styles.image} source={require('../../../assets/denise.jpg')} />
+                            <Image style={styles.image} source={url('https://res.cloudinary.com/basurahunt/image/upload/v1673797133/BasuraHunt/Developers/bh2_l8dgge.heic')} />
                             <Text style={styles.name}>Denise R. Fajardo</Text>
                             <Text style={styles.desc}>Mobile Developer and Tester</Text>
                             <Text style={styles.line} />
-                            <Image style={styles.image} source={require('../../../assets/harris.jpg')} />
+                            <Image style={styles.image} source={url('https://res.cloudinary.com/basurahunt/image/upload/v1673797146/BasuraHunt/Developers/bh2_vryfom.heic')} />
                             <Text style={styles.name}>Harris A. Gurion</Text>
                             <Text style={styles.desc}>Web and Mobile Developer</Text>
                             <Text style={styles.line} />

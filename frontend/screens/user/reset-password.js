@@ -5,11 +5,12 @@ import OtpInput from "../../stylesheets/otpInput";
 import Form1 from "../../stylesheets/form1";
 import { resetPassword } from "../../Redux/Actions/userActions";
 import { useDispatch, useSelector } from 'react-redux'
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign, Ionicons } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { CommonActions } from "@react-navigation/native";
 import { FORGOT_PASSWORD_RESET } from "../../Redux/Constants/userConstants";
+import { HStack, Input } from "native-base";
 const ResetPassword = (props) => {
     const dispatch = useDispatch();
 
@@ -22,6 +23,10 @@ const ResetPassword = (props) => {
     const [passwordError, setPasswordError] = useState(null)
     const [passwordMatchError, setPasswordMatchError] = useState(null)
     const email = props.route.params.email
+    
+	const [showNPass, setShowNPass] = useState(false);
+	const [showCPass, setShowCPass] = useState(false);
+
     useEffect(() => {
 
         if (success) {
@@ -84,7 +89,8 @@ const ResetPassword = (props) => {
             });
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d#$@!%&*?]{8,30}$/
+        // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d#$@!%&*?]{8,30}$/
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d~`!@#$%^&*()-=_+{}\|;':",./<>?]{8,}$/
 
         if (password !== "" && passwordRegex.test(password) === false) {
             setPasswordError(true)
@@ -149,27 +155,39 @@ const ResetPassword = (props) => {
         <View style={Styles.container2}>
             <Text style={[Styles.text0, Styles.text1]}>Reset Password</Text>
             <Text style={[Styles.textI, { color: "grey", padding: 20, textAlign: "center" }]}>Enter the 6-digit code sent to your email {email}</Text>
-
-            <View style={Form1.otpContainer}>
-                <OtpInput
-                    numberOfInput={6}
-                    setOtpCode={setCode}
-                />
+            
+            <View style={Form1.formContainer}>
+                <View style={Form1.otpContainer}>
+                    <Input style={{fontSize: 50, textAlign: "center"}} keyboardType="number-pad" maxLength={6} onChangeText={(value)=>setCode(value)}/>
+                </View>
             </View>
 
-            <Text style={Form1.formContainer}>
+            <View style={{paddingHorizontal: 20}}>
                 {passwordError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}>Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                 {passwordError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}>Approved <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
-            </Text>
-            <TextInput value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={true} style={Styles.textInput} />
+            </View>
+
+            {/* <TextInput value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={true} style={Styles.textInput} /> */}
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={password} onChangeText={(password_value) => setPassword(password_value)} placeholder="New Password" secureTextEntry={!showNPass}/>
+                <TouchableOpacity onPress={()=>setShowNPass(!showNPass)}>
+                    <Ionicons name={showNPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
+
             {confirmPassword ?
-                <Text style={Form1.formContainer}>
+                <View style={{paddingHorizontal: 20}}>
                     {passwordMatchError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}>Not Match <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordMatchError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}>Match <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
-                </Text> : null
+                </View> : null
             }
-            <TextInput value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={true} style={Styles.textInput} />
-
+            {/* <TextInput value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={true} style={Styles.textInput} /> */}
+            <HStack alignItems={"center"} style={Styles.textInput}>
+                <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} value={confirmPassword} onChangeText={(password_value) => setConfirmPassword(password_value)} placeholder="Confirm New Password" secureTextEntry={!showCPass}/>
+                <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
+                    <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                </TouchableOpacity>
+            </HStack>
 
             {forgotPasswordLoading ?
                 <View style={Styles.loginBtn} activeOpacity={0.8}>

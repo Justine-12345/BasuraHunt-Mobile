@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Text, View, TextInput, ScrollView, TouchableOpacity, Image, Platform } from "react-native";
-import { VStack } from "native-base";
+import { HStack, VStack } from "native-base";
 import * as ImagePicker from 'expo-image-picker';
 import Form1 from "../../../stylesheets/form1";
-import { FontAwesome } from "@expo/vector-icons";
+import { FontAwesome, Ionicons } from "@expo/vector-icons";
 import SelectList from 'react-native-dropdown-select-list';
 import { Checkbox } from 'react-native-paper';
 import { useDispatch, useSelector } from "react-redux";
@@ -23,6 +23,9 @@ const Account = ({ navigation }) => {
     const [availableEmail, setAvailableEmail] = useState(null)
     const [passwordError, setPasswordError] = useState(null)
     const [passwordMatchError, setPasswordMatchError] = useState(null)
+
+	const [showPass, setShowPass] = useState(false);
+	const [showCPass, setShowCPass] = useState(false);
 
     const [user, setUser] = useState({
         email: '',
@@ -93,7 +96,8 @@ const Account = ({ navigation }) => {
             setAvailableEmail("invalid")
         }
 
-        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d#$@!%&*?]{8,30}$/
+        // const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d#$@!%&*?]{8,30}$/
+        const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d~`!@#$%^&*()-=_+{}\|;':",./<>?]{8,}$/
 
         if (password !== "" && passwordRegex.test(password) === false) {
             setPasswordError(true)
@@ -158,7 +162,7 @@ const Account = ({ navigation }) => {
                     {availableEmail === false ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Already Used <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
                     {availableEmail === "invalid" ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> This Email is Invalid Format <AntDesign name="exclamationcircle" size={12} color="red" /></Text> : ""}
                 </Text>
-                <TextInput onChangeText={(email_value) => { setUser({ ...user, ["email"]: email_value }) }} style={Form1.textInput} />
+                <TextInput autoCapitalize={"none"} onChangeText={(email_value) => { setUser({ ...user, ["email"]: email_value }) }} style={Form1.textInput} />
 
                 {/* alias/nickname */}
                 <Text style={Form1.label}>Alias/Nickname<Text style={{color:"red"}}>*</Text></Text>
@@ -169,15 +173,25 @@ const Account = ({ navigation }) => {
                     {passwordError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> Minimum 8 characters, at least one uppercase letter, one lowercase letter and one number <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}> Approved <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
                 </Text>
-                <TextInput onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={true} style={Form1.textInput} />
-
+                {/* <TextInput onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={true} style={Form1.textInput} /> */}
+                <HStack alignItems={"center"} style={Form1.textInput}>
+                    <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(password_value) => setUser({ ...user, ["password"]: password_value })} secureTextEntry={!showPass}/>
+                    <TouchableOpacity onPress={()=>setShowPass(!showPass)}>
+                        <Ionicons name={showPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                    </TouchableOpacity>
+                </HStack>
                 {/* confirm password */}
                 <Text style={Form1.label}>Confirm Password<Text style={{color:"red"}}>*</Text>
                     {passwordMatchError === true && password ? <Text style={{ color: "red", fontWeight: "700", fontSize: 11 }}> Not Match <AntDesign name="exclamationcircle" size={12} color="red" /> </Text> : ""}
                     {passwordMatchError === false && password ? <Text style={{ color: "green", fontWeight: "700", fontSize: 11 }}> Match <AntDesign name="checkcircle" size={12} color="green" /></Text> : ""}
                 </Text>
-                <TextInput onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={true} style={Form1.textInput} />
-
+                {/* <TextInput onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={true} style={Form1.textInput} /> */}
+                <HStack alignItems={"center"} style={Form1.textInput}>
+                    <TextInput autoCapitalize={"none"} style={{display: "flex", flex: 1, fontSize: 20}} onChangeText={(confirm_password_value) => setUser({ ...user, ["confirm_password"]: confirm_password_value })} secureTextEntry={!showCPass}/>
+                    <TouchableOpacity onPress={()=>setShowCPass(!showCPass)}>
+                        <Ionicons name={showCPass ? "eye-outline" : "eye-off-outline"} size={20}/>
+                    </TouchableOpacity>
+                </HStack>
 
                 {/* collector */}
                 {/* <TouchableOpacity style={Form1.formBtn1} activeOpacity={0.8}
@@ -186,7 +200,7 @@ const Account = ({ navigation }) => {
                     <Text style={Form1.btnLabel}>I am a garbage collector</Text>
                 </TouchableOpacity> */}
                 <Checkbox.Item
-                    label="I am a garbage collector"
+                    label="Check this if you are a Garbage Collector"
                     labelStyle={{
                         textAlign: "center"
                     }}

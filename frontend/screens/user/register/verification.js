@@ -369,17 +369,17 @@ const Verification = ({ navigation }) => {
             </VStack>
 
             <View style={Form1.bottom}>
-                <TouchableOpacity style={authLoading ? Form1.formBtnDisable : Form1.formBtn} activeOpacity={0.8}
-                    disabled={authLoading}
-                    onPress={() => { navigation.navigate('Account') }}>
-                    <Text style={Form1.btnLabel}>Back</Text>
-                </TouchableOpacity>
                 <TouchableOpacity style={agreed ? Form1.formBtn : Form1.formBtnDisable} activeOpacity={0.8}
                     // onPress={()=>{navigation.navigate('')}}
                     disabled={!agreed || authLoading}
                     onPress={submitHandle}
                 >
                     <Text style={Form1.btnLabel}>{authLoading ? <ActivityIndicator size="large" color="#00ff00" /> : "Submit"}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={authLoading ? Form1.formBtnDisable : Form1.formBtn} activeOpacity={0.8}
+                    disabled={authLoading}
+                    onPress={() => { navigation.navigate('Account') }}>
+                    <Text style={Form1.btnLabel}>Back</Text>
                 </TouchableOpacity>
             </View>
         </ScrollView>

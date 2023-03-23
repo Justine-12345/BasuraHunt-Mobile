@@ -6,7 +6,6 @@ import {
 import { HStack, VStack } from "native-base";
 import * as ImagePicker from 'expo-image-picker';
 import Form1 from "../../../stylesheets/form1";
-import Styles from "../../../stylesheets/styles";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import { FontAwesome } from "@expo/vector-icons";
 import SelectList from 'react-native-dropdown-select-list';
@@ -15,13 +14,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { manipulateAsync } from 'expo-image-manipulator';
 import { findEmail } from
     "../../../Redux/Actions/userActions";
-import { AntDesign } from '@expo/vector-icons';
 import { setRegAccountData } from
     "../../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
 import DatePicker from 'react-native-modern-datepicker';
 import { updateProfile, loadUser } from "../../../Redux/Actions/userActions";
 import { UPDATE_PROFILE_RESET } from "../../../Redux/Constants/userConstants";
+
+
 const ProfileUpdate = (props) => {
     const dispatch = useDispatch()
     const { error:updateError, isUpdated, loading: updateLoading, user: updatedUser } = useSelector(state => state.user)
@@ -302,11 +302,12 @@ const ProfileUpdate = (props) => {
                 <Text style={Form1.label}>Phone
                     Number</Text>
                 <TextInput
+                maxLength={user.phone_number.includes("+") ? 13 : 11}
                 value={user.phone_number !== "undefined"?user.phone_number:null}
                     onChangeText={(phone_number_value) => setUser({
                         ...user, ["phone_number"]: phone_number_value
                     })}
-                    keyboardType="numeric" style={Form1.textInput2} />
+                    keyboardType="phone-pad" style={Form1.textInput2} />
 
                 {/* house number */}
                 <Text
@@ -332,7 +333,7 @@ const ProfileUpdate = (props) => {
                         ["barangay"]: barangaySelect
                     })} />
 
-                <View style={Form1.bottom1}>
+                <View style={Form1.bottom}>
                     <TouchableOpacity style={Form1.formBtn}
                         activeOpacity={0.8}
                         // 
@@ -341,9 +342,7 @@ const ProfileUpdate = (props) => {
                         <Text style={Form1.btnLabel}>Save
                             Changes</Text>
                     </TouchableOpacity>
-
                 </View>
-
             </VStack>
 
 
