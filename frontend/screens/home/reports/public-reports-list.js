@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator, RefreshControl } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator, RefreshControl, Dimensions } from "react-native";
 import { HStack, VStack, Select } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -14,6 +14,7 @@ import LoadingList from "../../extras/loadingPages/loading-list";
 import { getSingleDump } from "../../../Redux/Actions/dumpActions";
 import { Skeleton } from "@rneui/themed";
 import { DUMP_PAGE_SET } from "../../../Redux/Constants/dumpConstants";
+const windowWidth = Dimensions.get('window').width;
 const PublicReportsList = ({ navigation }) => {
 
     const dispatch = useDispatch();
@@ -37,7 +38,7 @@ const PublicReportsList = ({ navigation }) => {
     const onRefresh = useCallback(() => {
         setRefreshing(true);
         setReports([])
-        // setCurrentPage(1)
+        setCurrentPage(1)
         dispatch(getDumps(keyword, 1, district, barangay, size, type, "true"));
         setTimeout(() => {
             setRefreshing(false);
@@ -251,9 +252,9 @@ const PublicReportsList = ({ navigation }) => {
                             <Text style={RandomStyle.vBadge}>{item.status === "newReport" ? "New Report" : item.status === "Unfinish" ? "Unfinished" : item.status}</Text>
                             <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                             <VStack>
-                                <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                <Text numberOfLines={1} style={[RandomStyle.lTitle, {width:windowWidth-230}]}>{item.complete_address}</Text>
                                 {/* item.additional_desciption change to item.addition_description */}
-                                <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption !== "null" ?
+                                <Text numberOfLines={1} style={[RandomStyle.lContent, {borderWidth:0}]}>{item.additional_desciption !== "null" || !item.additional_desciption ?
                                     item.additional_desciption : item.waste_type.map((wt) => {
                                         return (<Text key={wt.type}>{wt.type}&nbsp;</Text>)
                                     })
@@ -313,6 +314,7 @@ const PublicReportsList = ({ navigation }) => {
                 {filter == false ? null : <FilterOptions />}
             </View>
             {loading && currentPage === 1 ? <LoadingList /> : null}
+
             {reports && reports.length > 0 ?
 
                 <>

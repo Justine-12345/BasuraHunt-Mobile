@@ -34,7 +34,7 @@ const Verification = ({ navigation }) => {
             Toast.show({
                 type: 'error',
                 text1: 'Registered Error',
-                text2: 'Please try again later'
+                text2: authError
             });
         }
 

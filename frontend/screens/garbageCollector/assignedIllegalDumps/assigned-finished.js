@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator, Dimensions, RefreshControl } from "react-native";
 import { HStack, VStack, Select, Toast } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -9,7 +9,7 @@ import { Ionicons } from "@expo/vector-icons";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux'
 import { getDumps, getDumpList, allDumps } from '../../../Redux/Actions/dumpActions'
-
+const windowWidth = Dimensions.get('window').width;
 
 const AssignedFinished = ({ navigation }) => {
 
@@ -25,6 +25,7 @@ const AssignedFinished = ({ navigation }) => {
     const [size, setSize] = useState("");
     const [type, setType] = useState("");
     const [keyword, setKeyword] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const barangayList = [
         { value: "Bagumbayan" },
@@ -73,6 +74,14 @@ const AssignedFinished = ({ navigation }) => {
         { value: "Other" }
     ]
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch(getDumpList());
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+    
     useFocusEffect(
         useCallback(() => {
             if (error) {
@@ -97,7 +106,7 @@ const AssignedFinished = ({ navigation }) => {
             return () => {
 
             }
-        }, [dumps, error, keyword, currentPage, district, barangay, size, type])
+        }, [ error, keyword, currentPage, district, barangay, size, type])
     )
 
     useEffect(() => {
@@ -175,9 +184,9 @@ const AssignedFinished = ({ navigation }) => {
 
                                     <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                                     <VStack>
-                                        <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                        <Text numberOfLines={1} style={[RandomStyle.lTitle, {width:windowWidth-230}]}>{item.complete_address}</Text>
                                         {/* item.additional_desciption change to item.addition_description */}
-                                        <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                        <Text numberOfLines={1} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
                                         <View style={{ flex: 1, justifyContent: "flex-end", }}>
                                             <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
                                         </View>
@@ -206,6 +215,8 @@ const AssignedFinished = ({ navigation }) => {
             </View>
             {dumps && dumps.length > 0 ?
                 <FlatList
+                refreshControl={
+                    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                     data={dumps}
                     renderItem={reportsItem}
                     keyExtractor={item => item._id}

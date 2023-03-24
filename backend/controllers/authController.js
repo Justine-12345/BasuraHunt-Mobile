@@ -50,8 +50,9 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 	}
 	while (count_otp > 0);
 	
-	req.body.email = req.body.email.toLowerCase();
-
+	if(req.body.email){
+		req.body.email = req.body.email.toLowerCase();
+	}
 	const { first_name, middle_name, last_name, suffix, birthday, phone_number, gender, house_number, street, barangay, email, alias, password, jobDesc } = req.body;
 
 	let user
@@ -807,7 +808,10 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 //******Update User(Admin)******
 exports.updateUser = catchAsyncErrors(async (req, res, next) => {
 
-
+	let newEmail = req.body.email
+	if(req.body.email){
+		req.body.email.toLowerCase()
+	}
 
 	const newUserData = {
 		first_name: req.body.first_name,
@@ -820,7 +824,7 @@ exports.updateUser = catchAsyncErrors(async (req, res, next) => {
 		house_number: req.body.house_number,
 		street: req.body.street,
 		barangay: req.body.barangay,
-		email: req.body.email.toLowerCase(),
+		email: newEmail,
 		alias: req.body.alias,
 		password: req.body.password,
 		role: req.body.role,

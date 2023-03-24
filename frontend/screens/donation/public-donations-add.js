@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import { useFocusEffect } from "@react-navigation/native";
 import { Text, View, ScrollView, Image, TouchableOpacity, TextInput, Modal, Platform, ImagePickerIOS, ActivityIndicator, Dimensions } from "react-native";
-import { HStack, VStack, Select } from "native-base";
+import { HStack, VStack, Select, Checkbox } from "native-base";
 import RandomStyle from "../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -19,11 +20,12 @@ import RandomStringGenerator from "../extras/randomStringGenerator";
 const swearjarEng = require('swearjar-extended2');
 const swearjarFil = require('swearjar-extended2');
 const windowHeight = Dimensions.get('window').height;
+const windowWidth = Dimensions.get('window').width;
 const PublicReportsAdd = ({ navigation }) => {
 
     const dispatch = useDispatch();
     const { loading, error, success, item } = useSelector(state => state.newItem);
-    const additionalDescriptionMessage = "Important detail such as claiming date, the quantity of the donation, an explanation of your mission, and other relevant details to your donated item."
+    const additionalDescriptionMessage = "(Important detail such as claiming date, the quantity, an explanation of your mission, and other relevant details of your donation.)"
     const [modalVisible, setModalVisible] = useState(false);
     const [modalContent, setModalContent] = useState();
 
@@ -31,6 +33,7 @@ const PublicReportsAdd = ({ navigation }) => {
     const [additionalDescription, setAdditionalDescription] = useState('');
     const [itemTypes, setItemTypes] = useState([]);
     const [itemDesc, setItemDesc] = useState('');
+    const [modalVisibleDontsAndDos, setModalVisibleDontsAndDos] = useState(false);
     const [donateUsing, setDonateUsing] = useState('Real Name');
     const [status, setStatus] = useState('');
 
@@ -107,6 +110,33 @@ const PublicReportsAdd = ({ navigation }) => {
         setOpenImages(true);
         setImgIndex(index);
     }
+
+    const dontShowHandler = (value) => {
+        if (value) {
+            AsyncStorage.setItem("iUnderstandDonation", "true");
+        } else {
+            AsyncStorage.setItem("iUnderstandDonation", "false");
+        }
+    }
+
+
+    useFocusEffect(
+        useCallback(() => {
+
+            AsyncStorage.getItem("iUnderstandDonation")
+                .then((res) => {
+                    console.log("res", res)
+                    if (res === "false" || !res) {
+                        setModalVisibleDontsAndDos(true)
+                    }
+                })
+                .catch((error) => console.log(error))
+
+            return () => {
+                setModalVisibleDontsAndDos(false)
+            }
+        }, [])
+    )
 
 
     useEffect(() => {
@@ -221,6 +251,30 @@ const PublicReportsAdd = ({ navigation }) => {
                         <Text style={RandomStyle.vText1}>Donate items</Text>
                     </View>
 
+
+                    <Modal animationType="slide" transparent={true} visible={modalVisibleDontsAndDos} onRequestClose={() => setModalVisibleDontsAndDos(!modalVisibleDontsAndDos)}>
+                        <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }}>
+                            <ScrollView contentContainerStyle={RandomStyle.nfAddInfoModal}>
+                                <View style={RandomStyle.nfAddInfoModalView}>
+                                    <Image source={require('../../assets/donate_dos_donts_mobile_jw4h2b.png')} style={RandomStyle.nfAddInfoImg} />
+
+                                    <View style={{ position: "absolute", bottom: 8, width: windowWidth, alignItems: "center" }}>
+                                        <Checkbox size="sm" onChange={dontShowHandler} colorScheme="green" value="test">
+                                            <Text style={{ fontSize: 12 }}> Don't show it again</Text>
+                                        </Checkbox>
+
+                                        <BhButton medium onPress={() => setModalVisibleDontsAndDos(false)}>
+                                            <Text style={{ color: "white", fontSize: 10 }}>I Understand</Text>
+                                        </BhButton>
+                                    </View>
+                                </View>
+                            </ScrollView>
+                        </View>
+                    </Modal>
+
+
+
+
                     <Modal animationType="slide" transparent={true} visible={modalVisible} onRequestClose={() => setModalVisible(!modalVisible)}>
                             <View style={[RandomStyle.usModal, {  flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(0,0,0,0.5)' }]}>
                                 <View style={[RandomStyle.usPoints,{backgroundColor:"#1e5128"}]}>
@@ -300,8 +354,8 @@ const PublicReportsAdd = ({ navigation }) => {
 
                     <Text style={RandomStyle.vText2}>
                         Additional Details
-                        <Text style={{color: "#808080"}}  onPress={() => { additionalDetailsModal(additionalDescriptionMessage) }}>{message()}</Text>
                     </Text>
+                    <Text style={{fontStyle:"italic", color:"gray", fontSize:10}}>{additionalDescriptionMessage}</Text>
                     <View style={RandomStyle.vContainer2}>
                         <TextInput textAlignVertical="top" numberOfLines={3} style={Form1.textInput2} value={additionalDescription} onChangeText={(value) => { setAdditionalDescription(value) }} />
                     </View>

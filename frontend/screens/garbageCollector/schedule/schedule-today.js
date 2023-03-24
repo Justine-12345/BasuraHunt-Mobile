@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { FlatList, Text, View, TouchableOpacity } from "react-native";
+import { FlatList, Text, View, TouchableOpacity, RefreshControl } from "react-native";
 import { Button, HStack, VStack } from "native-base";
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
 import RandomStyle from "../../../stylesheets/randomStyle";
@@ -16,10 +16,20 @@ import { DUMP_DETAILS_RESET } from "../../../Redux/Constants/dumpConstants";
 import LoadingSchedule from "../../extras/loadingPages/loading-schedule";
 const CScheduleToday = ({ navigation }) => {
     const [userID, setUserID] = useState("");
+    const [refreshing, setRefreshing] = useState(false);
     const { isRefreshed, collectionPointsToday, loading } = useSelector(state => state.collectionPointsToday);
     let collectionPointsCount = 0;
     const dispatch = useDispatch();
     const { screen, object, message } = useSelector(state => state.pushNotification);
+
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch(getTodayCollectionPointList())
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
     useFocusEffect(
         useCallback(() => {
             let user;
@@ -30,9 +40,9 @@ const CScheduleToday = ({ navigation }) => {
                 })
                 .catch((error) => console.log(error))
 
-                console.log("collectionPointsToday",collectionPointsToday.length<=0)
+            console.log("collectionPointsToday", collectionPointsToday.length <= 0)
             // dispatch({ type: TODAY_COLLECTION_POINT_LIST_RESET })
-            if (collectionPointsToday.length<=0) {
+            if (collectionPointsToday.length <= 0) {
                 dispatch(getTodayCollectionPointList())
             }
             return () => {
@@ -60,7 +70,7 @@ const CScheduleToday = ({ navigation }) => {
 
     const getSched = (collection) => {
         let sched = [];
-        collection.forEach((item)=>{
+        collection.forEach((item) => {
             item.collectors.forEach((cp) => {
                 if (String(cp && cp.collector && cp.collector).trim() === String(userID && userID._id).trim()) {
                     sched.push(item);
@@ -240,6 +250,8 @@ const CScheduleToday = ({ navigation }) => {
                 <>
                     {getSched(collectionPointsToday) && getSched(collectionPointsToday).length > 0 ?
                         <FlatList
+                            refreshControl={
+                                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                             data={getSched(collectionPointsToday)}
                             renderItem={schedulesList}
                             keyExtractor={item => item._id}

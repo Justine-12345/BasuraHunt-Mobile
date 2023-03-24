@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, ActivityIndicator, Dimensions, RefreshControl } from "react-native";
 import { HStack, VStack, Select, Toast } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -10,6 +10,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { useDispatch, useSelector } from 'react-redux'
 import { getDumps, getDumpList } from '../../../Redux/Actions/dumpActions'
 import LoadingList from "../../extras/loadingPages/loading-list";
+const windowWidth = Dimensions.get('window').width;
 const AssignedList = ({ navigation }) => {
 
     const [userID, setUserID] = useState("");
@@ -24,6 +25,7 @@ const AssignedList = ({ navigation }) => {
     const [size, setSize] = useState("");
     const [type, setType] = useState("");
     const [keyword, setKeyword] = useState('');
+    const [refreshing, setRefreshing] = useState(false);
 
     const barangayList = [
         { value: "Bagumbayan" },
@@ -72,6 +74,14 @@ const AssignedList = ({ navigation }) => {
         { value: "Other" }
     ]
 
+    const onRefresh = useCallback(() => {
+        setRefreshing(true);
+        dispatch(getDumpList());
+        setTimeout(() => {
+            setRefreshing(false);
+        }, 2000);
+    }, []);
+
     useFocusEffect(
         useCallback(() => {
             if (error) {
@@ -95,7 +105,7 @@ const AssignedList = ({ navigation }) => {
             return () => {
 
             }
-        }, [ error, keyword, currentPage, district, barangay, size, type])
+        }, [error, keyword, currentPage, district, barangay, size, type])
     )
 
 
@@ -174,14 +184,22 @@ const AssignedList = ({ navigation }) => {
                                 <View style={RandomStyle.lContainer2}>
                                     <HStack>
                                         <Text style={RandomStyle.vBadge}> {item.status === "newReport" ? "New Report" :
-													item.status === "Unfinish" ? "Unfinished" :
-														item.status} </Text>
+                                            item.status === "Unfinish" ? "Unfinished" :
+                                                item.status} </Text>
 
                                         <Image source={{ uri: img.toString() }} resizeMode="cover" style={RandomStyle.lImg} />
                                         <VStack>
-                                            <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.complete_address}</Text>
+                                            <Text numberOfLines={1} style={[RandomStyle.lTitle, { width: windowWidth - 230 }]}>{item.complete_address}</Text>
                                             {/* item.additional_desciption change to item.addition_description */}
-                                            <Text numberOfLines={2} style={RandomStyle.lContent}>{item.additional_desciption}</Text>
+                                            <Text numberOfLines={1} style={RandomStyle.lContent}>
+                                                {item.additional_desciption !== "null" || !item.additional_desciption ?
+                                                    item.additional_desciption : item.waste_type.map((wt) => {
+                                                        return (<Text key={wt.type}>{wt.type}&nbsp;</Text>)
+                                                    })
+
+                                                }
+
+                                            </Text>
                                             <View style={{ flex: 1, justifyContent: "flex-end", }}>
                                                 <Text style={{ alignSelf: "flex-end" }}>{date}</Text>
                                             </View>
@@ -216,6 +234,8 @@ const AssignedList = ({ navigation }) => {
             <>
                 {dumps && dumps.length > 0 ?
                     <FlatList
+                        refreshControl={
+                            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
                         data={dumps}
                         renderItem={reportsItem}
                         keyExtractor={item => item._id}

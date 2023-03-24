@@ -16,7 +16,7 @@ let baseURL = '';
 
 {
     Platform.OS == 'android'
-    ? baseURL = 'http://192.168.0.10:4001/api/v1'
+    ? baseURL = 'http://192.168.100.60:4001/api/v1'
     : baseURL = 'http://localhost:4001/api/v1/'
 }
 

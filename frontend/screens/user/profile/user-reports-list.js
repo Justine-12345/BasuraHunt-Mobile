@@ -1,6 +1,6 @@
 import React, { useState, useCallback, useEffect } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, FlatList, TouchableOpacity, Image, TextInput, RefreshControl } from "react-native";
+import { Text, View, FlatList, TouchableOpacity, Image, TextInput, RefreshControl, Dimensions } from "react-native";
 import { HStack, VStack, Select } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import Empty1 from "../../../stylesheets/empty1";
@@ -10,6 +10,7 @@ import LoadingList from "../../extras/loadingPages/loading-list";
 import { getSingleDump } from "../../../Redux/Actions/dumpActions";
 import { Skeleton } from "native-base";
 import { USER_DUMP_PAGE_SET } from "../../../Redux/Constants/userConstants";
+const windowWidth = Dimensions.get('window').width;
 const UserReportsList = (props) => {
     const dispatch = useDispatch()
     const sampleReports = require("../../../assets/sampleData/dumps.json");
@@ -134,9 +135,9 @@ const UserReportsList = (props) => {
                                     <Image source={{ uri: item.dump.images[0].url.toString() }} resizeMode="cover" style={RandomStyle.lImg} /> :
                                     <Image source={{ uri: "https://res.cloudinary.com/basurahunt/image/upload/v1659267361/BasuraHunt/Static/288365377_590996822453374_4511488390632883973_n_1_odzuj0.png" }} resizeMode="stretch" style={RandomStyle.lImg} />}
                                 <VStack>
-                                    <Text numberOfLines={1} style={RandomStyle.lTitle}>{item.dump.complete_address}</Text>
+                                    <Text numberOfLines={1} style={[RandomStyle.lTitle, {width:windowWidth-230}]}>{item.dump.complete_address}</Text>
                                     {/* item.additional_desciption change to item.addition_description */}
-                                    <Text numberOfLines={2} style={RandomStyle.lContent}>
+                                    <Text numberOfLines={1} style={RandomStyle.lContent}>
 
                                         {item.dump.additional_desciption !== "null" ?
                                             item.dump.additional_desciption : item.dump.waste_type.map((wt) => {
