@@ -41,6 +41,7 @@ const AssignedAccomplished = (props) => {
     const lati = props.route.params.lati
     const purokParams = props.route.params.purok
     const dumpBarangay = props.route.params.barangay
+    const alias = props.route.params.alias
     const { latitude: mapLatitude, longitude: mapLongtitude } = useSelector(state => state.coordinate)
     const { isDeleted, isUpdatedStatus, error: upDelError, loading: dumpLoading } = useSelector(state => state.dump)
     const { loading, success, dump, error } = useSelector(state => state.newDump)
@@ -131,11 +132,11 @@ const AssignedAccomplished = (props) => {
 
             let notifTitle = "Congratulations! Your reported illegal dump has been cleaned"
 
-            NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
+            NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id, user_id: { alias: alias } })
 
             if (role === "newUser") {
                 const notifTitle1 = "Congratulations you are now a verified user."
-                NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'illegalDump-update-status', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id })
+                NotificationSender(notifTitle, user && user._id, user_id, dumpBarangay, 'user-verified', notifCode, { coordinates: { longtitude: long, latitude: lati }, _id: id, user_id: { alias: alias }})
 
             }
 

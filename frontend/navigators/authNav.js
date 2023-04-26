@@ -6,6 +6,7 @@ import RegisterNav from "./registerNav";
 import Main from "./main";
 // import OTP from "../screens/user/otp-temp";
 import OTP from "../screens/user/otp";
+import ResetEmail from "../screens/user/reset-email";
 import IntroLoading from "../screens/extras/IntroLoading";
 import ForgotPassword from "../screens/user/forgot-password";
 import ResetPassword from "../screens/user/reset-password";
@@ -70,6 +71,14 @@ function MyStack() {
             <Stack.Screen
                 name="OTP"
                 component={OTP}
+                options={{
+                    headerShown: false
+                }}
+            />
+
+            <Stack.Screen
+                name="ResetEmail"
+                component={ResetEmail}
                 options={{
                     headerShown: false
                 }}

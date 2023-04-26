@@ -193,34 +193,64 @@ const PublicReportsAdd = ({ navigation }) => {
         // console.log(donateUsing)
         // console.log(itemTypes)
 
-        const formData = new FormData();
-
-        formData.append("name", name);
-
-        swearjarEng.setLang("en");
-        const cleanAddDescEng = swearjarEng.censor(additionalDescription);
-        swearjarFil.setLang("ph");
-        const cleanAddDescFil = swearjarEng.censor(cleanAddDescEng);
-
-        formData.append("addional_desciption", cleanAddDescFil);
-        if (itemTypes.includes("Other")) {
-            formData.append("item_desc", itemDesc);
-        } else {
-            formData.append("item_desc", "");
+        if (images.length === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Empty Images',
+                text2: 'Please put image/s'
+            });
         }
+        else if (itemTypes.length === 0) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Item Types',
+                text2: 'Please choose item type/s'
+            });
+        }
+        else if (!name) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Item Name',
+                text2: 'Please enter a valid value for item name'
+            });
+        }
+        else if (!additionalDescription) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Additional Details',
+                text2: 'Please enter a valid value for additional details'
+            });
+        }
+        else {
+            const formData = new FormData();
 
-        images.forEach(image => {
-            formData.append('images', image)
-        })
+            formData.append("name", name);
 
-        itemTypes.forEach(it => {
-            formData.append('item_types', it)
-        })
+            swearjarEng.setLang("en");
+            const cleanAddDescEng = swearjarEng.censor(additionalDescription);
+            swearjarFil.setLang("ph");
+            const cleanAddDescFil = swearjarEng.censor(cleanAddDescEng);
 
-        formData.append("donate_using", "Real name")
-        formData.append('notifCode', notifCode);
-        // console.log(formData)
-        dispatch(addItem(formData))
+            formData.append("addional_desciption", cleanAddDescFil);
+            if (itemTypes.includes("Other")) {
+                formData.append("item_desc", itemDesc);
+            } else {
+                formData.append("item_desc", "");
+            }
+
+            images.forEach(image => {
+                formData.append('images', image)
+            })
+
+            itemTypes.forEach(it => {
+                formData.append('item_types', it)
+            })
+
+            formData.append("donate_using", "Real name")
+            formData.append('notifCode', notifCode);
+            // console.log(formData)
+            dispatch(addItem(formData))
+        }
     }
 
     const message = () => {
@@ -326,7 +356,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Type of Donation</Text>
+                    <Text style={RandomStyle.vText2}>Type of Donation<Text style={{color:"red"}}>*</Text></Text>
                     <View style={RandomStyle.vContainer2}>
                         <CheckboxBtn isChecked={itemTypes.includes("Food")} onPress={(e) => { !itemTypes.includes("Food") ? setItemTypes(oldArray => [...oldArray, "Food"]) : setItemTypes(itemTypes.filter(type => type !== "Food")) }} >
                             <Text style={{ color: "white" }}>Food</Text>
@@ -347,7 +377,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         }
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Item Name:  </Text>
+                    <Text style={RandomStyle.vText2}>Item Name<Text style={{color:"red"}}>*</Text> </Text>
                     <View style={RandomStyle.vContainer2}>
                         <TextInput placeholder="..." style={Form1.textInput2} value={name} onChangeText={(value) => { setName(value) }} />
                     </View>

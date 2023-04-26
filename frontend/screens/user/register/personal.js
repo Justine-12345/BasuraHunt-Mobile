@@ -46,6 +46,12 @@ const Personal = ({ navigation }) => {
         setUser({ ...user, [e.target.name]: e.target.value })
     }
 
+    const getAge = (d1, d2) => {
+        d2 = d2 || new Date();
+        var diff = d2.getTime() - d1.getTime();
+        return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
+    }
+
     const nextHandle = () => {
 
         // **** ___Add Filters here
@@ -68,6 +74,13 @@ const Personal = ({ navigation }) => {
                 type: 'error',
                 text1: 'Invalid Birthday',
                 text2: 'Please enter a valid value for birthday'
+            });
+        }
+        else if (getAge(new Date(birthday)) < 18) {
+            Toast.show({
+                type: 'error',
+                text1: 'Invalid Birthday',
+                text2: 'You Must be 18 years old or above to use this app'
             });
         }
         // else if (!phone_number) {

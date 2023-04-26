@@ -260,7 +260,7 @@ const AssignedView = (props) => {
 
     const updateDumpStatusHandler = (new_status) => {
         if (new_status === "Cleaned") {
-            props.navigation.navigate('AssignedAccomplished', { purok: dump && dump.purok, status: status, id: dump && dump._id, room: dump && dump.chat_id && dump.chat_id.room, role: dump && dump.user_id && dump.user_id.role, user_id: dump && dump.user_id && dump.user_id._id, barangay: dump && dump.barangay, long: dump && dump.coordinates && dump.coordinates.longtitude, lati: dump && dump.coordinates && dump.coordinates.latitude });
+            props.navigation.navigate('AssignedAccomplished', { purok: dump && dump.purok, status: status, id: dump && dump._id, room: dump && dump.chat_id && dump.chat_id.room, role: dump && dump.user_id && dump.user_id.role, alias: dump && dump.user_id && dump.user_id.first_name, user_id: dump && dump.user_id && dump.user_id._id, barangay: dump && dump.barangay, long: dump && dump.coordinates && dump.coordinates.longtitude, lati: dump && dump.coordinates && dump.coordinates.latitude });
         } else {
             setNewStatus(new_status)
             if (status !== new_status) {
@@ -419,11 +419,11 @@ const AssignedView = (props) => {
 
 
 
-                                <Text style={[RandomStyle.vText2, { marginVertical: 10, position:"relative", bottom:10 }]}>Status: </Text>
+                                <Text style={[RandomStyle.vText2, { marginVertical: 10, position: "relative", bottom: 10 }]}>Status: </Text>
                                 {status === "Cleaned" ?
                                     <>
                                         {dump && dump.date_cleaned ?
-                                            <Text style={{borderWidth:1, borderColor:"white"}}>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump && dump.score / 10} /></Text> :
+                                            <Text style={{ borderWidth: 1, borderColor: "white" }}>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {`after ${getCleanedDuration()}`} <Star rate={dump && dump.score / 10} /></Text> :
                                             <Text>{status === "newReport" ? "New Report" : status === "Unfinish" ? "Unfinished" : status} {status === "newReport" ? "" : `approximately ${dump && dump.approxDayToClean} `} {status === "newReport" ? "" : dump && dump.approxDayToClean <= 1 ? "day" : "days"}  {status === "newReport" ? "" : "to clean"}</Text>
                                         }
 
