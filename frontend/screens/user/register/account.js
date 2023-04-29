@@ -115,7 +115,7 @@ const Account = ({ navigation }) => {
     }, [count, email, password, confirm_password])
 
     const nextHandle = () => {
-
+      
         // **** ___Add Filter here
 
         if (!email) {

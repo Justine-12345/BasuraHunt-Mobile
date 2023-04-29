@@ -6,7 +6,7 @@ import { VStack, Input } from "native-base";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
-import { checkOtp, refreshOtp, clearErrors } from "../../Redux/Actions/userActions";
+import { checkOtp, refreshOtp, clearErrors, loadUser } from "../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -54,6 +54,7 @@ const OTP = ({ navigation }) => {
 
 
     useFocusEffect(useCallback(() => {
+        dispatch(loadUser());
         registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
     }, []))
 
@@ -65,32 +66,7 @@ const OTP = ({ navigation }) => {
     useFocusEffect(
         useCallback(() => {
 
-            // AsyncStorage.getItem("user")
-            //     .then((res) => {
-            //         setUser(JSON.parse(res))
-            //     })
-            //     .catch((error) => console.log(error))
-
-            // if ((user && user.otp_status === "Verified") && user && user.role !== "administrator" || user && user.role !== "barangayAdministrator") {
-            //     if (isAuthenticated) {
-            //         Toast.show({
-            //             type: 'success',
-            //             text1: 'Registered Successfully',
-            //             text2: 'Welcome To BasuraHunt, you can log in now'
-            //         });
-
-            //         navigation.dispatch(
-            //             CommonActions.reset({
-            //                 index: 1,
-            //                 routes: [
-            //                     { name: 'Main' }
-            //                 ],
-            //             })
-            //         );
-
-            //         navigation.navigate('Main')
-            //     }
-            // }
+       
 
             if (authError) {
                 Toast.show({

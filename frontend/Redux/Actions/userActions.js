@@ -130,13 +130,13 @@ export const register = (userData) => async (dispatch) => {
         })
 
     } catch (error) {
-        console.log('There has been a problem with your fetch operation: ' + error.message);
+        console.log('There has been a problem with your fetch operation: ' + error);
         // ADD THIS THROW error
-        throw error;
-        // dispatch({
-        //     type: REGISTER_USER_FAIL,
-        //     payload: error.response.data.message
-        // })
+        // throw error;
+        dispatch({
+            type: REGISTER_USER_FAIL,
+            payload: error.response.data.message
+        })
     }
 }
 

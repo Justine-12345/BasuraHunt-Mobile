@@ -53,7 +53,7 @@ const Personal = ({ navigation }) => {
     }
 
     const nextHandle = () => {
-
+      
         // **** ___Add Filters here
 
         if (!first_name) {

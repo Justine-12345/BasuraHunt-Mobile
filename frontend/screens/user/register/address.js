@@ -55,7 +55,7 @@ const Address = ({ navigation }) => {
     ];
 
     const nextHandle = () => {
-
+       
         // **** ___Add Filter here
 
         if (!house_number) {

@@ -342,7 +342,7 @@ const Verification = ({ navigation }) => {
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
             <VStack style={Form1.formContainer}>
-                <ScrollView stickyHeaderIndices={[0]} style={{height:height/2}} >
+                <ScrollView nestedScrollEnabled stickyHeaderIndices={[0]} style={{height:height/2}} >
                     <View style={{backgroundColor: "#f7faf7", paddingHorizontal: 10}}>
                         <Text style={{ fontWeight: "bold", fontSize: 20 }}>TERMS AND CONDITIONS</Text>
                     </View>
