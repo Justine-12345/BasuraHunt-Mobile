@@ -176,8 +176,7 @@ export const refreshOtp = () => async (dispatch) => {
 
         dispatch({ type: REFRESH_OTP_REQUEST })
 
-
-        const { data } = await axios.put('/api/v1/otp/update')
+        const { data } = await axios.put(`${baseURL}/otp/update/`)
 
         dispatch({
             type: REFRESH_OTP_SUCCESS,

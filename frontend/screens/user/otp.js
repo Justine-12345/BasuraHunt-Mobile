@@ -6,7 +6,7 @@ import { VStack, Input } from "native-base";
 import { useSelector, useDispatch } from "react-redux";
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { useFocusEffect, CommonActions } from "@react-navigation/native";
-import { checkOtp, clearErrors } from "../../Redux/Actions/userActions";
+import { checkOtp, refreshOtp, clearErrors } from "../../Redux/Actions/userActions";
 import Toast from 'react-native-toast-message';
 import * as Notifications from 'expo-notifications';
 import * as Device from 'expo-device';
@@ -181,10 +181,33 @@ const OTP = ({ navigation }) => {
         }
     }
 
+    const resendOTP = () => {
+        dispatch(refreshOtp())
+
+        Toast.show({
+            type: 'success',
+            text1: 'Successfully Resent OTP',
+            text2: 'Code successfully sent to your email'
+        });
+    }
+
+    const navigateResetEmail = () => {
+        navigation.dispatch(
+            CommonActions.reset({
+                index: 1,
+                routes: [
+                    { name: 'ResetEmail' }
+                ],
+            })
+        );
+        navigation.navigate('ResetEmail')
+    }
+
     return (
         <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
 
             <VStack style={Form1.formContainer}>
+                {console.log(authUser && authUser._id)}
                 <Text style={Form1.title}>Enter 6-digit code</Text>
                 <Text style={[Form1.sub, { marginVertical: 20 }]}>Your code was sent to {authUser && authUser.email}</Text>
                 <View style={Form1.otpContainer}>
@@ -195,12 +218,15 @@ const OTP = ({ navigation }) => {
                     /> */}
                 </View>
                 {/* refresh OTP */}
-                <TouchableOpacity style={{ alignSelf: "flex-end" }}>
+                <TouchableOpacity onPress={resendOTP} style={{ alignSelf: "flex-end" }}>
                     <Text>Resend Code</Text>
                 </TouchableOpacity>
             </VStack>
 
             <View style={Form1.bottom}>
+                <TouchableOpacity onPress={navigateResetEmail} style={Form1.formBtn} activeOpacity={0.8}>
+                    <Text style={Form1.btnLabel}>Change Email</Text>
+                </TouchableOpacity>
                 <TouchableOpacity onPress={submitHandle} style={Form1.formBtn} activeOpacity={0.8}
                 >
                     <Text style={Form1.btnLabel}>Submit</Text>
