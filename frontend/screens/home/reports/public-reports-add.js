@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useFocusEffect } from "@react-navigation/native";
-import { Text, View, ScrollView, Image, TouchableOpacity, FlatList, TextInput, Platform, ImagePickerIOS, StyleSheet, Dimensions, Switch, ActivityIndicator, Modal } from "react-native";
+import { Text, View, ScrollView, Image, TouchableOpacity, FlatList, TextInput, Platform, ImagePickerIOS, StyleSheet, Dimensions, Switch, ActivityIndicator, Modal, Pressable } from "react-native";
 import { HStack, VStack, Select, Checkbox } from "native-base";
 import RandomStyle from "../../../stylesheets/randomStyle";
 import ImageView from "react-native-image-viewing";
@@ -37,6 +37,7 @@ const PublicReportsAdd = ({ navigation }) => {
     let longitude = 0
     let latitude = 0
     const [notifCode, setNotifCode] = useState('')
+    const [purpose, setPurpose] = useState(false)
     const [isDontShow, setIsDontShow] = useState(false);
     const [openImages, setOpenImages] = useState(false);
     const [imgIndex, setImgIndex] = useState(0);
@@ -113,9 +114,9 @@ const PublicReportsAdd = ({ navigation }) => {
         "Western Bicutan",
     ]
 
-    useEffect(()=>{
+    useEffect(() => {
         setComplete_address(address)
-    },[address])
+    }, [address])
 
     useEffect(() => {
         setNotifCode(RandomStringGenerator(40))
@@ -340,22 +341,22 @@ const PublicReportsAdd = ({ navigation }) => {
             return (
                 <ScrollView>
                     <View>
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>1. <View style={{ backgroundColor: "#5b9f2e", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View> Biodegradable Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste can be decomposed easily by microorganisms and can be used as fertilizer if handled properly. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> food waste, animal entrails, eggshell (any soft shells), seeds, leaves, small animal carcasses.</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>1. <View style={{ backgroundColor: "#5b9f2e", height: 20, width: 20, borderRadius: 10, borderWidth: 2 }}></View> Biodegradable Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste can be decomposed easily by microorganisms and can be used as fertilizer if handled properly. <Text style={{ fontStyle: 'italic' }}><Text style={{ fontWeight: "900" }}>Examples:</Text> food waste, animal entrails, eggshell (any soft shells), seeds, leaves, small animal carcasses.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>2. <View style={{ backgroundColor: "#2b71a4", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Non-Biodegradable Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste is free from contamination and can be recycled to produce a beneficial use. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> aluminum, tin cans, boxes, plastic, plastic bottles, glass, newspapers.</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>2. <View style={{ backgroundColor: "#2b71a4", height: 20, width: 20, borderRadius: 10, borderWidth: 2 }}></View>Non-Biodegradable Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>This type of waste is free from contamination and can be recycled to produce a beneficial use. <Text style={{ fontStyle: 'italic' }}><Text style={{ fontWeight: "900" }}>Examples:</Text> aluminum, tin cans, boxes, plastic, plastic bottles, glass, newspapers.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>3. <View style={{ backgroundColor: "#c90421", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Special Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Applies to harmful household wastes. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> batteries, thinner, paints, light bulbs, pesticides, gas tanks, household cleaners, worn-out electrical wires.</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>3. <View style={{ backgroundColor: "#c90421", height: 20, width: 20, borderRadius: 10, borderWidth: 2 }}></View>Special Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Applies to harmful household wastes. <Text style={{ fontStyle: 'italic' }}><Text style={{ fontWeight: "900" }}>Examples:</Text> batteries, thinner, paints, light bulbs, pesticides, gas tanks, household cleaners, worn-out electrical wires.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>4. <View style={{ backgroundColor: "#181818", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Residual Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Pertains to waste that cannot be recycled or composted. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> sanitary napkin, disposable diapers, tampon, sachet of chips, plastic-lined cartons (milk, juice), rugs, tissue, cigarette butts.</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>4. <View style={{ backgroundColor: "#181818", height: 20, width: 20, borderRadius: 10, borderWidth: 2 }}></View>Residual Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Pertains to waste that cannot be recycled or composted. <Text style={{ fontStyle: 'italic' }}><Text style={{ fontWeight: "900" }}>Examples:</Text> sanitary napkin, disposable diapers, tampon, sachet of chips, plastic-lined cartons (milk, juice), rugs, tissue, cigarette butts.</Text></Text>
 
-                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>5. <View style={{ backgroundColor: "#ffe200", height: 20, width: 20, borderRadius: 10,  borderWidth:2 }}></View>Hazardous Waste</Text>
-                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Type of waste that is most commonly produced by hospitals, clinics, or companies that produce chemicals. <Text style={{ fontStyle: 'italic' }}><Text style={{fontWeight:"900"}}>Examples:</Text> hospital waste, disposable syringe, PPE, bandages, mercury thermometer.</Text></Text>
+                        <Text style={{ color: "white", fontSize: 16, fontWeight: "bold", }}>5. <View style={{ backgroundColor: "#ffe200", height: 20, width: 20, borderRadius: 10, borderWidth: 2 }}></View>Hazardous Waste</Text>
+                        <Text style={{ color: "white", fontSize: 14, marginLeft: 24 }}>Type of waste that is most commonly produced by hospitals, clinics, or companies that produce chemicals. <Text style={{ fontStyle: 'italic' }}><Text style={{ fontWeight: "900" }}>Examples:</Text> hospital waste, disposable syringe, PPE, bandages, mercury thermometer.</Text></Text>
 
-                       
+
 
                     </View>
                 </ScrollView>
@@ -496,15 +497,23 @@ const PublicReportsAdd = ({ navigation }) => {
                     </Modal>
 
 
-                    <View onTouchStart={(e) => {
-                        const purpose = e.target._internalFiberInstanceHandleDEV.memoizedProps.purpose
-                        if (purpose === undefined) {
-                            setAddDetFocus(false)
-                        } else {
-                            setAddDetFocus(true)
-                        }
+                    <Pressable
 
-                    }} style={RandomStyle.vContainer}>
+                        onPress={(e) => {
+                            // const purpose = e.target._internalFiberInstanceHandleDEV.memoizedProps.purpose
+                            // console.log("purpose",purpose)
+                            // setPurpose(false)
+                            // if (purpose === undefined) {
+
+                            // } else {
+                            //     setAddDetFocus(true)
+                            // }
+                            setAddDetFocus(false)
+                            setPurpose(false)
+                            console.log("purpose", purpose)
+                        }}
+
+                        style={RandomStyle.vContainer}>
 
                         <Modal
                             animationType="slide"
@@ -613,16 +622,16 @@ const PublicReportsAdd = ({ navigation }) => {
                                 </View>
 
                                 <VStack>
-                                    <Text style={RandomStyle.vText2}>Complete Location Address<Text style={{color:"red"}}>*</Text></Text>
-                                    <Text style={{fontStyle:"italic", color:"gray", fontSize:10}}>(You can manually type the address if it is not accurate)</Text>
+                                    <Text style={RandomStyle.vText2}>Complete Location Address<Text style={{ color: "red" }}>*</Text></Text>
+                                    <Text style={{ fontStyle: "italic", color: "gray", fontSize: 10 }}>(You can manually type the address if it is not accurate or blank)</Text>
                                     <TextInput keyboardShouldPersistTaps="true" value={complete_address} onChangeText={(complete_address_value) => { setComplete_address(complete_address_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
                                 <VStack>
-                                    <Text style={RandomStyle.vText2}>Nearest Landmark<Text style={{color:"red"}}>*</Text> </Text>
+                                    <Text style={RandomStyle.vText2}>Nearest Landmark<Text style={{ color: "red" }}>*</Text> </Text>
                                     <TextInput keyboardShouldPersistTaps="true" value={landmark} onChangeText={(landmark_value) => { setLandmark(landmark_value) }} placeholder="..." style={Form1.textInput2} />
                                 </VStack>
 
-                                <Text style={RandomStyle.vText2}>Barangay<Text style={{color:"red"}}>*</Text></Text>
+                                <Text style={RandomStyle.vText2}>Barangay<Text style={{ color: "red" }}>*</Text></Text>
                                 <Select
                                     keyboardShouldPersistTaps="true"
                                     selectedValue={barangay}
@@ -681,7 +690,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         </> :
                             <>
                                 <HStack style={{ marginVertical: 8 }} >
-                                    <Text style={RandomStyle.vText2}>Type of Waste<Text style={{color:"red"}}>*</Text></Text>
+                                    <Text style={RandomStyle.vText2}>Type of Waste<Text style={{ color: "red" }}>*</Text></Text>
                                     <TouchableOpacity style={{ position: "relative", top: 0 }} onPress={() => {
                                         setModalContentIndex(1);
                                         setModalVisible(true)
@@ -759,7 +768,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
 
                                 {addDetFocus && suggestionsValues.filter(obj => Object.values(obj).some(val => val.includes(additional_desciption))).length >= 1 ?
-                                    <View purpose={"Text"} style={{ maxHeight: 200, borderWidth: 1, borderColor: "#c7c7c7", borderRadius: 10 }} onPress={() => setAddDetFocus(true)}>
+                                    <View style={{ maxHeight: 200, borderWidth: 1, borderColor: "#c7c7c7", borderRadius: 10 }} onTouchStart={() => setPurpose(true)} onPress={() => setAddDetFocus(true)}>
 
 
                                         <ScrollView keyboardShouldPersistTaps='always' nestedScrollEnabled={true}>
@@ -769,7 +778,7 @@ const PublicReportsAdd = ({ navigation }) => {
                                                         setAdditional_desciption(item.title)
                                                         setAddDetFocus(false)
                                                     }} key={item.id} style={{ paddingHorizontal: 5, paddingVertical: 10, borderBottomWidth: 1, borderColor: "#c7c7c7" }}>
-                                                        <Text purpose={"Text"} >{item.title}</Text>
+                                                        <Text onTouchStart={() => setPurpose(true)} >{item.title}</Text>
                                                     </TouchableOpacity>
                                                 )
                                             })}
@@ -778,7 +787,15 @@ const PublicReportsAdd = ({ navigation }) => {
 
                                     </View> : ""
                                 }
-                                <TextInput value={additional_desciption} purpose={"Text"} onFocus={() => setAddDetFocus(true)} onChangeText={(additional_desciption_value) => { setAdditional_desciption(additional_desciption_value) }} textAlignVertical="top" numberOfLines={1} style={Form1.textInput2} />
+                                <TextInput value={additional_desciption} onTouchStart={() => {
+                                    setPurpose(true)
+                                    setAddDetFocus(true)
+                                }} onFocus={() => setAddDetFocus(true)} onChangeText={(additional_desciption_value) => {
+                                    setAdditional_desciption(additional_desciption_value)
+                                    setPurpose(true)
+                                    setAddDetFocus(true)
+                                }
+                                } textAlignVertical="top" numberOfLines={1} style={Form1.textInput2} />
 
 
 
@@ -842,7 +859,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         }
                         {/* ===== */}
 
-                    </View>
+                    </Pressable>
 
 
 

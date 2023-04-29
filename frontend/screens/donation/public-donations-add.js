@@ -326,7 +326,7 @@ const PublicReportsAdd = ({ navigation }) => {
 
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Type of Donation</Text>
+                    <Text style={RandomStyle.vText2}>Type of Donation<Text style={{color:"red"}}>*</Text></Text>
                     <View style={RandomStyle.vContainer2}>
                         <CheckboxBtn isChecked={itemTypes.includes("Food")} onPress={(e) => { !itemTypes.includes("Food") ? setItemTypes(oldArray => [...oldArray, "Food"]) : setItemTypes(itemTypes.filter(type => type !== "Food")) }} >
                             <Text style={{ color: "white" }}>Food</Text>
@@ -347,7 +347,7 @@ const PublicReportsAdd = ({ navigation }) => {
                         }
                     </View>
 
-                    <Text style={RandomStyle.vText2}>Item Name:  </Text>
+                    <Text style={RandomStyle.vText2}>Item Name<Text style={{color:"red"}}>*</Text> </Text>
                     <View style={RandomStyle.vContainer2}>
                         <TextInput placeholder="..." style={Form1.textInput2} value={name} onChangeText={(value) => { setName(value) }} />
                     </View>
