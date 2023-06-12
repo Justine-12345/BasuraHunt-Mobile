@@ -200,6 +200,10 @@ exports.getCollectionPoints = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
+
+
+	console.log("req.body",req.body)
+
 	const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday",
 		"Saturday"];
 
@@ -240,11 +244,13 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	let collectors = [];
 
 	if (typeof req.body.collectors == "string") {
+		console.log("req.body.collectors",req.body.collectors)
 		collectors.push({ collector: req.body.collectors })
 	}
 	else {
 		for (let i = 0; i < req.body.collectors.length; i++) {
 			const collector = req.body.collectors[i];
+			console.log("collector",collector)
 			collectors.push({ collector })
 		}
 	}
@@ -334,6 +340,9 @@ exports.newCollectionPoint = catchAsyncErrors(async (req, res, next) => {
 	if(req.user.role == "barangayAdministrator") {
 		user_id = req.user.id;
 		user_role = "barangayAdministrator";
+	}else{
+		user_id = req.user.id;
+		user_role = "administrator";
 	}
 
 	const { name, startTime, endTime, barangay, type, status } = req.body;
